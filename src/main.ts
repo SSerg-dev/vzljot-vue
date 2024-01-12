@@ -62,3 +62,5 @@ import VButton from './components/Inputs/VButton.vue'
 app.component('RecursiveNode', RecursiveNode).component('PropsComponent', PropsComponent).component('Spinner', Spinner).component('TransitionExpand', TransitionExpand).component('VButton', VButton)
 
 app.mount('#app')
+
+// test commit
