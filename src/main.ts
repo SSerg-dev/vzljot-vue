@@ -63,4 +63,3 @@ app.component('RecursiveNode', RecursiveNode).component('PropsComponent', PropsC
 
 app.mount('#app')
 
-// test commit
