@@ -1,0 +1,31 @@
+.chart-tooltip {
+  position: absolute;
+  display: none;
+  border: 1px solid lightslategrey;
+  background: #fff;
+  color: darkslategrey;
+  overflow: hidden;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.chart-tooltip .title {
+  white-space: nowrap;
+  background-color: #ecf0f6;
+  padding: 0.5rem;
+  text-align: center;
+  font-weight: bold;
+}
+
+.chart-tooltip .grid {
+  display: grid;
+  grid-template-columns: max-content 1fr;
+  gap: 5px;
+  align-items: center;
+  padding: 0.5rem;
+}
+
+.chart-tooltip .name {
+  justify-self: end;
+  font-size: 0.8rem;
+}

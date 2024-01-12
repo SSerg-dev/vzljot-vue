@@ -1,0 +1,22 @@
+﻿.leaflet-container {
+  font: 12px 'Segoe UI', Helvetica, 'Droid Sans', Tahoma, Geneva, sans-serif;
+  color: #333333;
+}
+
+.leaflet-control-zoom a {
+  color: lightslategrey;
+}
+
+.leaflet-touch .leaflet-bar {
+  border: none;
+  box-shadow: 0 3px 14px rgba(0, 0, 0, 0.4);
+}
+
+.custom .leaflet-popup-tip,
+.custom .leaflet-popup-content-wrapper {
+  border-radius: 3px;
+}
+
+.custom a.leaflet-popup-close-button {
+  color: lightslategrey;
+}
