@@ -38,7 +38,7 @@
       ></path>
       <text
         :x="viewBox.width / 2"
-        :y="viewBox.height / 2"
+        :y="viewBox.height / 1.5"
         dy=".3em"
         style="text-anchor: middle"
       >
@@ -64,7 +64,7 @@ export default {
       },
       text: '',
       strokeWidth: 25,
-      strokeWidthSelected: 30,
+      strokeWidthSelected: 35,
     }
   },
   computed: {
@@ -74,8 +74,8 @@ export default {
     pathes() {
       let angle = 0
       let centerX = this.viewBox.width / 2
-      let centerY = this.viewBox.height / 2
-      return this.values.map((value) => {
+      let centerY = this.viewBox.height / 1.5
+        return this.values.map((value) => {
         let largeArcFlag = value.percent * 360 <= 180 ? '0' : '1'
         let start = this.polarToCartesian(centerX, centerY, this.radius, angle)
         angle += value.percent * 360
