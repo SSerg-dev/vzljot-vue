@@ -26,15 +26,9 @@
           class="container-item"
         >
           <pie-chart
-            :values="pointListsPieChart"
+            :values="pointListsPieChart[index]"
             :statuses="statuses"
           ></pie-chart>
-          <!-- $serg -->
-          <ul>
-            <li v-for="stat in point.statistic" :key="stat.key">
-              {{ stat.key }}: {{ stat.value }}
-            </li>
-          </ul>
 
           <template #footer>
             <div class="footer" v-if="time" title="Update Time">
@@ -70,12 +64,6 @@
           class="container-item"
         >
           <pie-chart :values="equips" :statuses="statuses"></pie-chart>
-          <!-- $serg -->
-          <!-- <ul>
-            <li v-for="stat in equip.statistic" :key="stat.key">
-              {{ stat.key }}: {{ stat.value }}
-            </li>
-          </ul> -->
           <template #footer>
             <div class="footer" v-if="time" title="Update Time">
               <span
@@ -111,26 +99,9 @@ export default {
 
       pointLists: [],
       equipLists: [],
-      pointListsNames: [],
-      equipListsNames: [],
 
       pointListsPieChart: [],
       equipListsPieChart: [],
-
-      pointItemPieChart: {
-        key: '',
-        value: 0,
-        state: {},
-        // state: {
-        //   type: '',
-        //   text: '',
-        //   class: '',
-        //   image: '',
-        //   color: '',
-        // },
-
-        percent: 0,
-      },
     }
   },
 
@@ -184,11 +155,6 @@ export default {
         }
       })
 
-      // alert(`data.points: ${JSON.stringify(this.pointsCount)}`)
-      // alert(`this.$store.state.env.statuses: ${JSON.stringify(this.$store.state.env.statuses)}`)
-      // alert(`data.points: ${JSON.stringify(data.points)}`)
-      // alert(`this.points: ${JSON.stringify(this.points)}`)
-
       this.equipsCount = Object.keys(data.equips).reduce(
         (sum, current) => sum + data.equips[current],
         0
@@ -202,146 +168,83 @@ export default {
         }
       })
       // --------------------------------
-      // get names
-      /*
-      this.pointListsNames = data.pointLists.map((point) => ({
-        id: point.id,
-        name: point.name,
-      }))
-      */
-      // get raw data
       this.pointLists = data.pointLists.map((point) => ({
         id: point.id,
+        
         name: point.name,
         statistic: Object.keys(point.statistic).map((statKey) => ({
           key: statKey,
           value: point.statistic[statKey],
         })),
       }))
-      // select data for PieChart
-      /*
-      this.pointLists.forEach((point) => {
-        point.statistic.forEach((stat) => {
-          this.pointListsPieChart.push({
-            [stat.key]: stat.value,
-          })
-        })
-      })
-      */
+      console.log('this.pointLists:', this.pointLists)
+      const statisticArray = this.pointLists.map((point) => point.statistic)
+      console.log('statisticArray:', statisticArray)
 
+      //const item = statisticArray
+
+      // console.log('item:', item)
       /*
-      this.pointListsPieChart = this.pointLists.map((point, index) => {
-        return {
-          index: index,
-          // key: point.statistic[0]?.key,
-          // value: point.statistic[0].value,
-          // state: this.$store.state.env.statuses[point],
-          // state: this.$store.state.env.statuses[point?.statistic[3]?.key],
-          percent: data.pointLists[0]
-        }
-      })
-      */
-      /*
-      this.pointListsPieChart = Object.keys(data.pointLists).map((key) => {
+      const result = Object.keys(item).map((key) => {
         return {
           key: key.toString(),
-        }
+          value: data.points[key],
+          state: this.$store.state.env.statuses[key],
+          percent: data.points[key] / this.pointsCount,
+        } 
+      })
+      */
+      /*
+      this.pointListsPieChart = statisticArray.map((item) => 
+        Object.keys(item).map((key) => ({
+          key: key.toString(),
+          value: data.points[key],
+          state: this.$store.state.env.statuses[key],
+          percent: data.points[key] / this.pointsCount,
+        }))
+      )
+      */
+      console.log('statisticArray:', statisticArray)   
+      console.log('----------------------------------')
+      console.log('data.points[key]:', data.points)
+      
+    //  console.log('data.points[key]:', data.points['0'])
+    //  console.log('data.points[key]:', data.points['1'])
+    //  console.log('data.points[key]:', data.points['2'])
+    //  console.log('data.points[key]:', data.points['3'])
+    //  console.log('data.points[key]:', data.points['4'])   
+
+      let result
+      /*
+      statisticArray.forEach((item) => {
+        // console.log('item:', item)
+        result = Object.keys(item).map((key) => ({
+          key: key.toString(),
+          value: data.points[key] ?? 0,
+          state: this.$store.state.env.statuses[key] ?? this.$store.state.env.statuses[0],
+          percent: !isNaN(data.points[key] / this.pointsCount) ? data.points[key] / this.pointsCount : 0,
+        }))
+        // console.log('result:', result)
+        this.pointListsPieChart.push(result)
       })
       */
 
-      for (let i = 0; i < this.pointLists.length; i++) {
-        pointItemPieChart.key
-        pointItemPieChart.value
-        pointItemPieChart.state
-        pointItemPieChart.percent
-        
-        // this.pointListsPieChart.push(pointItemPieChart)
-      }
+      statisticArray.forEach((item) => {
+        // console.log('item:', item)
+        result = Object.keys(item).map((key) => ({
+          key: key.toString(),
+          value: data.points[key] ?? 0,
+          state: this.$store.state.env.statuses[key] ?? this.$store.state.env.statuses[0],
+          percent: !isNaN(data.points[key] / this.pointsCount) ? data.points[key] / this.pointsCount : 0,
+        }))
+        // console.log('result:', result)
+        this.pointListsPieChart.push(result)
+      })
+      console.log('this.pointListsPieChart:', this.pointListsPieChart)
 
-      alert(`data.pointLists: ${JSON.stringify(this.pointLists)}`)
-      // alert(`this.pointLists: ${JSON.stringify(this.pointLists)}`)
-      // alert(
-      //   `this.pointListsPieChart: ${JSON.stringify(this.pointListsPieChart)}`
-      // )
+      // alert(`result: ${JSON.stringify(result)}`)
+      // this.pointListsPieChart = result
       // --------------------------------
-      /*
-      const arrayPieChart = [
-        {
-          key: '0',
-          value: 8926,
-          state: {
-            type: 'ok',
-            text: 'Работает нормально',
-            class: 'color-ok',
-            image: 'status-ok',
-            color: 'limegreen',
-          },
-          percent: 0.9968729059638151,
-        },
-        {
-          key: '1',
-          value: 9,
-          state: {
-            type: 'noControl',
-            text: 'Контроль архивов отключен',
-            class: 'color-nocontrol',
-            image: 'status-nocontrol',
-            color: 'dimgrey',
-          },
-          percent: 0.0010051373687737324,
-        },
-        {
-          key: '2',
-          value: 6,
-          state: {
-            type: 'noData',
-            text: 'Нет архива',
-            class: 'color-nodata',
-            image: 'status-nodata',
-            color: 'blueviolet',
-          },
-          percent: 0.0006700915791824883,
-        },
-        {
-          key: '4',
-          value: 1,
-          state: {
-            type: 'warning',
-            text: 'Нештатная ситуация',
-            class: 'color-warning',
-            image: 'status-warning',
-            color: 'orange',
-          },
-          percent: 0.00011168192986374804,
-        },
-        {
-          key: '8',
-          value: 12,
-          state: {
-            type: 'error',
-            text: 'Критическая ошибка',
-            class: 'color-error',
-            image: 'status-error',
-            color: 'orangered',
-          },
-          percent: 0.0013401831583649765,
-        },
-      ]
-
-      for (let i = 0; i < arrayPieChart.length; i++) {
-        this.pointListsPieChart.push(arrayPieChart[i])
-      }
-      */
-      this.pointListsPieChart = this.points
-      // --------------------------------
-
-      // get names
-      /*
-      this.equipListsNames = data.equipLists.map((point) => ({
-        id: point.id,
-        name: point.name,
-      }))
-      */
 
       this.equipLists = data.equipLists.map((equip) => ({
         id: equip.id,
@@ -351,8 +254,6 @@ export default {
           value: equip.statistic[statKey],
         })),
       }))
-      // alert(`equipLists: ${JSON.stringify(this.equipLists)}`)
-
       this.time = new Date()
     },
   },

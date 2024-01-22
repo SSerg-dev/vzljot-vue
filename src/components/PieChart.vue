@@ -17,8 +17,8 @@
       <circle
         v-if="pathes.length === 1"
         :r="radius"
-        :cx="viewBox.width / 2"
-        :cy="viewBox.height / 2"
+        :cx="viewBox.width /this.centerX"
+        :cy="viewBox.height / this.centerY"
         fill="none"
         :ref="pathes[0].key"
         :stroke="pathes[0].state.color"
@@ -37,8 +37,8 @@
         @mouseout="pathOut(path)"
       ></path>
       <text
-        :x="viewBox.width / 2"
-        :y="viewBox.height / 1.5"
+        :x="viewBox.width /this.centerX"
+        :y="viewBox.height / this.centerY"
         dy=".3em"
         style="text-anchor: middle"
       >
@@ -65,6 +65,8 @@ export default {
       text: '',
       strokeWidth: 25,
       strokeWidthSelected: 35,
+      centerX: 2,
+      centerY: 1.5
     }
   },
   computed: {
@@ -73,8 +75,8 @@ export default {
     },
     pathes() {
       let angle = 0
-      let centerX = this.viewBox.width / 2
-      let centerY = this.viewBox.height / 1.5
+      let centerX = this.viewBox.width /this.centerX
+      let centerY = this.viewBox.height / this.centerY
         return this.values.map((value) => {
         let largeArcFlag = value.percent * 360 <= 180 ? '0' : '1'
         let start = this.polarToCartesian(centerX, centerY, this.radius, angle)
