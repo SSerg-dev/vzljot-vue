@@ -59,6 +59,13 @@ const env: Env = {
   setTypes: {}
 }
 
+interface Card {
+  isCardSelected: boolean | null
+}
+const card: Card = {
+  isCardSelected: false
+}
+
 interface State {
   collator: any
   colors: any | null
@@ -71,6 +78,7 @@ interface State {
   user: any
   vsp: any
   weather: any | null
+  card: Card
 }
 
 export const store = createStore<State>({
@@ -107,14 +115,15 @@ export const store = createStore<State>({
     vsp: {
       isOpened: false
     },
-    weather: null
+    weather: null,
+    card
+    
   },
   mutations: {
     notification(state, payload) {
       if (payload.error) {
         console.log('Ошибка:', payload.error)
       }
-
       state.notification = payload
     },
     error(state, payload) {
@@ -140,7 +149,10 @@ export const store = createStore<State>({
     },
     weather(state, payload) {
       state.weather = payload
-    }
+    },
+    setCard(state, payload)  {
+      state.card.isCardSelected = payload.isCardSelected
+    },
   },
   getters: {
     styleColors: state => {
@@ -149,13 +161,22 @@ export const store = createStore<State>({
         backgroundColor: state.colors.fill
       }
     },
+    getCard: state => {
+      return {
+        isCardSelected: state.card.isCardSelected
+      }
+    },
+
     reversedArchiveTypes: state => matchType(state.env.archiveTypes),
     reversedItemTypes: state => matchType(state.env.itemTypes),
     reversedReportDataSource: state => matchType(state.env.reportDataSource),
     reversedSeasonTypes: state => matchType(state.env.seasonTypes),
     pageInfo: state => Object.assign({}, state.pageInfo),
     pollDataTypes: state => matchType(state.env.pollDataTypes),
-    dateFormat: state => JSON.parse(JSON.stringify(state.dateFormat))
+    dateFormat: state => JSON.parse(JSON.stringify(state.dateFormat)),
+
+    
+
   },
-  actions: {}
+  actions: {},
 })

@@ -4,7 +4,10 @@
       <div>
         <card-item
           :title="'Точки учета: ' + pointsCount"
-          class="container-item"
+          :class="[
+            { 'container-item-small': this.isCardSelected },
+            { 'container-item-large': !this.isCardSelected },
+          ]"
         >
           <pie-chart :values="points" :statuses="statuses"></pie-chart>
           <template #footer>
@@ -22,8 +25,8 @@
       <div v-for="(point, index) in pointLists" :key="point.id">
         <card-item
           :title="index + 1 + '.' + 'Точки:' + point.name"
-          v-if="pointLists.length > 0"
-          class="container-item"
+          v-if="pointLists.length > 0 && isCardSelected"
+          class="container-item-small"
         >
           <pie-chart
             :values="pointListsPieChart[index]"
@@ -43,7 +46,13 @@
       </div>
 
       <div>
-        <card-item :title="'Приборы: ' + equipsCount" class="container-item">
+        <card-item
+          :title="'Приборы: ' + equipsCount"
+          :class="[
+            { 'container-item-small': this.isCardSelected },
+            { 'container-item-large': !this.isCardSelected },
+          ]"
+        >
           <pie-chart :values="equips" :statuses="statuses"></pie-chart>
           <template #footer>
             <div class="footer" v-if="this.time" title="Время обновления">
@@ -60,10 +69,14 @@
       <div v-for="(equip, index) in equipLists" :key="equip.id">
         <card-item
           :title="index + 1 + '.' + ' Приборы: ' + equip.name"
-          v-if="equipLists.length > 0"
-          class="container-item"
+          v-if="equipLists.length > 0 && isCardSelected"
+          class="container-item-small"
         >
-          <pie-chart :values="equips" :statuses="statuses"></pie-chart>
+          <pie-chart
+            :values="equipListsPieChart[index]"
+            :statuses="statuses"
+          ></pie-chart>
+
           <template #footer>
             <div class="footer" v-if="time" title="Update Time">
               <span
@@ -102,6 +115,8 @@ export default {
 
       pointListsPieChart: [],
       equipListsPieChart: [],
+
+      isCardSelected: false,
     }
   },
 
@@ -113,6 +128,13 @@ export default {
       this.showLoader = false
       this.$store.commit('error', error)
     })
+    // ----------------------------------
+    const options = {
+      isCardSelected: true,
+    }
+    this.$store.commit('setCard', options)
+    this.isCardSelected = this.getCard.isCardSelected
+    // ----------------------------------
   },
   computed: {
     statuses() {
@@ -127,6 +149,12 @@ export default {
               })
           )
         : {}
+    },
+    styleColors() {
+      return this.$store.getters.styleColors
+    },
+    getCard() {
+      return this.$store.getters.getCard
     },
   },
   methods: {
@@ -167,84 +195,31 @@ export default {
           percent: data.equips[key] / this.equipsCount,
         }
       })
-      // --------------------------------
+
       this.pointLists = data.pointLists.map((point) => ({
         id: point.id,
-        
         name: point.name,
         statistic: Object.keys(point.statistic).map((statKey) => ({
           key: statKey,
           value: point.statistic[statKey],
         })),
       }))
-      console.log('this.pointLists:', this.pointLists)
-      const statisticArray = this.pointLists.map((point) => point.statistic)
-      console.log('statisticArray:', statisticArray)
 
-      //const item = statisticArray
-
-      // console.log('item:', item)
-      /*
-      const result = Object.keys(item).map((key) => {
-        return {
-          key: key.toString(),
-          value: data.points[key],
-          state: this.$store.state.env.statuses[key],
-          percent: data.points[key] / this.pointsCount,
-        } 
-      })
-      */
-      /*
-      this.pointListsPieChart = statisticArray.map((item) => 
+      const statisticPointArray = this.pointLists.map(
+        (point) => point.statistic
+      )
+      this.pointListsPieChart = statisticPointArray.map((item) =>
         Object.keys(item).map((key) => ({
           key: key.toString(),
-          value: data.points[key],
-          state: this.$store.state.env.statuses[key],
-          percent: data.points[key] / this.pointsCount,
+          value: data.points[key] ?? 0,
+          state:
+            this.$store.state.env.statuses[key] ??
+            this.$store.state.env.statuses[0],
+          percent: !isNaN(data.points[key] / this.pointsCount)
+            ? data.points[key] / this.pointsCount
+            : 0,
         }))
       )
-      */
-      console.log('statisticArray:', statisticArray)   
-      console.log('----------------------------------')
-      console.log('data.points[key]:', data.points)
-      
-    //  console.log('data.points[key]:', data.points['0'])
-    //  console.log('data.points[key]:', data.points['1'])
-    //  console.log('data.points[key]:', data.points['2'])
-    //  console.log('data.points[key]:', data.points['3'])
-    //  console.log('data.points[key]:', data.points['4'])   
-
-      let result
-      /*
-      statisticArray.forEach((item) => {
-        // console.log('item:', item)
-        result = Object.keys(item).map((key) => ({
-          key: key.toString(),
-          value: data.points[key] ?? 0,
-          state: this.$store.state.env.statuses[key] ?? this.$store.state.env.statuses[0],
-          percent: !isNaN(data.points[key] / this.pointsCount) ? data.points[key] / this.pointsCount : 0,
-        }))
-        // console.log('result:', result)
-        this.pointListsPieChart.push(result)
-      })
-      */
-
-      statisticArray.forEach((item) => {
-        // console.log('item:', item)
-        result = Object.keys(item).map((key) => ({
-          key: key.toString(),
-          value: data.points[key] ?? 0,
-          state: this.$store.state.env.statuses[key] ?? this.$store.state.env.statuses[0],
-          percent: !isNaN(data.points[key] / this.pointsCount) ? data.points[key] / this.pointsCount : 0,
-        }))
-        // console.log('result:', result)
-        this.pointListsPieChart.push(result)
-      })
-      console.log('this.pointListsPieChart:', this.pointListsPieChart)
-
-      // alert(`result: ${JSON.stringify(result)}`)
-      // this.pointListsPieChart = result
-      // --------------------------------
 
       this.equipLists = data.equipLists.map((equip) => ({
         id: equip.id,
@@ -254,6 +229,22 @@ export default {
           value: equip.statistic[statKey],
         })),
       }))
+      const statisticEquipArray = this.equipLists.map(
+        (equip) => equip.statistic
+      )
+      this.equipListsPieChart = statisticEquipArray.map((item) =>
+        Object.keys(item).map((key) => ({
+          key: key.toString(),
+          value: data.equips[key] ?? 0,
+          state:
+            this.$store.state.env.statuses[key] ??
+            this.$store.state.env.statuses[0],
+          percent: !isNaN(data.equips[key] / this.equipsCount)
+            ? data.equips[key] / this.equipsCount
+            : 0,
+        }))
+      )
+
       this.time = new Date()
     },
   },
@@ -281,8 +272,12 @@ export default {
   flex-direction: row;
   flex-wrap: wrap;
 }
-.container .container-item {
+.container .container-item-small {
   height: 420px;
   width: 284px;
+}
+.container .container-item-large {
+  height: 90vh;
+  width: 25vw;
 }
 </style>
