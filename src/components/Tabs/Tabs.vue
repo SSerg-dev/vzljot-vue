@@ -39,7 +39,6 @@ export default {
       () => this.tabs.length,
       () => {
         const slots = getTabs(this.$slots)
-
         this.tabs.sort((a, b) => {
           const aIndex = slots.findIndex(r => r.text === a.text)
           const bIndex = slots.findIndex(r => r.text === b.text)

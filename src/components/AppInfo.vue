@@ -1,12 +1,12 @@
 <template>
   <div class="info-wrapper not-selectable">
-    <div class="container">
+    <div v-if="isVisible" class="container">
       <div>
         <card-item
           :title="'Точки учета: ' + pointsCount"
           :class="[
-            { 'container-item-small': this.isCardSelected },
-            { 'container-item-large': !this.isCardSelected },
+            { 'container-item-small': isCardSelected },
+            { 'container-item-large': !isCardSelected },
           ]"
         >
           <pie-chart :values="points" :statuses="statuses"></pie-chart>
@@ -24,8 +24,10 @@
 
       <div v-for="(point, index) in pointLists" :key="point.id">
         <card-item
-          :title="index + 1 + '.' + 'Точки:' + point.name"
-          v-if="pointLists.length > 0 && isCardSelected"
+          :title="
+            index + 1 + '.' + 'Точки ' + point.name + ': ' + point.count + 'шт.'
+          "
+          v-if="isCardSelected"
           class="container-item-small"
         >
           <pie-chart
@@ -49,8 +51,8 @@
         <card-item
           :title="'Приборы: ' + equipsCount"
           :class="[
-            { 'container-item-small': this.isCardSelected },
-            { 'container-item-large': !this.isCardSelected },
+            { 'container-item-small': isCardSelected },
+            { 'container-item-large': !isCardSelected },
           ]"
         >
           <pie-chart :values="equips" :statuses="statuses"></pie-chart>
@@ -68,8 +70,17 @@
 
       <div v-for="(equip, index) in equipLists" :key="equip.id">
         <card-item
-          :title="index + 1 + '.' + ' Приборы: ' + equip.name"
-          v-if="equipLists.length > 0 && isCardSelected"
+          :title="
+            index +
+            1 +
+            '.' +
+            ' Приборы ' +
+            equip.name +
+            ': ' +
+            equip.count +
+            'шт.'
+          "
+          v-if="isCardSelected"
           class="container-item-small"
         >
           <pie-chart
@@ -90,7 +101,6 @@
       </div>
     </div>
 
-    <!-- <div style="flex: 2"></div> -->
     <spinner :show="showLoader" />
   </div>
 </template>
@@ -117,6 +127,10 @@ export default {
       equipListsPieChart: [],
 
       isCardSelected: false,
+      isVisible: false,
+
+      timeout: null,
+      delay: 500
     }
   },
 
@@ -124,18 +138,28 @@ export default {
     this.$emitter.on('si', this.onSi)
   },
   mounted() {
+    
     this.get().catch((error) => {
       this.showLoader = false
       this.$store.commit('error', error)
     })
-    // ----------------------------------
+    
     const options = {
       isCardSelected: true,
     }
     this.$store.commit('setCard', options)
     this.isCardSelected = this.getCard.isCardSelected
-    // ----------------------------------
+
+    if (!this.isVisible) {
+      this.timeout = setTimeout(() => {
+        this.isVisible = true
+      }, this.delay)
+    }
   },
+  
+  beforeUnmount() {
+    clearTimeout(this.timeout)
+  },  
   computed: {
     statuses() {
       return this.$store.state.env
@@ -155,6 +179,20 @@ export default {
     },
     getCard() {
       return this.$store.getters.getCard
+    },
+  },
+  watch: {
+    getCard(newVal) {
+      if (newVal.isCardChanged) {
+        this.get().catch((error) => {
+          this.$store.commit('error', error)
+        })
+
+        const options = {
+          isCardChanged: false,
+        }
+        this.$store.commit('setCard', options)
+      }
     },
   },
   methods: {
@@ -196,56 +234,71 @@ export default {
         }
       })
 
-      this.pointLists = data.pointLists.map((point) => ({
-        id: point.id,
-        name: point.name,
-        statistic: Object.keys(point.statistic).map((statKey) => ({
-          key: statKey,
-          value: point.statistic[statKey],
-        })),
-      }))
-
-      const statisticPointArray = this.pointLists.map(
-        (point) => point.statistic
-      )
-      this.pointListsPieChart = statisticPointArray.map((item) =>
-        Object.keys(item).map((key) => ({
-          key: key.toString(),
-          value: data.points[key] ?? 0,
-          state:
-            this.$store.state.env.statuses[key] ??
-            this.$store.state.env.statuses[0],
-          percent: !isNaN(data.points[key] / this.pointsCount)
-            ? data.points[key] / this.pointsCount
-            : 0,
+      try {
+        this.pointLists = data.pointLists.map((point) => ({
+          id: point.id,
+          name: point.name,
+          count: point.count,
+          statistic: Object.keys(point.statistic).map((statKey) => ({
+            key: statKey,
+            value: point.statistic[statKey],
+          })),
         }))
-      )
 
-      this.equipLists = data.equipLists.map((equip) => ({
-        id: equip.id,
-        name: equip.name,
-        statistic: Object.keys(equip.statistic).map((statKey) => ({
-          key: statKey,
-          value: equip.statistic[statKey],
-        })),
-      }))
-      const statisticEquipArray = this.equipLists.map(
-        (equip) => equip.statistic
-      )
-      this.equipListsPieChart = statisticEquipArray.map((item) =>
-        Object.keys(item).map((key) => ({
-          key: key.toString(),
-          value: data.equips[key] ?? 0,
-          state:
-            this.$store.state.env.statuses[key] ??
-            this.$store.state.env.statuses[0],
-          percent: !isNaN(data.equips[key] / this.equipsCount)
-            ? data.equips[key] / this.equipsCount
-            : 0,
+        const statisticPointArray = this.pointLists.map(
+          (point) => point.statistic
+        )
+        this.pointListsPieChart = statisticPointArray.map((item) =>
+          Object.keys(item).map((key, index) => ({
+            key: key.toString(),
+            value: data.points[key] ?? 0,
+            state:
+              this.$store.state.env.statuses[key] ??
+              this.$store.state.env.statuses[0],
+            percent: this.calcPercent(item, index),
+          }))
+        )
+
+        this.equipLists = data.equipLists.map((equip) => ({
+          id: equip.id,
+          name: equip.name,
+          count: equip.count,
+          statistic: Object.keys(equip.statistic).map((statKey) => ({
+            key: statKey,
+            value: equip.statistic[statKey],
+          })),
         }))
-      )
+
+        const statisticEquipArray = this.equipLists.map(
+          (equip) => equip.statistic
+        )
+        this.equipListsPieChart = statisticEquipArray.map((item) =>
+          Object.keys(item).map((key, index) => ({
+            key: key.toString(),
+            value: data.equips[key] ?? 0,
+            state:
+              this.$store.state.env.statuses[key] ??
+              this.$store.state.env.statuses[0],
+            percent: this.calcPercent(item, index),
+          }))
+        )
+      } catch {
+        console.error(err)
+      }
 
       this.time = new Date()
+    },
+
+    calcPercent: function (item, index) {
+      let result
+
+      if (item.length === 1) {
+        result = 1
+      } else if (item.length > 1) {
+        const sum = item.reduce((acc, current) => acc + current.value, 0)
+        result = +item[index].value / +sum
+      }
+      return result
     },
   },
 }
