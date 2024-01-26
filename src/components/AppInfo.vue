@@ -1,6 +1,6 @@
 <template>
   <div class="info-wrapper not-selectable">
-    <div v-if="isVisible" class="container">
+    <div class="container" :key="keyRender">
       <div>
         <card-item
           :title="'Точки учета: ' + pointsCount"
@@ -10,6 +10,27 @@
           ]"
         >
           <pie-chart :values="points" :statuses="statuses"></pie-chart>
+          <template #footer>
+            <div class="footer" v-if="this.time" title="Время обновления">
+              <span
+                style="font-size: 22px; padding: 0 3px 0 0"
+                class="fas fa-clock icon"
+              />
+              <span>{{ this.time ? this.time.toLocaleString() : '' }}</span>
+            </div>
+          </template>
+        </card-item>
+      </div>
+
+      <div>
+        <card-item
+          :title="'Приборы: ' + equipsCount"
+          :class="[
+            { 'container-item-small': isCardSelected },
+            { 'container-item-large': !isCardSelected },
+          ]"
+        >
+          <pie-chart :values="equips" :statuses="statuses"></pie-chart>
           <template #footer>
             <div class="footer" v-if="this.time" title="Время обновления">
               <span
@@ -42,27 +63,6 @@
                 class="fas fa-clock icon"
               />
               <span>{{ time ? time.toLocaleString() : '' }}</span>
-            </div>
-          </template>
-        </card-item>
-      </div>
-
-      <div>
-        <card-item
-          :title="'Приборы: ' + equipsCount"
-          :class="[
-            { 'container-item-small': isCardSelected },
-            { 'container-item-large': !isCardSelected },
-          ]"
-        >
-          <pie-chart :values="equips" :statuses="statuses"></pie-chart>
-          <template #footer>
-            <div class="footer" v-if="this.time" title="Время обновления">
-              <span
-                style="font-size: 22px; padding: 0 3px 0 0"
-                class="fas fa-clock icon"
-              />
-              <span>{{ this.time ? this.time.toLocaleString() : '' }}</span>
             </div>
           </template>
         </card-item>
@@ -128,9 +128,9 @@ export default {
 
       isCardSelected: false,
       isVisible: false,
-
+      keyRender: 0,
       timeout: null,
-      delay: 500
+      delay: 0,
     }
   },
 
@@ -138,12 +138,11 @@ export default {
     this.$emitter.on('si', this.onSi)
   },
   mounted() {
-    
     this.get().catch((error) => {
       this.showLoader = false
       this.$store.commit('error', error)
     })
-    
+
     const options = {
       isCardSelected: true,
     }
@@ -156,10 +155,10 @@ export default {
       }, this.delay)
     }
   },
-  
+
   beforeUnmount() {
     clearTimeout(this.timeout)
-  },  
+  },
   computed: {
     statuses() {
       return this.$store.state.env
@@ -182,16 +181,14 @@ export default {
     },
   },
   watch: {
-    getCard(newVal) {
-      if (newVal.isCardChanged) {
-        this.get().catch((error) => {
-          this.$store.commit('error', error)
-        })
-
-        const options = {
-          isCardChanged: false,
-        }
-        this.$store.commit('setCard', options)
+    pointLists(newVal) {
+      if (newVal.length > 1) {
+        this.keyRender = newVal.length
+      }
+    },
+    equipLists(newVal) {
+      if (newVal.length > 1) {
+        this.keyRender = newVal.length
       }
     },
   },

@@ -57,6 +57,7 @@
             </select>
           </div>
         </expantion-panel>
+        <SystemPropsPoints />
       </div>
     </expantion-panel>
     <expantion-panel v-if="localUser.id" caption="Уведомления" :opened="expNotification" @open="expNotification = $event">
@@ -143,7 +144,9 @@
           </div>
         </fieldset>
       </div>
+      
     </expantion-panel>
+    
   </div>
 </template>
 
@@ -161,6 +164,8 @@ import DatePicker from '../Inputs/DatePicker.vue'
 import SelectorCombo from '../Inputs/SelectorCombo.vue'
 import VButton from '../Inputs/VButton.vue'
 
+import SystemPropsPoints from '../SystemProps/SystemPropsPoints.vue' 
+
 export default {
   components: {
     ExpantionPanel,
@@ -168,7 +173,8 @@ export default {
     NumberBox,
     DatePicker,
     SelectorCombo,
-    VButton
+    VButton,
+    SystemPropsPoints
   },
   props: {
     user: Object,

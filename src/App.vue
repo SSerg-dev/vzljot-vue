@@ -329,9 +329,6 @@ export default {
         case 'equips':
         case 'extra':
         case 'map':
-          if (name === 'info') {
-            this.onInfo()
-          }
           this.currentMenu = name
           break
         case 'notifications':
@@ -402,12 +399,6 @@ export default {
       } catch (error) {
         this.$store.commit('error', error.response.data)
       }
-    },
-    onInfo() {
-      const options = {
-        isCardChanged: true
-      }
-      this.$store.commit('setCard', options)
     },
   } 
 }

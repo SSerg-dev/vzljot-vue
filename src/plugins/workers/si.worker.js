@@ -38,7 +38,9 @@
     postMessage({
       event: 'statistic',
       points: data.statistic.points,
-      equips: data.statistic.equips
+      equips: data.statistic.equips,
+      pointLists: data.statistic.pointLists,
+      equipLists: data.statistic.equipLists
     })
   }
 

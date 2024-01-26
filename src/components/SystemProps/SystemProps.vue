@@ -1,52 +1,133 @@
 <template>
   <div class="component-detail">
-    <preserver-component v-bind="{ saving, disabled: !hasChanges || loading, loading }" @saveClick="onSaveClick()">
+    <preserver-component
+      v-bind="{ saving, disabled: !hasChanges || loading, loading }"
+      @saveClick="onSaveClick()"
+    >
       <tabs>
         <tabx text="Параметры">
           <div class="system-props-common">
             <div class="system-props-grid">
               <label>Режим сервера:</label>
               <select v-if="server.isAlone" v-model="commonData.serverMode">
-                <option v-for="key in Object.keys($store.state.env.serverModes)" :key="key" :value="parseInt(key)">{{ $store.state.env.serverModes[key].text }}</option>
+                <option
+                  v-for="key in Object.keys($store.state.env.serverModes)"
+                  :key="key"
+                  :value="parseInt(key)"
+                >
+                  {{ $store.state.env.serverModes[key].text }}
+                </option>
               </select>
-              <label style="justify-self: left" v-else>{{ $store.state.env.serverModes[commonData.serverMode].text }}</label>
+              <label style="justify-self: left" v-else>{{
+                $store.state.env.serverModes[commonData.serverMode].text
+              }}</label>
               <label>Экземпляр сервера лицензии:</label>
               <select v-model="commonData.licenseSystemNode">
-                <option v-for="r in server.servers" :key="r.id" :value="parseInt(r.id)">{{ r.name }}</option>
+                <option
+                  v-for="r in server.servers"
+                  :key="r.id"
+                  :value="parseInt(r.id)"
+                >
+                  {{ r.name }}
+                </option>
               </select>
               <label>Экземпляр сервера для общих задач:</label>
               <select v-model="commonData.systemNode">
-                <option v-for="r in server.servers" :key="r.id" :value="parseInt(r.id)">{{ r.name }}</option>
+                <option
+                  v-for="r in server.servers"
+                  :key="r.id"
+                  :value="parseInt(r.id)"
+                >
+                  {{ r.name }}
+                </option>
               </select>
               <label>Экземпляр сервера для новых приборов:</label>
               <select v-model="commonData.defaultSystemNode">
-                <option v-for="r in server.servers" :key="r.id" :value="parseInt(r.id)">{{ r.name }}</option>
+                <option
+                  v-for="r in server.servers"
+                  :key="r.id"
+                  :value="parseInt(r.id)"
+                >
+                  {{ r.name }}
+                </option>
               </select>
             </div>
             <expantion caption="Настройки очистки сообщений" :resizable="false">
               <div class="system-props-common">
-                <check-box v-model="commonData.autoClearSystemMessage">Автоматическая очистка полученных сообщений</check-box>
+                <check-box v-model="commonData.autoClearSystemMessage"
+                  >Автоматическая очистка полученных сообщений</check-box
+                >
                 <div class="system-props-grid">
-                  <label :disabled="!commonData.autoClearSystemMessage">Удалять сообщения старше:</label>
-                  <div :disabled="!commonData.autoClearSystemMessage"><number-box :disabled="!commonData.autoClearSystemMessage" v-model="commonData.systemMessageAge" style="width: 30px" :min="1" :max="999" /> дн.</div>
+                  <label :disabled="!commonData.autoClearSystemMessage"
+                    >Удалять сообщения старше:</label
+                  >
+                  <div :disabled="!commonData.autoClearSystemMessage">
+                    <number-box
+                      :disabled="!commonData.autoClearSystemMessage"
+                      v-model="commonData.systemMessageAge"
+                      style="width: 30px"
+                      :min="1"
+                      :max="999"
+                    />
+                    дн.
+                  </div>
                 </div>
               </div>
             </expantion>
-            <expantion caption="Настройки очистки каталога с данными" :resizable="false">
+            <expantion
+              caption="Настройки очистки каталога с данными"
+              :resizable="false"
+            >
               <div class="system-props-common">
-                <check-box v-model="commonData.autoClearFiles">Автоматическая очистка полученных данных</check-box>
+                <check-box v-model="commonData.autoClearFiles"
+                  >Автоматическая очистка полученных данных</check-box
+                >
                 <div class="system-props-grid">
-                  <label :disabled="!commonData.autoClearFiles">Удалять файлы старше:</label>
-                  <div :disabled="!commonData.autoClearFiles"><number-box :disabled="!commonData.autoClearFiles" v-model="commonData.fileAge" style="width: 30px" :min="1" :max="999" /> дн.</div>
+                  <label :disabled="!commonData.autoClearFiles"
+                    >Удалять файлы старше:</label
+                  >
+                  <div :disabled="!commonData.autoClearFiles">
+                    <number-box
+                      :disabled="!commonData.autoClearFiles"
+                      v-model="commonData.fileAge"
+                      style="width: 30px"
+                      :min="1"
+                      :max="999"
+                    />
+                    дн.
+                  </div>
                 </div>
               </div>
             </expantion>
             <expantion caption="Поверка" :resizable="false">
               <div class="system-props-common">
-                <check-box v-model="commonData.checkingExpired">Контроль поверки оборудования</check-box>
+                <check-box v-model="commonData.checkingExpired"
+                  >Контроль поверки оборудования</check-box
+                >
                 <div class="system-props-grid">
-                  <check-box v-model="commonData.checkingDeadline" :disabled="!commonData.checkingExpired">Выдавать предупреждение за:</check-box>
-                  <div :disabled="!commonData.checkingExpired || !commonData.checkingDeadline"><number-box v-model="commonData.checkingDeadlineDays" :disabled="!commonData.checkingExpired || !commonData.checkingDeadline" style="width: 30px" :min="1" :max="999" /> дн.</div>
+                  <check-box
+                    v-model="commonData.checkingDeadline"
+                    :disabled="!commonData.checkingExpired"
+                    >Выдавать предупреждение за:</check-box
+                  >
+                  <div
+                    :disabled="
+                      !commonData.checkingExpired ||
+                      !commonData.checkingDeadline
+                    "
+                  >
+                    <number-box
+                      v-model="commonData.checkingDeadlineDays"
+                      :disabled="
+                        !commonData.checkingExpired ||
+                        !commonData.checkingDeadline
+                      "
+                      style="width: 30px"
+                      :min="1"
+                      :max="999"
+                    />
+                    дн.
+                  </div>
                 </div>
               </div>
             </expantion>
@@ -60,85 +141,264 @@
                 <option :value="false">отключен</option>
                 <option :value="true">включен</option>
               </select>
-              <label :disabled="!pollData.enabled" style="align-self: baseline">Данные:</label>
-              <div style="display: grid; gap: 5px 3px; grid-template-columns: repeat(3, 200px)">
-                <template v-for="[k, v] in Object.entries($store.state.env.pollDataTypes)">
-                  <check-box v-if="pollData[v.type] !== null" :key="k" v-model="pollData[v.type]" :disabled="!pollData.enabled" :class="{ 'validation-error': error.pollDataType }" :title="error.pollDataType">{{ v.text }}</check-box>
+              <label :disabled="!pollData.enabled" style="align-self: baseline"
+                >Данные:</label
+              >
+              <div
+                style="
+                  display: grid;
+                  gap: 5px 3px;
+                  grid-template-columns: repeat(3, 200px);
+                "
+              >
+                <template
+                  v-for="[k, v] in Object.entries(
+                    $store.state.env.pollDataTypes
+                  )"
+                >
+                  <check-box
+                    v-if="pollData[v.type] !== null"
+                    :key="k"
+                    v-model="pollData[v.type]"
+                    :disabled="!pollData.enabled"
+                    :class="{ 'validation-error': error.pollDataType }"
+                    :title="error.pollDataType"
+                    >{{ v.text }}</check-box
+                  >
                 </template>
               </div>
             </div>
             <div class="grid two">
-              <label :disabled="!pollData.enabled">Разрешенный интервал сбора и рассылки:</label>
+              <label :disabled="!pollData.enabled"
+                >Разрешенный интервал сбора и рассылки:</label
+              >
               <div :disabled="!pollData.enabled">
-                <number-box :disabled="!pollData.enabled" v-model="pollData.allowStartHour" style="width: 2em" :min="0" :max="23" /> ч <number-box :disabled="!pollData.enabled" v-model="pollData.allowStartMin" style="width: 2em" :min="0" :max="59" /> мин
-                <number-box :disabled="!pollData.enabled" v-model="pollData.allowEndHour" style="width: 2em" :min="0" :max="23" /> ч <number-box :disabled="!pollData.enabled" v-model="pollData.allowEndMin" style="width: 2em" :min="0" :max="59" /> мин
+                <number-box
+                  :disabled="!pollData.enabled"
+                  v-model="pollData.allowStartHour"
+                  style="width: 2em"
+                  :min="0"
+                  :max="23"
+                />
+                ч
+                <number-box
+                  :disabled="!pollData.enabled"
+                  v-model="pollData.allowStartMin"
+                  style="width: 2em"
+                  :min="0"
+                  :max="59"
+                />
+                мин
+                <number-box
+                  :disabled="!pollData.enabled"
+                  v-model="pollData.allowEndHour"
+                  style="width: 2em"
+                  :min="0"
+                  :max="23"
+                />
+                ч
+                <number-box
+                  :disabled="!pollData.enabled"
+                  v-model="pollData.allowEndMin"
+                  style="width: 2em"
+                  :min="0"
+                  :max="59"
+                />
+                мин
               </div>
               <label :disabled="!pollData.enabled">Диапазон сбора:</label>
               <div class="system-props-temp" :disabled="!pollData.enabled">
-                <select v-model="pollData.depthType" :disabled="!pollData.enabled">
+                <select
+                  v-model="pollData.depthType"
+                  :disabled="!pollData.enabled"
+                >
                   <option :value="0">на глубину</option>
                   <option :value="1">с даты</option>
                 </select>
                 <template v-if="pollData.depthType === 0">
-                  <number-box :disabled="!pollData.enabled" v-model="pollData.depth" style="width: 50px" :min="1" :max="999" />
+                  <number-box
+                    :disabled="!pollData.enabled"
+                    v-model="pollData.depth"
+                    style="width: 50px"
+                    :min="1"
+                    :max="999"
+                  />
                   <label>дн.</label>
                 </template>
-                <datepicker v-else :disabled="!pollData.enabled" v-model="pollData.dateStart" :format="dateFormat" style="width: 90px" />
+                <datepicker
+                  v-else
+                  :disabled="!pollData.enabled"
+                  v-model="pollData.dateStart"
+                  :format="dateFormat"
+                  style="width: 90px"
+                />
               </div>
             </div>
             <div class="grid two">
-              <label :disabled="!pollData.enabled">Периодичность обновления приборных настроек:</label>
-              <div class="grid" style="grid-template-columns: min-content min-content">
-                <number-box :disabled="!pollData.enabled" v-model="pollData.periodEquipSettings" style="width: 3em" :min="1" :max="999" />
+              <label :disabled="!pollData.enabled"
+                >Периодичность обновления приборных настроек:</label
+              >
+              <div
+                class="grid"
+                style="grid-template-columns: min-content min-content"
+              >
+                <number-box
+                  :disabled="!pollData.enabled"
+                  v-model="pollData.periodEquipSettings"
+                  style="width: 3em"
+                  :min="1"
+                  :max="999"
+                />
                 <label :disabled="!pollData.enabled">дн.</label>
               </div>
             </div>
-            <check-box v-model="pollData.allowCaptureData" :disabled="!pollData.enabled">Разрешить сбор отсутствующих данных вне диапазона</check-box>
-            <check-box v-model="pollData.autoEnableControl" :disabled="!pollData.enabled">Автоматическое включение контроля при поступлении данных</check-box>
-            <expantion caption="Контроль поступления и рассылки данных" :resizable="false">
+            <check-box
+              v-model="pollData.allowCaptureData"
+              :disabled="!pollData.enabled"
+              >Разрешить сбор отсутствующих данных вне диапазона</check-box
+            >
+            <check-box
+              v-model="pollData.autoEnableControl"
+              :disabled="!pollData.enabled"
+              >Автоматическое включение контроля при поступлении
+              данных</check-box
+            >
+            <expantion
+              caption="Контроль поступления и рассылки данных"
+              :resizable="false"
+            >
               <div class="system-props-control">
                 <div class="system-props-grid">
                   <label :disabled="!pollData.enabled">Состояние:</label>
-                  <select :disabled="!pollData.enabled" v-model="pollData.control">
+                  <select
+                    :disabled="!pollData.enabled"
+                    v-model="pollData.control"
+                  >
                     <option :value="false">отключен</option>
                     <option :value="true">включен</option>
                   </select>
                 </div>
                 <tabs>
-                  <tabx text="Архивы" v-if="pollData.archiveHour || pollData.archiveDay || pollData.archiveMonth">
-                    <poll-period-props @change="onPeriodArchiveChange" v-bind="periodArchiveData" />
+                  <tabx
+                    text="Архивы"
+                    v-if="
+                      pollData.archiveHour ||
+                      pollData.archiveDay ||
+                      pollData.archiveMonth
+                    "
+                  >
+                    <poll-period-props
+                      @change="onPeriodArchiveChange"
+                      v-bind="periodArchiveData"
+                    />
                   </tabx>
                   <tabx text="Данные наборов" v-if="pollData.setParams">
-                    <poll-period-props @change="onPeriodSetParamsChange" v-bind="periodSetParamsData" />
+                    <poll-period-props
+                      @change="onPeriodSetParamsChange"
+                      v-bind="periodSetParamsData"
+                    />
                   </tabx>
                   <tabx text="Текущие события" v-if="pollData.equipEvents">
-                    <poll-period-props @change="onPeriodEquipEventsChange" v-bind="periodEquipEventsData" />
+                    <poll-period-props
+                      @change="onPeriodEquipEventsChange"
+                      v-bind="periodEquipEventsData"
+                    />
                   </tabx>
-                  <tabx text="Настроечные параметры" v-if="pollData.equipCustomizing">
-                    <poll-period-props v-if="pollData.equipCustomizing" @change="onPeriodEquipCustomizingChange" v-bind="periodEquipCustomizingData" />
+                  <tabx
+                    text="Настроечные параметры"
+                    v-if="pollData.equipCustomizing"
+                  >
+                    <poll-period-props
+                      v-if="pollData.equipCustomizing"
+                      @change="onPeriodEquipCustomizingChange"
+                      v-bind="periodEquipCustomizingData"
+                    />
                   </tabx>
-                  <tabx text="Рассылка параметров ХВ" v-if="pollData.setDataColdWater">
-                    <poll-period-props @change="onPeriodSetDataColdWaterChange" v-bind="periodSetDataColdWaterData" />
+                  <tabx
+                    text="Рассылка параметров ХВ"
+                    v-if="pollData.setDataColdWater"
+                  >
+                    <poll-period-props
+                      @change="onPeriodSetDataColdWaterChange"
+                      v-bind="periodSetDataColdWaterData"
+                    />
                   </tabx>
                   <tabx text="Параметры ХВ" v-if="pollData.coldWater">
-                    <poll-period-props @change="onPeriodColdWaterChange" v-bind="periodColdWaterData" />
+                    <poll-period-props
+                      @change="onPeriodColdWaterChange"
+                      v-bind="periodColdWaterData"
+                    />
                   </tabx>
                 </tabs>
-                <div style="margin: 10px 0 10px 0; height: 1px; background-color: #ecf0f6" />
+                <div
+                  style="
+                    margin: 10px 0 10px 0;
+                    height: 1px;
+                    background-color: #ecf0f6;
+                  "
+                />
                 <div class="system-props-grid">
-                  <check-box v-model="pollData.autoDisableControl" :disabled="!pollData.enabled || !pollData.control">Автоматическое выключение контроля после:</check-box>
-                  <div :disabled="!pollData.enabled || !pollData.control || !pollData.autoDisableControl"><number-box :disabled="!pollData.enabled || !pollData.control || !pollData.autoDisableControl" v-model="pollData.retryCount" style="width: 2em" :min="1" :max="99" /> попыток</div>
-                  <label :disabled="!pollData.enabled || !pollData.control">Время ожидания:</label>
-                  <div :disabled="!pollData.enabled || !pollData.control" colspan="2">
-                    <number-box :disabled="!pollData.enabled || !pollData.control" v-model="pollData.waitHour" style="width: 2em" :min="0" :max="23" /> ч <number-box :disabled="!pollData.enabled || !pollData.control" v-model="pollData.waitMin" style="width: 2em" :min="0" :max="59" /> мин
+                  <check-box
+                    v-model="pollData.autoDisableControl"
+                    :disabled="!pollData.enabled || !pollData.control"
+                    >Автоматическое выключение контроля после:</check-box
+                  >
+                  <div
+                    :disabled="
+                      !pollData.enabled ||
+                      !pollData.control ||
+                      !pollData.autoDisableControl
+                    "
+                  >
+                    <number-box
+                      :disabled="
+                        !pollData.enabled ||
+                        !pollData.control ||
+                        !pollData.autoDisableControl
+                      "
+                      v-model="pollData.retryCount"
+                      style="width: 2em"
+                      :min="1"
+                      :max="99"
+                    />
+                    попыток
+                  </div>
+                  <label :disabled="!pollData.enabled || !pollData.control"
+                    >Время ожидания:</label
+                  >
+                  <div
+                    :disabled="!pollData.enabled || !pollData.control"
+                    colspan="2"
+                  >
+                    <number-box
+                      :disabled="!pollData.enabled || !pollData.control"
+                      v-model="pollData.waitHour"
+                      style="width: 2em"
+                      :min="0"
+                      :max="23"
+                    />
+                    ч
+                    <number-box
+                      :disabled="!pollData.enabled || !pollData.control"
+                      v-model="pollData.waitMin"
+                      style="width: 2em"
+                      :min="0"
+                      :max="59"
+                    />
+                    мин
                   </div>
                 </div>
               </div>
             </expantion>
             <expantion caption="Настройки автовызова" :resizable="false">
               <div class="system-props-grid">
-                <label :disabled="!pollData.enabled || !pollData.control">Состояние:</label>
-                <select :disabled="!pollData.enabled || !pollData.control" v-model="pollData.autoRequest">
+                <label :disabled="!pollData.enabled || !pollData.control"
+                  >Состояние:</label
+                >
+                <select
+                  :disabled="!pollData.enabled || !pollData.control"
+                  v-model="pollData.autoRequest"
+                >
                   <option :value="false">отключен</option>
                   <option :value="true">включен</option>
                 </select>
@@ -149,32 +409,108 @@
         <tabx text="Отчеты">
           <div class="system-props-report">
             <expantion caption="Отчетное время" :resizable="false">
-              <div style="display: grid; gap: 5px 3px; grid-template-columns: repeat(9, min-content); align-items: baseline">
+              <div
+                style="
+                  display: grid;
+                  gap: 5px 3px;
+                  grid-template-columns: repeat(9, min-content);
+                  align-items: baseline;
+                "
+              >
                 <label>День:</label>
-                <number-box v-model="reportData.day" style="width: 30px" :min="1" :max="31" />
+                <number-box
+                  v-model="reportData.day"
+                  style="width: 30px"
+                  :min="1"
+                  :max="31"
+                />
                 <label>Месяц:</label>
                 <select v-model="reportData.month">
-                  <option v-for="(item, index) in months" :key="index" :value="index + 1">{{ item }}</option>
+                  <option
+                    v-for="(item, index) in months"
+                    :key="index"
+                    :value="index + 1"
+                  >
+                    {{ item }}
+                  </option>
                 </select>
                 <label>Время:</label>
-                <number-box v-model="reportData.hours" style="width: 30px" :max="23" />
+                <number-box
+                  v-model="reportData.hours"
+                  style="width: 30px"
+                  :max="23"
+                />
                 ч.
-                <number-box v-model="reportData.minutes" style="width: 30px" :max="59" />
+                <number-box
+                  v-model="reportData.minutes"
+                  style="width: 30px"
+                  :max="59"
+                />
                 мин.
               </div>
             </expantion>
-            <expantion caption="Расчет потребления тепла и горячей воды" :resizable="false">
+            <expantion
+              caption="Расчет потребления тепла и горячей воды"
+              :resizable="false"
+            >
               <div class="system-props-report">
-                <expantion v-for="r in Object.values($store.state.env.nodeTypes)" :key="r.type" :caption="r.text" :resizable="false">
+                <expantion
+                  v-for="r in Object.values($store.state.env.nodeTypes)"
+                  :key="r.type"
+                  :caption="r.text"
+                  :resizable="false"
+                >
                   <div class="system-props-grid">
-                    <check-box style="grid-column: span 2" v-model="reportData[r.type].enableLosses">Учитывать тепловые потери</check-box>
-                    <check-box v-model="reportData[r.type].enableCorrection">Использовать корректировку при Тнш не более, дн.:</check-box>
-                    <number-box v-model="reportData[r.type].timeIdleForCorrection" :disabled="!reportData[r.type].enableCorrection" style="width: 30px" :min="1" :max="999" />
-                    <check-box v-model="reportData[r.type].enableAvgToPeriod">Рассчитывать по среднему при Тнш не более, дн.:</check-box>
-                    <number-box v-model="reportData[r.type].timeIdleForAvgToPeriod" :disabled="!reportData[r.type].enableAvgToPeriod" style="width: 30px" :min="1" :max="999" />
-                    <check-box style="grid-column: span 2" v-model="reportData[r.type].enableContract">Рассчитывать по договорным нагрузкам</check-box>
-                    <label :disabled="!reportData[r.type].enableAvgToPeriod && !reportData[r.type].enableCorrection">Рассчитывать средние значения при Tраб не менее, дн:</label>
-                    <number-box v-model="reportData[r.type].timeWork" :disabled="!reportData[r.type].enableAvgToPeriod && !reportData[r.type].enableCorrection" style="width: 30px" :min="1" :max="999" />
+                    <check-box
+                      style="grid-column: span 2"
+                      v-model="reportData[r.type].enableLosses"
+                      >Учитывать тепловые потери</check-box
+                    >
+                    <check-box v-model="reportData[r.type].enableCorrection"
+                      >Использовать корректировку при Тнш не более,
+                      дн.:</check-box
+                    >
+                    <number-box
+                      v-model="reportData[r.type].timeIdleForCorrection"
+                      :disabled="!reportData[r.type].enableCorrection"
+                      style="width: 30px"
+                      :min="1"
+                      :max="999"
+                    />
+                    <check-box v-model="reportData[r.type].enableAvgToPeriod"
+                      >Рассчитывать по среднему при Тнш не более,
+                      дн.:</check-box
+                    >
+                    <number-box
+                      v-model="reportData[r.type].timeIdleForAvgToPeriod"
+                      :disabled="!reportData[r.type].enableAvgToPeriod"
+                      style="width: 30px"
+                      :min="1"
+                      :max="999"
+                    />
+                    <check-box
+                      style="grid-column: span 2"
+                      v-model="reportData[r.type].enableContract"
+                      >Рассчитывать по договорным нагрузкам</check-box
+                    >
+                    <label
+                      :disabled="
+                        !reportData[r.type].enableAvgToPeriod &&
+                        !reportData[r.type].enableCorrection
+                      "
+                      >Рассчитывать средние значения при Tраб не менее,
+                      дн:</label
+                    >
+                    <number-box
+                      v-model="reportData[r.type].timeWork"
+                      :disabled="
+                        !reportData[r.type].enableAvgToPeriod &&
+                        !reportData[r.type].enableCorrection
+                      "
+                      style="width: 30px"
+                      :min="1"
+                      :max="999"
+                    />
                   </div>
                 </expantion>
               </div>
@@ -183,29 +519,76 @@
         </tabx>
         <tabx text="Температурный график">
           <div style="width: fit-content">
-            <expantion caption="Критерии анализа температурного графика" :resizable="false">
+            <expantion
+              caption="Критерии анализа температурного графика"
+              :resizable="false"
+            >
               <div class="system-props-temp">
-                <check-box v-model="temperatureGraphData.t1more">Перегрев в подающем трубопроводе более:</check-box>
-                <number-box v-model="temperatureGraphData.t1moreValue" :disabled="!temperatureGraphData.t1more" style="width: 30px" :min="1" :max="100" />
-                <select v-model="temperatureGraphData.t1moreType" :disabled="!temperatureGraphData.t1more">
+                <check-box v-model="temperatureGraphData.t1more"
+                  >Перегрев в подающем трубопроводе более:</check-box
+                >
+                <number-box
+                  v-model="temperatureGraphData.t1moreValue"
+                  :disabled="!temperatureGraphData.t1more"
+                  style="width: 30px"
+                  :min="1"
+                  :max="100"
+                />
+                <select
+                  v-model="temperatureGraphData.t1moreType"
+                  :disabled="!temperatureGraphData.t1more"
+                >
                   <option :value="false">°C</option>
                   <option :value="true">%</option>
                 </select>
-                <check-box v-model="temperatureGraphData.t1less">Недогрев в подающем трубопроводе менее:</check-box>
-                <number-box v-model="temperatureGraphData.t1lessValue" :disabled="!temperatureGraphData.t1less" style="width: 30px" :min="1" :max="100" />
-                <select v-model="temperatureGraphData.t1lessType" :disabled="!temperatureGraphData.t1less">
+                <check-box v-model="temperatureGraphData.t1less"
+                  >Недогрев в подающем трубопроводе менее:</check-box
+                >
+                <number-box
+                  v-model="temperatureGraphData.t1lessValue"
+                  :disabled="!temperatureGraphData.t1less"
+                  style="width: 30px"
+                  :min="1"
+                  :max="100"
+                />
+                <select
+                  v-model="temperatureGraphData.t1lessType"
+                  :disabled="!temperatureGraphData.t1less"
+                >
                   <option :value="false">°C</option>
                   <option :value="true">%</option>
                 </select>
-                <check-box v-model="temperatureGraphData.t2more">Перегрев в обратном трубопроводе более:</check-box>
-                <number-box v-model="temperatureGraphData.t2moreValue" :disabled="!temperatureGraphData.t2more" style="width: 30px" :min="1" :max="100" />
-                <select v-model="temperatureGraphData.t2moreType" :disabled="!temperatureGraphData.t2more">
+                <check-box v-model="temperatureGraphData.t2more"
+                  >Перегрев в обратном трубопроводе более:</check-box
+                >
+                <number-box
+                  v-model="temperatureGraphData.t2moreValue"
+                  :disabled="!temperatureGraphData.t2more"
+                  style="width: 30px"
+                  :min="1"
+                  :max="100"
+                />
+                <select
+                  v-model="temperatureGraphData.t2moreType"
+                  :disabled="!temperatureGraphData.t2more"
+                >
                   <option :value="false">°C</option>
                   <option :value="true">%</option>
                 </select>
-                <check-box v-model="temperatureGraphData.t2less">Недогрев в обратном трубопроводе менее:</check-box>
-                <number-box v-model="temperatureGraphData.t2lessValue" :disabled="!temperatureGraphData.t2less" style="width: 30px" :min="1" :max="100" />
-                <select v-model="temperatureGraphData.t2lessType" :disabled="!temperatureGraphData.t2less">
+                <check-box v-model="temperatureGraphData.t2less"
+                  >Недогрев в обратном трубопроводе менее:</check-box
+                >
+                <number-box
+                  v-model="temperatureGraphData.t2lessValue"
+                  :disabled="!temperatureGraphData.t2less"
+                  style="width: 30px"
+                  :min="1"
+                  :max="100"
+                />
+                <select
+                  v-model="temperatureGraphData.t2lessType"
+                  :disabled="!temperatureGraphData.t2less"
+                >
                   <option :value="false">°C</option>
                   <option :value="true">%</option>
                 </select>
@@ -217,80 +600,312 @@
           <div class="system-props-mail">
             <expantion caption="Разрешения" :resizable="false">
               <div class="system-props-grid">
-                <check-box style="grid-column: span 2" v-model="mailingData.notificationEmailEnable">Разрешить рассылку уведомлений по Email</check-box>
-                <check-box style="grid-column: span 2" v-model="mailingData.reportEmailEnable">Разрешить рассылку сформированных отчетов</check-box>
+                <check-box
+                  style="grid-column: span 2"
+                  v-model="mailingData.notificationEmailEnable"
+                  >Разрешить рассылку уведомлений по Email</check-box
+                >
+                <check-box
+                  style="grid-column: span 2"
+                  v-model="mailingData.reportEmailEnable"
+                  >Разрешить рассылку сформированных отчетов</check-box
+                >
                 <div />
-                <div :disabled="!mailingData.reportEmailEnable" class="system-props-grid">
+                <div
+                  :disabled="!mailingData.reportEmailEnable"
+                  class="system-props-grid"
+                >
                   <label>Максимальное количество файлов в письме, шт:</label>
-                  <number-box :disabled="!mailingData.reportEmailEnable" v-model="mailingData.reportEmailMaxFilesCount" style="width: 30px" :min="1" :max="999" />
+                  <number-box
+                    :disabled="!mailingData.reportEmailEnable"
+                    v-model="mailingData.reportEmailMaxFilesCount"
+                    style="width: 30px"
+                    :min="1"
+                    :max="999"
+                  />
                   <label>Максимальный размер всех файлов в письме, Мб:</label>
-                  <number-box :disabled="!mailingData.reportEmailEnable" v-model="mailingData.reportEmailMaxFilesSize" style="width: 30px" :min="1" :max="999" />
+                  <number-box
+                    :disabled="!mailingData.reportEmailEnable"
+                    v-model="mailingData.reportEmailMaxFilesSize"
+                    style="width: 30px"
+                    :min="1"
+                    :max="999"
+                  />
                 </div>
-                <check-box style="grid-column: span 2" v-model="mailingData.notificationSmsEnable">Разрешить рассылку уведомлений c помощью SMS-сообщений</check-box>
+                <check-box
+                  style="grid-column: span 2"
+                  v-model="mailingData.notificationSmsEnable"
+                  >Разрешить рассылку уведомлений c помощью
+                  SMS-сообщений</check-box
+                >
               </div>
             </expantion>
             <expantion caption="Настройки отправки Email" :resizable="false">
               <div class="system-props-grid">
-                <label :disabled="!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable">SMTP сервер:</label>
-                <input v-model="mailingData.email.host" type="text" :disabled="!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable" :class="{ 'validation-error': error.emailHost }" :title="error.emailHost" />
-                <label :disabled="!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable">Порт:</label>
-                <number-box :min="0" :max="65535" ref="comNetPort" v-model="mailingData.email.port" style="width: 50px" :disabled="!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable" />
-                <check-box style="grid-column: span 2" v-model="mailingData.email.useAuthentication" :disabled="!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable">Аутентификация</check-box>
-                <div class="system-props-grid" style="grid-column: span 2; padding-left: 5em">
-                  <label :disabled="(!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable) || !mailingData.email.useAuthentication">Пользователь:</label>
-                  <input v-model="mailingData.email.user" type="text" :disabled="(!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable) || !mailingData.email.useAuthentication" :class="{ 'validation-error': error.emailUser }" :title="error.emailUser" />
-                  <label :disabled="(!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable) || !mailingData.email.useAuthentication">Пароль:</label>
-                  <input type="password" v-model="mailingData.email.password" :disabled="(!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable) || !mailingData.email.useAuthentication" :class="{ 'validation-error': error.emailPassword }" :title="error.emailPassword" />
+                <label
+                  :disabled="
+                    !mailingData.notificationEmailEnable &&
+                    !mailingData.reportEmailEnable
+                  "
+                  >SMTP сервер:</label
+                >
+                <input
+                  v-model="mailingData.email.host"
+                  type="text"
+                  :disabled="
+                    !mailingData.notificationEmailEnable &&
+                    !mailingData.reportEmailEnable
+                  "
+                  :class="{ 'validation-error': error.emailHost }"
+                  :title="error.emailHost"
+                />
+                <label
+                  :disabled="
+                    !mailingData.notificationEmailEnable &&
+                    !mailingData.reportEmailEnable
+                  "
+                  >Порт:</label
+                >
+                <number-box
+                  :min="0"
+                  :max="65535"
+                  ref="comNetPort"
+                  v-model="mailingData.email.port"
+                  style="width: 50px"
+                  :disabled="
+                    !mailingData.notificationEmailEnable &&
+                    !mailingData.reportEmailEnable
+                  "
+                />
+                <check-box
+                  style="grid-column: span 2"
+                  v-model="mailingData.email.useAuthentication"
+                  :disabled="
+                    !mailingData.notificationEmailEnable &&
+                    !mailingData.reportEmailEnable
+                  "
+                  >Аутентификация</check-box
+                >
+                <div
+                  class="system-props-grid"
+                  style="grid-column: span 2; padding-left: 5em"
+                >
+                  <label
+                    :disabled="
+                      (!mailingData.notificationEmailEnable &&
+                        !mailingData.reportEmailEnable) ||
+                      !mailingData.email.useAuthentication
+                    "
+                    >Пользователь:</label
+                  >
+                  <input
+                    v-model="mailingData.email.user"
+                    type="text"
+                    :disabled="
+                      (!mailingData.notificationEmailEnable &&
+                        !mailingData.reportEmailEnable) ||
+                      !mailingData.email.useAuthentication
+                    "
+                    :class="{ 'validation-error': error.emailUser }"
+                    :title="error.emailUser"
+                  />
+                  <label
+                    :disabled="
+                      (!mailingData.notificationEmailEnable &&
+                        !mailingData.reportEmailEnable) ||
+                      !mailingData.email.useAuthentication
+                    "
+                    >Пароль:</label
+                  >
+                  <input
+                    type="password"
+                    v-model="mailingData.email.password"
+                    :disabled="
+                      (!mailingData.notificationEmailEnable &&
+                        !mailingData.reportEmailEnable) ||
+                      !mailingData.email.useAuthentication
+                    "
+                    :class="{ 'validation-error': error.emailPassword }"
+                    :title="error.emailPassword"
+                  />
                 </div>
-                <label :disabled="!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable">Email отправителя:</label>
-                <input v-model="mailingData.email.senderEmail" type="text" :disabled="!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable" :class="{ 'validation-error': error.senderEmail }" :title="error.senderEmail" />
-                <label :disabled="!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable">Имя отправителя:</label>
-                <input v-model="mailingData.email.senderName" type="text" :disabled="!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable" />
+                <label
+                  :disabled="
+                    !mailingData.notificationEmailEnable &&
+                    !mailingData.reportEmailEnable
+                  "
+                  >Email отправителя:</label
+                >
+                <input
+                  v-model="mailingData.email.senderEmail"
+                  type="text"
+                  :disabled="
+                    !mailingData.notificationEmailEnable &&
+                    !mailingData.reportEmailEnable
+                  "
+                  :class="{ 'validation-error': error.senderEmail }"
+                  :title="error.senderEmail"
+                />
+                <label
+                  :disabled="
+                    !mailingData.notificationEmailEnable &&
+                    !mailingData.reportEmailEnable
+                  "
+                  >Имя отправителя:</label
+                >
+                <input
+                  v-model="mailingData.email.senderName"
+                  type="text"
+                  :disabled="
+                    !mailingData.notificationEmailEnable &&
+                    !mailingData.reportEmailEnable
+                  "
+                />
                 <div />
-                <button @click="onTestEmailClick" :disabled="testingEmail || (!mailingData.notificationEmailEnable && !mailingData.reportEmailEnable)" style="justify-self: right">Проверить</button>
+                <button
+                  @click="onTestEmailClick"
+                  :disabled="
+                    testingEmail ||
+                    (!mailingData.notificationEmailEnable &&
+                      !mailingData.reportEmailEnable)
+                  "
+                  style="justify-self: right"
+                >
+                  Проверить
+                </button>
               </div>
             </expantion>
-            <expantion caption="Настройки отправки SMS-сообщений" :resizable="false">
-              <div class="system-props-grid" :disabled="!mailingData.notificationSmsEnable">
-                <label :disabled="!mailingData.notificationSmsEnable">Порт отсылки сообщений:</label>
-                <select v-model="mailingData.sms.port" :disabled="!mailingData.notificationSmsEnable">
-                  <option v-for="(r, index) in ports" :key="index" :value="r">{{ r.name }}</option>
+            <expantion
+              caption="Настройки отправки SMS-сообщений"
+              :resizable="false"
+            >
+              <div
+                class="system-props-grid"
+                :disabled="!mailingData.notificationSmsEnable"
+              >
+                <label :disabled="!mailingData.notificationSmsEnable"
+                  >Порт отсылки сообщений:</label
+                >
+                <select
+                  v-model="mailingData.sms.port"
+                  :disabled="!mailingData.notificationSmsEnable"
+                >
+                  <option v-for="(r, index) in ports" :key="index" :value="r">
+                    {{ r.name }}
+                  </option>
                 </select>
-                <label :disabled="!mailingData.notificationSmsEnable">Скорость:</label>
-                <select v-model="mailingData.sms.portSpeed" :disabled="!mailingData.notificationSmsEnable">
-                  <option v-for="r in $store.state.env.comPortSpeeds" :key="r" :value="parseInt(r)">{{ r }}</option>
+                <label :disabled="!mailingData.notificationSmsEnable"
+                  >Скорость:</label
+                >
+                <select
+                  v-model="mailingData.sms.portSpeed"
+                  :disabled="!mailingData.notificationSmsEnable"
+                >
+                  <option
+                    v-for="r in $store.state.env.comPortSpeeds"
+                    :key="r"
+                    :value="parseInt(r)"
+                  >
+                    {{ r }}
+                  </option>
                 </select>
-                <label :disabled="!mailingData.notificationSmsEnable">Частей в СМС, не более:</label>
-                <number-box v-model="mailingData.sms.messageSmsPartCount" style="width: 30px" :min="1" :max="250" :disabled="!mailingData.notificationSmsEnable" :class="{ 'validation-error': error.messageSmsPartCount }" :title="error.messageSmsPartCount" />
-                <check-box style="grid-column: span 2" v-model="mailingData.sms.notificationTextSend" :disabled="!mailingData.notificationSmsEnable">Посылать сообщения только о наличии уведомлений</check-box>
+                <label :disabled="!mailingData.notificationSmsEnable"
+                  >Частей в СМС, не более:</label
+                >
+                <number-box
+                  v-model="mailingData.sms.messageSmsPartCount"
+                  style="width: 30px"
+                  :min="1"
+                  :max="250"
+                  :disabled="!mailingData.notificationSmsEnable"
+                  :class="{ 'validation-error': error.messageSmsPartCount }"
+                  :title="error.messageSmsPartCount"
+                />
+                <check-box
+                  style="grid-column: span 2"
+                  v-model="mailingData.sms.notificationTextSend"
+                  :disabled="!mailingData.notificationSmsEnable"
+                  >Посылать сообщения только о наличии уведомлений</check-box
+                >
                 <div />
-                <button @click="onTestSmsClick" :disabled="testingSms || !mailingData.notificationSmsEnable" style="justify-self: right">Проверить</button>
+                <button
+                  @click="onTestSmsClick"
+                  :disabled="testingSms || !mailingData.notificationSmsEnable"
+                  style="justify-self: right"
+                >
+                  Проверить
+                </button>
               </div>
             </expantion>
           </div>
           <transition>
-            <wizard v-if="wizard" v-bind="wizard" @cancel="cancelWizard" @end="onWizardEnd" />
+            <wizard
+              v-if="wizard"
+              v-bind="wizard"
+              @cancel="cancelWizard"
+              @end="onWizardEnd"
+            />
           </transition>
         </tabx>
         <tabx text="Вид">
           <div class="system-props-view">
-            <expantion caption="Индикация наличия собранных данных" :resizable="false">
+            <expantion
+              caption="Индикация наличия собранных данных"
+              :resizable="false"
+            >
               <div class="system-props-grid">
                 <label>Диапазон отображения:</label>
                 <div class="system-props-grid">
                   <select v-model="viewData.timeType">
-                    <option v-for="key in Object.keys($store.state.env.pollDataTimeTypes)" :key="key" :value="parseInt(key)">{{ $store.state.env.pollDataTimeTypes[key].text }}</option>
+                    <option
+                      v-for="key in Object.keys(
+                        $store.state.env.pollDataTimeTypes
+                      )"
+                      :key="key"
+                      :value="parseInt(key)"
+                    >
+                      {{ $store.state.env.pollDataTimeTypes[key].text }}
+                    </option>
                   </select>
                   <div class="system-props-grid" style="min-width: 250px">
-                    <div v-if="viewData.timeType === pollDataTimeTypes.onDepth" class="system-props-grid">
-                      <number-box v-model="viewData.timeDepth" style="width: 30px" :min="1" :max="999" />
+                    <div
+                      v-if="viewData.timeType === pollDataTimeTypes.onDepth"
+                      class="system-props-grid"
+                    >
+                      <number-box
+                        v-model="viewData.timeDepth"
+                        style="width: 30px"
+                        :min="1"
+                        :max="999"
+                      />
                       <label>дн</label>
                     </div>
-                    <div v-else style="display: grid; align-items: center; grid-gap: 5px 3px; grid-template-columns: auto auto auto 1fr">
-                      <datepicker v-model="viewData.timeFrom" format="DD.MM.YYYY" style="width: 90px" :class="{ 'validation-error': error.viewTime }" :title="error.viewTime" />
+                    <div
+                      v-else
+                      style="
+                        display: grid;
+                        align-items: center;
+                        grid-gap: 5px 3px;
+                        grid-template-columns: auto auto auto 1fr;
+                      "
+                    >
+                      <datepicker
+                        v-model="viewData.timeFrom"
+                        format="DD.MM.YYYY"
+                        style="width: 90px"
+                        :class="{ 'validation-error': error.viewTime }"
+                        :title="error.viewTime"
+                      />
                       <check-box v-model="viewData.isTimeTo" />
                       <label :disabled="!viewData.isTimeTo">по</label>
-                      <datepicker :disabled="!viewData.isTimeTo" v-model="viewData.timeTo" format="DD.MM.YYYY" style="width: 90px" :class="{ 'validation-error': error.viewTime }" :title="error.viewTime" />
+                      <datepicker
+                        :disabled="!viewData.isTimeTo"
+                        v-model="viewData.timeTo"
+                        format="DD.MM.YYYY"
+                        style="width: 90px"
+                        :class="{ 'validation-error': error.viewTime }"
+                        :title="error.viewTime"
+                      />
                     </div>
                     <div></div>
                   </div>
@@ -298,7 +913,10 @@
               </div>
             </expantion>
             <expantion caption="Общие параметры" :resizable="false">
-              <check-box v-model="viewData.hideNodeNameInAddress">Никогда не отображать наименование объекта учета в адресе точки учета</check-box>
+              <check-box v-model="viewData.hideNodeNameInAddress"
+                >Никогда не отображать наименование объекта учета в адресе точки
+                учета</check-box
+              >
             </expantion>
             <expantion caption="Отображение вкладок в Web" :resizable="false">
               <div class="system-props-web">
@@ -309,6 +927,15 @@
                 <check-box v-model="viewData.map">Карта</check-box>
               </div>
             </expantion>
+
+            <!-- serg -->
+            <expantion caption="Отображение списков точек учета в Web" :resizable="false">
+              <div class="system-props-points">
+                <SystemPropsPoints />
+              </div>
+            </expantion>
+            
+            
           </div>
         </tabx>
         <tabx v-if="certificates" text="Сертификаты">
@@ -317,7 +944,13 @@
               <div class="system-props-grid">
                 <label>Сервер хранения сертификатов:</label>
                 <select v-model="certificates.server">
-                  <option v-for="r in certificates.servers" :key="r.id" :value="r.id">{{ r.name }}</option>
+                  <option
+                    v-for="r in certificates.servers"
+                    :key="r.id"
+                    :value="r.id"
+                  >
+                    {{ r.name }}
+                  </option>
                 </select>
               </div>
             </expantion>
@@ -345,8 +978,9 @@ import PreserverComponent from '../PreserverComponent.vue'
 import Tabs from '../Tabs/Tabs.vue'
 import Tabx from '../Tabs/Tabx.vue'
 import Wizard from '../Wizard.vue'
+import SystemPropsPoints from './SystemPropsPoints.vue'
 
-const wizardSms = phone => {
+const wizardSms = (phone) => {
   return {
     name: 'testSms',
     component: {
@@ -354,13 +988,13 @@ const wizardSms = phone => {
       component: 'test-sms',
       event: 'changed',
       data: {
-        phone: phone
-      }
-    }
+        phone: phone,
+      },
+    },
   }
 }
 
-const wizardEmail = email => {
+const wizardEmail = (email) => {
   return {
     name: 'testEmail',
     component: {
@@ -368,9 +1002,9 @@ const wizardEmail = email => {
       component: 'test-email',
       event: 'changed',
       data: {
-        email: email
-      }
-    }
+        email: email,
+      },
+    },
   }
 }
 
@@ -384,7 +1018,8 @@ export default {
     PreserverComponent,
     Tabs,
     Tabx,
-    Wizard
+    Wizard,
+    SystemPropsPoints
   },
   data() {
     return {
@@ -411,15 +1046,18 @@ export default {
         periodEquipEvents: null,
         periodEquipCustomizing: null,
         periodSetDataColdWater: null,
-        periodColdWater: null
+        periodColdWater: null,
       },
-      months: 'Январь_Февраль_Март_Апрель_Май_Июнь_Июль_Август_Сентябрь_Октябрь_Ноябрь_Декабрь'.split('_'),
+      months:
+        'Январь_Февраль_Март_Апрель_Май_Июнь_Июль_Август_Сентябрь_Октябрь_Ноябрь_Декабрь'.split(
+          '_'
+        ),
       server: {
         isAlone: true,
-        servers: []
+        servers: [],
       },
       commonData: {
-        systemNode: null
+        systemNode: null,
       },
       pollData: {
         enabled: true,
@@ -446,60 +1084,66 @@ export default {
           periodHour: 0,
           periodMin: 0,
           periodSec: 0,
-          periodType: matchType(this.$store.state.env.pollDataPeriodTypes).everyHour,
+          periodType: matchType(this.$store.state.env.pollDataPeriodTypes)
+            .everyHour,
           retryHour: 0,
-          retryMin: 0
+          retryMin: 0,
         },
         periodSetParams: {
           periodNum: 0,
           periodHour: 0,
           periodMin: 0,
           periodSec: 0,
-          periodType: matchType(this.$store.state.env.pollDataPeriodTypes).everyHour,
+          periodType: matchType(this.$store.state.env.pollDataPeriodTypes)
+            .everyHour,
           retryHour: 0,
-          retryMin: 0
+          retryMin: 0,
         },
         periodEquipEvents: {
           periodNum: 0,
           periodHour: 0,
           periodMin: 0,
           periodSec: 0,
-          periodType: matchType(this.$store.state.env.pollDataPeriodTypes).everyHour,
+          periodType: matchType(this.$store.state.env.pollDataPeriodTypes)
+            .everyHour,
           retryHour: 0,
-          retryMin: 0
+          retryMin: 0,
         },
         periodEquipCustomizing: {
           periodNum: 0,
           periodHour: 0,
           periodMin: 0,
           periodSec: 0,
-          periodType: matchType(this.$store.state.env.pollDataPeriodTypes).everyHour,
+          periodType: matchType(this.$store.state.env.pollDataPeriodTypes)
+            .everyHour,
           retryHour: 0,
-          retryMin: 0
+          retryMin: 0,
         },
         periodSetDataColdwater: {
           periodNum: 0,
           periodHour: 0,
           periodMin: 0,
           periodSec: 0,
-          periodType: matchType(this.$store.state.env.pollDataPeriodTypes).everyHour,
+          periodType: matchType(this.$store.state.env.pollDataPeriodTypes)
+            .everyHour,
           retryHour: 0,
-          retryMin: 0
+          retryMin: 0,
         },
         periodColdWater: {
           periodNum: 0,
           periodHour: 0,
           periodMin: 0,
           periodSec: 0,
-          periodType: matchType(this.$store.state.env.pollDataPeriodTypes).everyHour,
+          periodType: matchType(this.$store.state.env.pollDataPeriodTypes)
+            .everyHour,
           retryHour: 0,
-          retryMin: 0
+          retryMin: 0,
         },
         waitHour: 0,
         waitMin: 0,
         autoDisableControl: false,
         retryCount: 1,
-        autoRequest: true
+        autoRequest: true,
       },
       reportData: {
         day: 1,
@@ -513,7 +1157,7 @@ export default {
           enableLosses: false,
           timeIdleForAvgToPeriod: 30,
           timeIdleForCorrection: 15,
-          timeWork: 1
+          timeWork: 1,
         },
         residentialBuilding: {
           enableAvgToPeriod: false,
@@ -522,8 +1166,8 @@ export default {
           enableLosses: false,
           timeIdleForAvgToPeriod: 30,
           timeIdleForCorrection: 15,
-          timeWork: 1
-        }
+          timeWork: 1,
+        },
       },
       mailingData: {
         email: {
@@ -533,14 +1177,14 @@ export default {
           user: null,
           password: null,
           senderEmail: null,
-          senderName: null
+          senderName: null,
         },
         sms: {
           port: null,
           portSpeed: null,
           messageSmsPartCount: 1,
-          notificationTextSend: false
-        }
+          notificationTextSend: false,
+        },
       },
       temperatureGraphData: {
         t1more: true,
@@ -554,7 +1198,7 @@ export default {
         t2moreType: true,
         t2less: true,
         t2lessValue: 5,
-        t2lessType: true
+        t2lessType: true,
       },
       viewData: {
         timeType: matchType(this.$store.state.env.pollDataTimeTypes).onDepth,
@@ -566,13 +1210,17 @@ export default {
         points: true,
         equips: true,
         extra: true,
-        map: true
+        map: true,
       },
-      certificates: null
+      certificates: null,
     }
   },
   async created() {
-    this.$emitter.emit('componentCreated', { type: matchType(this.$store.state.env.itemTypes).systemProps, key: this.key, component: this })
+    this.$emitter.emit('componentCreated', {
+      type: matchType(this.$store.state.env.itemTypes).systemProps,
+      key: this.key,
+      component: this,
+    })
 
     await this.edit()
 
@@ -618,7 +1266,11 @@ export default {
     )
   },
   beforeUnmount() {
-    this.$emitter.emit('componentBeforeUnmount', { type: matchType(this.$store.state.env.itemTypes).systemProps, key: this.key, component: this })
+    this.$emitter.emit('componentBeforeUnmount', {
+      type: matchType(this.$store.state.env.itemTypes).systemProps,
+      key: this.key,
+      component: this,
+    })
   },
   computed: {
     periodTypes() {
@@ -631,7 +1283,10 @@ export default {
       return matchType(this.$store.state.env.pollDataTimeTypes)
     },
     ports() {
-      const server = this.commonData.systemNode !== null ? this.server.servers.find(r => r.id === this.commonData.systemNode) : null
+      const server =
+        this.commonData.systemNode !== null
+          ? this.server.servers.find((r) => r.id === this.commonData.systemNode)
+          : null
 
       if (server) {
         return server.ports
@@ -640,23 +1295,77 @@ export default {
       return []
     },
     periodArchiveData() {
-      return Object.assign({ enabled: this.pollData.enabled && this.pollData.control, error: Object.assign({ pollDataPeriod: this.error.periodArchive }, this.error) }, this.pollData.periodArchive)
+      return Object.assign(
+        {
+          enabled: this.pollData.enabled && this.pollData.control,
+          error: Object.assign(
+            { pollDataPeriod: this.error.periodArchive },
+            this.error
+          ),
+        },
+        this.pollData.periodArchive
+      )
     },
     periodSetParamsData() {
-      return Object.assign({ enabled: this.pollData.enabled && this.pollData.control, error: Object.assign({ pollDataPeriod: this.error.periodSetParams }, this.error) }, this.pollData.periodSetParams)
+      return Object.assign(
+        {
+          enabled: this.pollData.enabled && this.pollData.control,
+          error: Object.assign(
+            { pollDataPeriod: this.error.periodSetParams },
+            this.error
+          ),
+        },
+        this.pollData.periodSetParams
+      )
     },
     periodEquipEventsData() {
-      return Object.assign({ enabled: this.pollData.enabled && this.pollData.control, error: Object.assign({ pollDataPeriod: this.error.periodEquipEvents }, this.error) }, this.pollData.periodEquipEvents)
+      return Object.assign(
+        {
+          enabled: this.pollData.enabled && this.pollData.control,
+          error: Object.assign(
+            { pollDataPeriod: this.error.periodEquipEvents },
+            this.error
+          ),
+        },
+        this.pollData.periodEquipEvents
+      )
     },
     periodEquipCustomizingData() {
-      return Object.assign({ enabled: this.pollData.enabled && this.pollData.control, error: Object.assign({ pollDataPeriod: this.error.periodEquipCustomizing }, this.error) }, this.pollData.periodEquipCustomizing)
+      return Object.assign(
+        {
+          enabled: this.pollData.enabled && this.pollData.control,
+          error: Object.assign(
+            { pollDataPeriod: this.error.periodEquipCustomizing },
+            this.error
+          ),
+        },
+        this.pollData.periodEquipCustomizing
+      )
     },
     periodSetDataColdWaterData() {
-      return Object.assign({ enabled: this.pollData.enabled && this.pollData.control, error: Object.assign({ pollDataPeriod: this.error.periodSetDataColdWater }, this.error) }, this.pollData.periodSetDataColdWater)
+      return Object.assign(
+        {
+          enabled: this.pollData.enabled && this.pollData.control,
+          error: Object.assign(
+            { pollDataPeriod: this.error.periodSetDataColdWater },
+            this.error
+          ),
+        },
+        this.pollData.periodSetDataColdWater
+      )
     },
     periodColdWaterData() {
-      return Object.assign({ enabled: this.pollData.enabled && this.pollData.control, error: Object.assign({ pollDataPeriod: this.error.periodColdWater }, this.error) }, this.pollData.periodColdWater)
-    }
+      return Object.assign(
+        {
+          enabled: this.pollData.enabled && this.pollData.control,
+          error: Object.assign(
+            { pollDataPeriod: this.error.periodColdWater },
+            this.error
+          ),
+        },
+        this.pollData.periodColdWater
+      )
+    },
   },
   methods: {
     async edit() {
@@ -671,11 +1380,21 @@ export default {
         this.reportData = data.reportData
 
         if (data.mailingData.sms.port) {
-          data.mailingData.sms.port = this.ports.find(r => r.type === data.mailingData.sms.port.type && r.id === data.mailingData.sms.port.id && r.name === data.mailingData.sms.port.name)
+          data.mailingData.sms.port = this.ports.find(
+            (r) =>
+              r.type === data.mailingData.sms.port.type &&
+              r.id === data.mailingData.sms.port.id &&
+              r.name === data.mailingData.sms.port.name
+          )
         }
         this.mailingData = data.mailingData
 
-        this.certificates = Object.prototype.hasOwnProperty.call(data, 'certificates') ? data.certificates : null
+        this.certificates = Object.prototype.hasOwnProperty.call(
+          data,
+          'certificates'
+        )
+          ? data.certificates
+          : null
       } catch (error) {
         this.$store.commit('error', error)
       } finally {
@@ -692,21 +1411,35 @@ export default {
           pollData: JSON.parse(JSON.stringify(this.pollData)),
           viewData: {
             timeType: this.viewData.timeType,
-            timeDepth: matchType(this.$store.state.env.pollDataTimeTypes).onDepth === this.viewData.timeType ? this.viewData.timeDepth : null,
-            timeFrom: matchType(this.$store.state.env.pollDataTimeTypes).fromTime === this.viewData.timeType ? new Date(this.viewData.timeFrom).getTime() : null,
-            timeTo: matchType(this.$store.state.env.pollDataTimeTypes).fromTime === this.viewData.timeType ? (this.viewData.isTimeTo ? new Date(this.viewData.timeTo).getTime() : null) : null,
+            timeDepth:
+              matchType(this.$store.state.env.pollDataTimeTypes).onDepth ===
+              this.viewData.timeType
+                ? this.viewData.timeDepth
+                : null,
+            timeFrom:
+              matchType(this.$store.state.env.pollDataTimeTypes).fromTime ===
+              this.viewData.timeType
+                ? new Date(this.viewData.timeFrom).getTime()
+                : null,
+            timeTo:
+              matchType(this.$store.state.env.pollDataTimeTypes).fromTime ===
+              this.viewData.timeType
+                ? this.viewData.isTimeTo
+                  ? new Date(this.viewData.timeTo).getTime()
+                  : null
+                : null,
             hideNodeNameInAddress: this.viewData.hideNodeNameInAddress,
             info: this.viewData.info,
             points: this.viewData.points,
             equips: this.viewData.equips,
             extra: this.viewData.extra,
-            map: this.viewData.map
+            map: this.viewData.map,
           },
           commonData: this.commonData,
           reportData: this.reportData,
           temperatureGraphData: this.temperatureGraphData,
           mailingData: this.mailingData,
-          certServer: this.certificates ? this.certificates.server : null
+          certServer: this.certificates ? this.certificates.server : null,
         }
 
         obj.pollData.dateStart = new Date(this.pollData.dateStart).getTime()
@@ -735,10 +1468,26 @@ export default {
 
       if (name === 'testSms') {
         this.localPhone = data
-        this.testSms(Object.assign({ phone: this.localPhone, systemNodeId: this.commonData.systemNode }, this.mailingData.sms))
+        this.testSms(
+          Object.assign(
+            {
+              phone: this.localPhone,
+              systemNodeId: this.commonData.systemNode,
+            },
+            this.mailingData.sms
+          )
+        )
       } else if (name === 'testEmail') {
         this.localEmail = data
-        this.testEmail(Object.assign({ email: this.localEmail, systemNodeId: this.commonData.systemNode }, this.mailingData.email))
+        this.testEmail(
+          Object.assign(
+            {
+              email: this.localEmail,
+              systemNodeId: this.commonData.systemNode,
+            },
+            this.mailingData.email
+          )
+        )
       }
     },
     cancelWizard() {
@@ -773,8 +1522,8 @@ export default {
     },
     onPeriodColdWaterChange(value, prop) {
       this.pollData.periodColdWater[prop] = value
-    }
-  }
+    },
+  },
 }
 </script>
 
@@ -817,6 +1566,8 @@ export default {
 .system-props-view,
 .system-props-web,
 .system-props-report,
+.system-props-points,
+.system-props-equips,
 .system-props-control {
   display: grid;
   gap: 5px 3px;
