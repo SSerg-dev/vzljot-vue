@@ -19,13 +19,7 @@ export class PointCustomProperty {
   name: string
   value: string
 
-  constructor({
-    name,
-    value
-  }: {
-    name: string
-    value: string
-  }) {
+  constructor({ name, value }: { name: string; value: string }) {
     this.name = name
     this.value = value
   }
@@ -50,7 +44,7 @@ export class Point {
   pollSource: number
   consumer?: string
   custom: Array<PointCustomProperty>
-  
+
   constructor({
     id,
     name = '',
@@ -65,7 +59,7 @@ export class Point {
     reportTypes,
     pollSource,
     consumer,
-    custom
+    custom,
   }: {
     id: number
     name: string
@@ -118,7 +112,7 @@ export class PointList extends BaseObject {
     name = '',
     points = [],
     reportTypes = [],
-    settings = {}
+    settings = {},
   }: {
     uuid?: string
     id?: number
@@ -131,18 +125,19 @@ export class PointList extends BaseObject {
 
     this.id = id
     this.name = name
-    this.points = points.map(r => new Point(r))
+    this.points = points.map((r) => new Point(r))
     this.reportTypes = reportTypes
     this.settings = settings
   }
 
   async init(id: number) {
     if (!Number.isNaN(id)) {
-      const { data } = await this.http.get<PointList>('pointList/pointList', { params: { id } })
-      
+      const { data } = await this.http.get<PointList>('pointList/pointList', {
+        params: { id },
+      })
       this.id = data.id
       this.name = data.name
-      this.points = data.points.map(r => new Point(r))
+      this.points = data.points.map((r) => new Point(r))
       this.reportTypes = data.reportTypes ? data.reportTypes : this.reportTypes
       this.settings = data.settings ? data.settings : this.settings
     }
@@ -152,15 +147,18 @@ export class PointList extends BaseObject {
     await this.http.post('pointList/pointList', {
       id: this.id,
       name: this.name,
-      points: this.points.map(r => r.id)
+      points: this.points.map((r) => r.id),
     })
   }
 
   async addPoints(points: Array<number>) {
     if (points.length > 0) {
-      const { data } = await this.http.post<Array<Point>>('pointList/addPoints', { points })
+      const { data } = await this.http.post<Array<Point>>(
+        'pointList/addPoints',
+        { points }
+      )
 
-      data.forEach(r => new Point(r))
+      data.forEach((r) => new Point(r))
 
       this.points.push(...data)
     }

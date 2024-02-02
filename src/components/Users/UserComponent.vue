@@ -1,14 +1,38 @@
 <template>
   <div class="component-detail">
-    <preserver-component v-bind="{ saving, disabled: !hasChanges || loading, loading }" @saveClick="onSaveClick()">
+    <preserver-component
+      v-bind="{ saving, disabled: !hasChanges || loading, loading }"
+      @saveClick="onSaveClick()"
+    >
       <tabs @click="onTabClick($event)">
         <tab text="Параметры">
-          <user-props ref="userProps" v-bind="{ user: value, maps }" @change="onChangeEvent" @fullNameChange="onFullNameChange" />
+          <user-props
+            ref="userProps"
+            v-bind="{ user: value, maps }"
+            @change="onChangeEvent"
+            @fullNameChange="onFullNameChange"
+          />
         </tab>
-        <tab v-if="$store.state.user && $store.state.user?.userRights.allowCryptSign" text="Сертификат" :name="'certificate'">
+        <tab
+          v-if="
+            $store.state.user && $store.state.user?.userRights.allowCryptSign
+          "
+          text="Сертификат"
+          :name="'certificate'"
+        >
           <div class="cert-grid" style="width: fit-content">
-            <button v-if="certRunned && cert === null" @click="onCreateCertClick()">Создать</button>
-            <button v-if="certRunned && cert !== null" @click="onTrustCertClick()">Добавить к надежным</button>
+            <button
+              v-if="certRunned && cert === null"
+              @click="onCreateCertClick()"
+            >
+              Создать
+            </button>
+            <button
+              v-if="certRunned && cert !== null"
+              @click="onTrustCertClick()"
+            >
+              Добавить к надежным
+            </button>
             <div v-if="cert" class="cert-grid two">
               <label>Имя субъекта:</label>
               <div>{{ cert.subject }}</div>
@@ -18,114 +42,306 @@
               <div>{{ new Date(cert.validTo).toLocaleString() }}</div>
             </div>
           </div>
-          <wizard v-if="wizardCert" v-bind="wizardCert" @cancel="cancelWizardCert" @end="onWizardCertEnd" />
+          <wizard
+            v-if="wizardCert"
+            v-bind="wizardCert"
+            @cancel="cancelWizardCert"
+            @end="onWizardCertEnd"
+          />
           <spinner :show="waitCert" text="Ожидание..." />
         </tab>
         <tab text="Подписки">
           <tool-bar>
-            <div :class="['button', 'fas', 'fa-plus-circle']" title="Добавить..." @click="onAddSubscriptionClick()" />
-            <div :class="['button', 'fas', 'fa-times-circle', { disabled: !subscriptions.some(r => r.checked) }]" title="Удалить" @click="onRemoveSubscriptionClick()" />
+            <div
+              :class="['button', 'fas', 'fa-plus-circle']"
+              title="Добавить..."
+              @click="onAddSubscriptionClick()"
+            />
+            <div
+              :class="[
+                'button',
+                'fas',
+                'fa-times-circle',
+                { disabled: !subscriptions.some((r) => r.checked) },
+              ]"
+              title="Удалить"
+              @click="onRemoveSubscriptionClick()"
+            />
           </tool-bar>
-          <div class="table-grid" style="grid-template-columns: repeat(4, max-content)">
+          <div
+            class="table-grid"
+            style="grid-template-columns: repeat(4, max-content)"
+          >
             <header class="header" />
-            <header class="header"><input type="checkbox" v-model="allSubscriptions" @change="changeAllSubscriptions" /></header>
+            <header class="header">
+              <input
+                type="checkbox"
+                v-model="allSubscriptions"
+                @change="changeAllSubscriptions"
+              />
+            </header>
             <header class="header">Наименование</header>
             <header class="header">Приоритет</header>
-            <div v-for="(r, i) in localSubscriptions" :key="i" class="table-row">
+            <div
+              v-for="(r, i) in localSubscriptions"
+              :key="i"
+              class="table-row"
+            >
               <span class="cell icon">
-                <div :class="`${getImage(r)} clickable-icon`" @click="viewSubscriptionClick(r)" title="Просмотр..." />
+                <div
+                  :class="`${getImage(r)} clickable-icon`"
+                  @click="viewSubscriptionClick(r)"
+                  title="Просмотр..."
+                />
               </span>
               <span class="cell">
                 <input type="checkbox" v-model="r.checked" />
               </span>
               <span class="cell">{{ r.name }}</span>
-              <span class="cell">{{ $store.state.env.notificationPriorityEnum[r.priority] }}</span>
+              <span class="cell">{{
+                $store.state.env.notificationPriorityEnum[r.priority]
+              }}</span>
             </div>
           </div>
           <pager v-bind="subscriptionPageInfo" @go="onChangeSubscriptionPage" />
           <transition-group>
-            <wizard v-if="wizardSubscription" v-bind="wizardSubscription" @cancel="cancelWizardSubscription" @end="onWizardSubscriptionEnd" />
-            <props v-if="subscriptionEdit" :text="`Подписка: ${subscriptionComponentText}`" @close="subscriptionClose">
-              <user-subscription v-bind="subscriptionData" @saved="onSaveSubscriptionClick" />
+            <wizard
+              v-if="wizardSubscription"
+              v-bind="wizardSubscription"
+              @cancel="cancelWizardSubscription"
+              @end="onWizardSubscriptionEnd"
+            />
+            <props
+              v-if="subscriptionEdit"
+              :text="`Подписка: ${subscriptionComponentText}`"
+              @close="subscriptionClose"
+            >
+              <user-subscription
+                v-bind="subscriptionData"
+                @saved="onSaveSubscriptionClick"
+              />
             </props>
           </transition-group>
         </tab>
         <tab v-if="isTabVisible" text="Права пользователя">
-          <user-rights v-bind="{ userRights: getUserRights(), groupsRights: getGroupRights(), objectsRights: getObjectRights() }" @changeAllow="onChangeAllow" @changeDeny="onChangeDeny" />
+          <user-rights
+            v-bind="{
+              userRights: getUserRights(),
+              groupsRights: getGroupRights(),
+              objectsRights: getObjectRights(),
+            }"
+            @changeAllow="onChangeAllow"
+            @changeDeny="onChangeDeny"
+          />
         </tab>
         <tab v-if="isTabVisible" text="Доступ к приборам">
           <div style="display: flex; padding: 10px">
-            <check-box v-model="value.limitEquips">Ограничить доступ к приборам</check-box>
-            <check-box style="padding: 0 20px" v-model="value.includeRelatedPoints" :disabled="!value.limitEquips">Предоставить доступ от связанных точек учета</check-box>
+            <check-box v-model="value.limitEquips"
+              >Ограничить доступ к приборам</check-box
+            >
+            <check-box
+              style="padding: 0 20px"
+              v-model="value.includeRelatedPoints"
+              :disabled="!value.limitEquips"
+              >Предоставить доступ от связанных точек учета</check-box
+            >
           </div>
           <tool-bar>
-            <div :class="['button', 'fas', 'fa-plus-circle', { disabled: !value.limitEquips }]" title="Добавить..." @click="onAddEquipClick" />
-            <div :class="['button', 'fas', 'fa-times-circle', { disabled: !hasSelectedEquips || !value.limitEquips }]" title="Удалить" @click="onRemoveEquipClick" />
+            <div
+              :class="[
+                'button',
+                'fas',
+                'fa-plus-circle',
+                { disabled: !value.limitEquips },
+              ]"
+              title="Добавить..."
+              @click="onAddEquipClick"
+            />
+            <div
+              :class="[
+                'button',
+                'fas',
+                'fa-times-circle',
+                { disabled: !hasSelectedEquips || !value.limitEquips },
+              ]"
+              title="Удалить"
+              @click="onRemoveEquipClick"
+            />
           </tool-bar>
-          <div class="table-grid" style="grid-template-columns: repeat(3, max-content)">
-            <header class="header"><input type="checkbox" v-model="allEquips" @change="changeAllEquips()" :disabled="!value.limitEquips" /></header>
+          <div
+            class="table-grid"
+            style="grid-template-columns: repeat(3, max-content)"
+          >
+            <header class="header">
+              <input
+                type="checkbox"
+                v-model="allEquips"
+                @change="changeAllEquips()"
+                :disabled="!value.limitEquips"
+              />
+            </header>
             <header class="header"></header>
             <header class="header">Наименование</header>
             <div v-for="(r, i) in localEquips" :key="i" class="table-row">
               <span class="cell">
-                <input type="checkbox" v-model="r.checked" :disabled="!value.limitEquips" />
+                <input
+                  type="checkbox"
+                  v-model="r.checked"
+                  :disabled="!value.limitEquips"
+                />
               </span>
               <span class="cell icon">
-                <div :class="`${getImage(r)} ${r.hasOwnProperty('state') ? $store.state.env.statuses[r.state].class : ''} table-icon`" />
+                <div
+                  :class="`${getImage(r)} ${
+                    r.hasOwnProperty('state')
+                      ? $store.state.env.statuses[r.state].class
+                      : ''
+                  } table-icon`"
+                />
               </span>
               <span class="cell">{{ r.name }}</span>
             </div>
           </div>
           <pager v-bind="equipPageInfo" @go="onChangeEquipPage" />
           <transition>
-            <wizard v-if="wizardEquip" v-bind="wizardEquip" @cancel="cancelWizardEquip" @end="onWizardEquipEnd" />
+            <wizard
+              v-if="wizardEquip"
+              v-bind="wizardEquip"
+              @cancel="cancelWizardEquip"
+              @end="onWizardEquipEnd"
+            />
           </transition>
         </tab>
         <tab v-if="isTabVisible" text="Доступ к точкам учета">
           <div style="display: flex; padding: 10px">
-            <check-box v-model="value.limitPoints">Ограничить доступ к точкам учета</check-box>
-            <check-box style="padding: 0 20px" v-model="value.includeRelatedEquips" :disabled="!value.limitPoints">Предоставить доступ от связанных приборов</check-box>
+            <check-box v-model="value.limitPoints"
+              >Ограничить доступ к точкам учета</check-box
+            >
+            <check-box
+              style="padding: 0 20px"
+              v-model="value.includeRelatedEquips"
+              :disabled="!value.limitPoints"
+              >Предоставить доступ от связанных приборов</check-box
+            >
           </div>
           <tool-bar>
-            <div :class="['button', 'fas', 'fa-plus-circle', { disabled: !value.limitPoints }]" title="Добавить..." @click="onAddPointClick" />
-            <div :class="['button', 'fas', 'fa-times-circle', { disabled: !hasSelectedPoints || !value.limitPoints }]" title="Удалить" @click="onRemovePointClick" />
+            <div
+              :class="[
+                'button',
+                'fas',
+                'fa-plus-circle',
+                { disabled: !value.limitPoints },
+              ]"
+              title="Добавить..."
+              @click="onAddPointClick"
+            />
+            <div
+              :class="[
+                'button',
+                'fas',
+                'fa-times-circle',
+                { disabled: !hasSelectedPoints || !value.limitPoints },
+              ]"
+              title="Удалить"
+              @click="onRemovePointClick"
+            />
           </tool-bar>
-          <div class="table-grid" style="grid-template-columns: repeat(3, max-content)">
-            <header class="header"><input type="checkbox" v-model="allPoints" @change="changeAllPoints()" :disabled="!value.limitPoints" /></header>
+          <div
+            class="table-grid"
+            style="grid-template-columns: repeat(3, max-content)"
+          >
+            <header class="header">
+              <input
+                type="checkbox"
+                v-model="allPoints"
+                @change="changeAllPoints()"
+                :disabled="!value.limitPoints"
+              />
+            </header>
             <header class="header"></header>
             <header class="header">Наименование</header>
             <div v-for="(r, i) in localPoints" :key="i" class="table-row">
               <span class="cell">
-                <input type="checkbox" v-model="r.checked" :disabled="!value.limitPoints" />
+                <input
+                  type="checkbox"
+                  v-model="r.checked"
+                  :disabled="!value.limitPoints"
+                />
               </span>
               <span class="cell icon">
-                <div :class="`${getImage(r)} ${r.hasOwnProperty('state') ? $store.state.env.statuses[r.state].class : ''} table-icon`" />
+                <div
+                  :class="`${getImage(r)} ${
+                    r.hasOwnProperty('state')
+                      ? $store.state.env.statuses[r.state].class
+                      : ''
+                  } table-icon`"
+                />
               </span>
               <span class="cell">{{ r.name }}</span>
             </div>
           </div>
+          <!-- <SystemPropsPoints />  -->
           <pager v-bind="pointPageInfo" @go="onChangePointPage" />
           <transition>
-            <wizard v-if="wizardPoint" v-bind="wizardPoint" @cancel="cancelWizardPoint" @end="onWizardPointEnd" />
+            <wizard
+              v-if="wizardPoint"
+              v-bind="wizardPoint"
+              @cancel="cancelWizardPoint"
+              @end="onWizardPointEnd"
+            />
           </transition>
         </tab>
         <tab v-if="isTabVisible" text="Доступ к отчетам">
           <div style="display: flex; padding: 10px">
-            <check-box v-model="value.limitReports">Ограничить доступ к отчетам</check-box>
+            <check-box v-model="value.limitReports"
+              >Ограничить доступ к отчетам</check-box
+            >
           </div>
           <tool-bar>
-            <div :class="['button', 'fas', 'fa-plus-circle', { disabled: !value.limitReports }]" title="Добавить..." @click="onAddReportClick" />
-            <div :class="['button', 'fas', 'fa-times-circle', { disabled: !hasSelectedReports || !value.limitReports }]" title="Удалить" @click="onRemoveReportClick" />
+            <div
+              :class="[
+                'button',
+                'fas',
+                'fa-plus-circle',
+                { disabled: !value.limitReports },
+              ]"
+              title="Добавить..."
+              @click="onAddReportClick"
+            />
+            <div
+              :class="[
+                'button',
+                'fas',
+                'fa-times-circle',
+                { disabled: !hasSelectedReports || !value.limitReports },
+              ]"
+              title="Удалить"
+              @click="onRemoveReportClick"
+            />
           </tool-bar>
-          <div class="table-grid" style="grid-template-columns: repeat(5, max-content)">
-            <header class="header"><input type="checkbox" v-model="allReports" @change="changeAllReports()" :disabled="!value.limitReports" /></header>
+          <div
+            class="table-grid"
+            style="grid-template-columns: repeat(5, max-content)"
+          >
+            <header class="header">
+              <input
+                type="checkbox"
+                v-model="allReports"
+                @change="changeAllReports()"
+                :disabled="!value.limitReports"
+              />
+            </header>
             <header class="header"></header>
             <header class="header">Наименование</header>
             <header class="header">Тип объекта</header>
             <header class="header">Тип отчета</header>
             <div v-for="(r, i) in localReports" :key="i" class="table-row">
               <span class="cell">
-                <input type="checkbox" v-model="r.checked" :disabled="!value.limitReports" />
+                <input
+                  type="checkbox"
+                  v-model="r.checked"
+                  :disabled="!value.limitReports"
+                />
               </span>
               <span class="cell icon">
                 <div :class="`${getImage(r)} table-icon`" />
@@ -137,13 +353,24 @@
           </div>
           <pager v-bind="reportPageInfo" @go="onChangeReportPage" />
           <transition>
-            <wizard v-if="wizardReport" v-bind="wizardReport" @cancel="cancelWizardReport" @end="onWizardReportEnd" />
+            <wizard
+              v-if="wizardReport"
+              v-bind="wizardReport"
+              @cancel="cancelWizardReport"
+              @end="onWizardReportEnd"
+            />
           </transition>
         </tab>
       </tabs>
     </preserver-component>
     <transition-group>
-      <wizard v-if="wizard" v-bind="wizard" @cancel="cancelWizard" @end="onWizardEnd" key="0" />
+      <wizard
+        v-if="wizard"
+        v-bind="wizard"
+        @cancel="cancelWizard"
+        @end="onWizardEnd"
+        key="0"
+      />
       <spinner :show="loading" :text="'Загрузка...'" key="1" />
     </transition-group>
   </div>
@@ -165,31 +392,32 @@ const wizardReportAdd = (http, reports) => {
       data: {
         loader: async () => {
           let { data } = await http.get('user/reports')
-          return data.filter(r => !reports.includes(r.id)).sort(sortByName)
+          return data.filter((r) => !reports.includes(r.id)).sort(sortByName)
         },
         searchColumn: 'name',
         columns: [
           {
             prop: 'name',
-            text: 'Наименование'
+            text: 'Наименование',
           },
           {
             prop: 'objType',
-            text: 'Тип объекта'
+            text: 'Тип объекта',
           },
           {
             prop: 'reportType',
-            text: 'Тип отчета'
-          }
-        ]
-      }
-    }
+            text: 'Тип отчета',
+          },
+        ],
+      },
+    },
   }
 }
 
 const wizardEquipAdd = (http, equips, equipLists) => {
-  const getType = type => Object.values(store.state.env.itemTypes).find(r => r.type === type)
-  const types = ['equip', 'equipList'].map(r => getType(r))
+  const getType = (type) =>
+    Object.values(store.state.env.itemTypes).find((r) => r.type === type)
+  const types = ['equip', 'equipList'].map((r) => getType(r))
 
   return {
     name: 'add',
@@ -199,7 +427,7 @@ const wizardEquipAdd = (http, equips, equipLists) => {
       event: 'selectionChanged',
       data: {
         options: types,
-        defaultOption: types[0]
+        defaultOption: types[0],
       },
       next(data) {
         return {
@@ -211,29 +439,47 @@ const wizardEquipAdd = (http, equips, equipLists) => {
             loader: async () => {
               if (data === 'equip') {
                 let { data } = await http.get('user/equips')
-                return data.filter(r => !equips.includes(r.id)).sort(sortByName)
+                return data
+                  .filter((r) => !equips.includes(r.id))
+                  .sort(sortByName)
               } else {
                 let { data } = await http.get('user/equipLists')
-                return data.filter(r => !equipLists.includes(r.id)).sort(sortByName)
+                return data
+                  .filter((r) => !equipLists.includes(r.id))
+                  .sort(sortByName)
               }
             },
             searchColumn: 'name',
             columns: [
               {
                 prop: 'name',
-                text: 'Наименование'
-              }
-            ]
-          }
+                text: 'Наименование',
+              },
+            ],
+          },
         }
-      }
-    }
+      },
+    },
   }
 }
 
-const wizardPointAdd = (http, points, pointLists, pointGroups, balanceGroups, nodes) => {
-  const getType = type => Object.values(store.state.env.itemTypes).find(r => r.type === type)
-  const types = ['point', 'pointList', 'pointGroup', 'balanceGroup', 'node'].map(r => getType(r))
+const wizardPointAdd = (
+  http,
+  points,
+  pointLists,
+  pointGroups,
+  balanceGroups,
+  nodes
+) => {
+  const getType = (type) =>
+    Object.values(store.state.env.itemTypes).find((r) => r.type === type)
+  const types = [
+    'point',
+    'pointList',
+    'pointGroup',
+    'balanceGroup',
+    'node',
+  ].map((r) => getType(r))
 
   return {
     name: 'add',
@@ -243,54 +489,92 @@ const wizardPointAdd = (http, points, pointLists, pointGroups, balanceGroups, no
       event: 'selectionChanged',
       data: {
         options: types,
-        defaultOption: types[0]
+        defaultOption: types[0],
       },
       next(data) {
         return {
           name: 'add',
-          text: `Выбор ${data === 'point' ? 'точки учета' : data === 'pointList' ? 'списка точек учета' : data === 'pointGroup' ? 'группы точек учета' : data === 'balanceGroup' ? 'балансовой группы' : 'объекта учета'}:`,
+          text: `Выбор ${
+            data === 'point'
+              ? 'точки учета'
+              : data === 'pointList'
+              ? 'списка точек учета'
+              : data === 'pointGroup'
+              ? 'группы точек учета'
+              : data === 'balanceGroup'
+              ? 'балансовой группы'
+              : 'объекта учета'
+          }:`,
           component: 'selector',
           event: 'selectionChanged',
           data: {
             loader: async () => {
               if (data === 'point') {
                 let { data } = await http.get('point/points')
-                return data.filter(r => !points.includes(r.id)).sort(sortByName)
+                return data
+                  .filter((r) => !points.includes(r.id))
+                  .sort(sortByName)
               } else if (data === 'pointList') {
                 let { data } = await http.get('pointList/pointLists')
-                return data.filter(r => !pointLists.includes(r.id)).sort(sortByName)
+                return data
+                  .filter((r) => !pointLists.includes(r.id))
+                  .sort(sortByName)
               } else if (data === 'pointGroup') {
                 let { data } = await http.get('user/pointGroups')
-                return data.filter(r => !pointGroups.includes(r.id)).sort(sortByName)
+                return data
+                  .filter((r) => !pointGroups.includes(r.id))
+                  .sort(sortByName)
               } else if (data === 'balanceGroup') {
                 let { data } = await http.get('balanceGroup/balanceGroups')
 
                 let bgs = []
-                data.forEach(r => {
-                  if (!balanceGroups.some(group => group.id === r.id && group.groups === 1)) {
-                    bgs.push({ id: r.id, type: r.type, name: r.name + ' (Источники)', groups: 1, state: r.state })
+                data.forEach((r) => {
+                  if (
+                    !balanceGroups.some(
+                      (group) => group.id === r.id && group.groups === 1
+                    )
+                  ) {
+                    bgs.push({
+                      id: r.id,
+                      type: r.type,
+                      name: r.name + ' (Источники)',
+                      groups: 1,
+                      state: r.state,
+                    })
                   }
-                  if (!balanceGroups.some(group => group.id === r.id && group.groups === 2)) {
-                    bgs.push({ id: r.id, type: r.type, name: r.name + ' (Потребители)', groups: 2, state: r.state })
+                  if (
+                    !balanceGroups.some(
+                      (group) => group.id === r.id && group.groups === 2
+                    )
+                  ) {
+                    bgs.push({
+                      id: r.id,
+                      type: r.type,
+                      name: r.name + ' (Потребители)',
+                      groups: 2,
+                      state: r.state,
+                    })
                   }
                 })
                 return bgs.sort(sortByName)
               } else if (data === 'node') {
                 let { data } = await http.get('node/nodes')
-                return data.filter(r => !nodes.includes(r.id)).sort(sortByName)
+                return data
+                  .filter((r) => !nodes.includes(r.id))
+                  .sort(sortByName)
               }
             },
             searchColumn: 'name',
             columns: [
               {
                 prop: 'name',
-                text: 'Наименование'
-              }
-            ]
-          }
+                text: 'Наименование',
+              },
+            ],
+          },
         }
-      }
-    }
+      },
+    },
   }
 }
 
@@ -301,9 +585,9 @@ const wizardReportRemove = () => {
       text: 'Удаление отчетов:',
       component: 'message',
       data: {
-        text: 'Вы действительно хотите удалить выбранные отчеты?'
-      }
-    }
+        text: 'Вы действительно хотите удалить выбранные отчеты?',
+      },
+    },
   }
 }
 
@@ -314,9 +598,9 @@ const wizardEquipRemove = () => {
       text: 'Удаление приборов:',
       component: 'message',
       data: {
-        text: 'Вы действительно хотите удалить выбранные объекты?'
-      }
-    }
+        text: 'Вы действительно хотите удалить выбранные объекты?',
+      },
+    },
   }
 }
 
@@ -327,32 +611,32 @@ const wizardPointRemove = () => {
       text: 'Удаление точек учета:',
       component: 'message',
       data: {
-        text: 'Вы действительно хотите удалить выбранные объекты?'
-      }
-    }
+        text: 'Вы действительно хотите удалить выбранные объекты?',
+      },
+    },
   }
 }
 
-const wizardCert = name => {
+const wizardCert = (name) => {
   return {
     name: name,
     component: {
       text: 'Ввод пароля:',
       component: 'certPassword',
-      event: 'changed'
-    }
+      event: 'changed',
+    },
   }
 }
 
-const wizardSubscriptionAdd = value => {
+const wizardSubscriptionAdd = (value) => {
   return {
     name: 'add',
     component: {
       text: 'Создание подписки:',
       component: 'user-subscription-props',
       event: 'changed',
-      data: value
-    }
+      data: value,
+    },
   }
 }
 
@@ -363,9 +647,9 @@ const wizardSubscriptionRemove = () => {
       text: 'Удаление подписок:',
       component: 'message',
       data: {
-        text: 'Вы действительно хотите удалить выбранные подписки?'
-      }
-    }
+        text: 'Вы действительно хотите удалить выбранные подписки?',
+      },
+    },
   }
 }
 
@@ -390,8 +674,11 @@ import Wizard from '../Wizard.vue'
 import UserRights from './UserRights.vue'
 import UserSubscription from './UserSubscription.vue'
 
+// import SystemPropsPoints from '../SystemProps/SystemPropsPoints.vue'
+
 export default {
   components: {
+    // SystemPropsPoints,
     ToolBar,
     Pager,
     UserProps,
@@ -402,7 +689,7 @@ export default {
     Wizard,
     PreserverComponent,
     Props,
-    UserSubscription
+    UserSubscription,
   },
   extends: BaseComponent,
   data() {
@@ -418,7 +705,9 @@ export default {
       equipPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
       pointPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
       reportPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
-      subscriptionPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
+      subscriptionPageInfo: JSON.parse(
+        JSON.stringify(this.$store.getters.pageInfo)
+      ),
       allEquips: false,
       allPoints: false,
       allReports: false,
@@ -431,7 +720,7 @@ export default {
       waitCert: false,
       subscriptionData: null,
       subscriptionComponentText: null,
-      subscriptionEdit: false
+      subscriptionEdit: false,
     }
   },
   computed: {
@@ -439,65 +728,109 @@ export default {
       return this.matchType(this.$store.state.env.itemTypes)
     },
     hasSelectedEquips() {
-      return this.value.equips.some(r => r.checked) || this.value.equipLists.some(r => r.checked)
+      return (
+        this.value.equips.some((r) => r.checked) ||
+        this.value.equipLists.some((r) => r.checked)
+      )
     },
     hasSelectedPoints() {
-      return this.value.points.some(r => r.checked) || this.value.pointGroups.some(r => r.checked) || this.value.pointLists.some(r => r.checked) || this.value.nodes.some(r => r.checked) || this.value.balanceGroups.some(r => r.checked)
+      return (
+        this.value.points.some((r) => r.checked) ||
+        this.value.pointGroups.some((r) => r.checked) ||
+        this.value.pointLists.some((r) => r.checked) ||
+        this.value.nodes.some((r) => r.checked) ||
+        this.value.balanceGroups.some((r) => r.checked)
+      )
     },
     hasSelectedReports() {
-      return this.value.reports.some(r => r.checked)
+      return this.value.reports.some((r) => r.checked)
     },
     localReports() {
       let rows = this.value.reports.slice(0).sort(sortByName)
 
-      const firstIndex = (this.reportPageInfo.Page - 1) * this.reportPageInfo.Size
-      const lastIndex = this.reportPageInfo.Page * this.reportPageInfo.Size > rows.length ? rows.length : this.reportPageInfo.Page * this.reportPageInfo.Size
+      const firstIndex =
+        (this.reportPageInfo.Page - 1) * this.reportPageInfo.Size
+      const lastIndex =
+        this.reportPageInfo.Page * this.reportPageInfo.Size > rows.length
+          ? rows.length
+          : this.reportPageInfo.Page * this.reportPageInfo.Size
 
       return rows.slice(firstIndex, lastIndex)
     },
     localPoints() {
-      let rows = this.value.points.concat(this.value.pointGroups, this.value.pointLists, this.value.balanceGroups, this.value.nodes).sort(sortByName)
+      let rows = this.value.points
+        .concat(
+          this.value.pointGroups,
+          this.value.pointLists,
+          this.value.balanceGroups,
+          this.value.nodes
+        )
+        .sort(sortByName)
 
       const firstIndex = (this.pointPageInfo.Page - 1) * this.pointPageInfo.Size
-      const lastIndex = this.pointPageInfo.Page * this.pointPageInfo.Size > rows.length ? rows.length : this.pointPageInfo.Page * this.pointPageInfo.Size
+      const lastIndex =
+        this.pointPageInfo.Page * this.pointPageInfo.Size > rows.length
+          ? rows.length
+          : this.pointPageInfo.Page * this.pointPageInfo.Size
 
       return rows.slice(firstIndex, lastIndex)
     },
     localEquips() {
-      let rows = this.value.equips.concat(this.value.equipLists).sort(sortByName)
+      let rows = this.value.equips
+        .concat(this.value.equipLists)
+        .sort(sortByName)
 
       const firstIndex = (this.equipPageInfo.Page - 1) * this.equipPageInfo.Size
-      const lastIndex = this.equipPageInfo.Page * this.equipPageInfo.Size > rows.length ? rows.length : this.equipPageInfo.Page * this.equipPageInfo.Size
+      const lastIndex =
+        this.equipPageInfo.Page * this.equipPageInfo.Size > rows.length
+          ? rows.length
+          : this.equipPageInfo.Page * this.equipPageInfo.Size
 
       return rows.slice(firstIndex, lastIndex)
     },
     localSubscriptions() {
       let rows = this.subscriptions.slice(0).sort(sortByName)
 
-      const firstIndex = (this.subscriptionPageInfo.Page - 1) * this.subscriptionPageInfo.Size
-      const lastIndex = this.subscriptionPageInfo.Page * this.subscriptionPageInfo.Size > rows.length ? rows.length : this.subscriptionPageInfo.Page * this.subscriptionPageInfo.Size
+      const firstIndex =
+        (this.subscriptionPageInfo.Page - 1) * this.subscriptionPageInfo.Size
+      const lastIndex =
+        this.subscriptionPageInfo.Page * this.subscriptionPageInfo.Size >
+        rows.length
+          ? rows.length
+          : this.subscriptionPageInfo.Page * this.subscriptionPageInfo.Size
 
       return rows.slice(firstIndex, lastIndex)
     },
     isModerator() {
-      const groups = this.value.userGroups.map(id => this.value.groups.find(r => id === r.id).typeCode)
+      const groups = this.value.userGroups.map(
+        (id) => this.value.groups.find((r) => id === r.id).typeCode
+      )
       return groups.includes('admin') || groups.includes('moderator')
     },
     isTabVisible() {
-      return this.value.id !== null && !this.isModerator && this.$store.state.user?.userRights.isModerator
+      return (
+        this.value.id !== null &&
+        !this.isModerator &&
+        this.$store.state.user?.userRights.isModerator
+      )
     },
     localEquipTypes() {
       let arr = this.equipTypes
 
       if (this.value.limitEquips) {
         const set = new Set()
-        this.value.equipLists.forEach(list => list.equipTypes.forEach(equipType => set.add(equipType)))
-        this.value.equips.forEach(equip => set.add(equip.equipType))
+        this.value.equipLists.forEach((list) =>
+          list.equipTypes.forEach((equipType) => set.add(equipType))
+        )
+        this.value.equips.forEach((equip) => set.add(equip.equipType))
         arr = [...set]
       }
 
-      return arr.filter(r => this.$store.state.env.systemMessageTypeEnum.equipEvent.templates[r])
-    }
+      return arr.filter(
+        (r) =>
+          this.$store.state.env.systemMessageTypeEnum.equipEvent.templates[r]
+      )
+    },
   },
   created() {
     this.$watch(
@@ -508,22 +841,35 @@ export default {
     this.reportPageInfo.Items = this.value.reports.length
 
     this.$watch(
-      () => this.value.points.concat(this.value.pointGroups, this.value.pointLists, this.value.balanceGroups, this.value.nodes).length,
-      value => (this.pointPageInfo.Items = value)
+      () =>
+        this.value.points.concat(
+          this.value.pointGroups,
+          this.value.pointLists,
+          this.value.balanceGroups,
+          this.value.nodes
+        ).length,
+      (value) => (this.pointPageInfo.Items = value)
     )
 
-    this.pointPageInfo.Items = this.value.points.concat(this.value.pointGroups, this.value.pointLists, this.value.balanceGroups, this.value.nodes).length
+    this.pointPageInfo.Items = this.value.points.concat(
+      this.value.pointGroups,
+      this.value.pointLists,
+      this.value.balanceGroups,
+      this.value.nodes
+    ).length
 
     this.$watch(
       () => this.value.equips.concat(this.value.equipLists).length,
-      value => (this.equipPageInfo.Items = value)
+      (value) => (this.equipPageInfo.Items = value)
     )
 
-    this.equipPageInfo.Items = this.value.equips.concat(this.value.equipLists).length
+    this.equipPageInfo.Items = this.value.equips.concat(
+      this.value.equipLists
+    ).length
 
     this.$watch(
       () => this.subscriptions.length,
-      value => (this.subscriptionPageInfo.Items = value)
+      (value) => (this.subscriptionPageInfo.Items = value)
     )
 
     this.subscriptionPageInfo.Items = this.subscriptions.length
@@ -558,7 +904,9 @@ export default {
     },
     'value.equipLists': function (value) {
       if (this.subscriptionData) {
-        this.subscriptionData.allowedEquipLists = JSON.parse(JSON.stringify(value))
+        this.subscriptionData.allowedEquipLists = JSON.parse(
+          JSON.stringify(value)
+        )
       }
     },
     'value.points': function (value) {
@@ -568,12 +916,16 @@ export default {
     },
     'value.pointLists': function (value) {
       if (this.subscriptionData) {
-        this.subscriptionData.allowedPointLists = JSON.parse(JSON.stringify(value))
+        this.subscriptionData.allowedPointLists = JSON.parse(
+          JSON.stringify(value)
+        )
       }
     },
     'value.pointGroups': function (value) {
       if (this.subscriptionData) {
-        this.subscriptionData.allowedPointGroups = JSON.parse(JSON.stringify(value))
+        this.subscriptionData.allowedPointGroups = JSON.parse(
+          JSON.stringify(value)
+        )
       }
     },
     'value.nodes': function (value) {
@@ -583,9 +935,11 @@ export default {
     },
     'value.balanceGroups': function (value) {
       if (this.subscriptionData) {
-        this.subscriptionData.allowedBalanceGroups = JSON.parse(JSON.stringify(value))
+        this.subscriptionData.allowedBalanceGroups = JSON.parse(
+          JSON.stringify(value)
+        )
       }
-    }
+    },
   },
   methods: {
     onFullNameChange(value) {
@@ -595,21 +949,21 @@ export default {
       return getImage.call(this, item)
     },
     changeAllEquips() {
-      this.value.equips.forEach(r => (r.checked = this.allEquips))
-      this.value.equipLists.forEach(r => (r.checked = this.allEquips))
+      this.value.equips.forEach((r) => (r.checked = this.allEquips))
+      this.value.equipLists.forEach((r) => (r.checked = this.allEquips))
     },
     changeAllPoints() {
-      this.value.points.forEach(r => (r.checked = this.allPoints))
-      this.value.pointLists.forEach(r => (r.checked = this.allPoints))
-      this.value.pointGroups.forEach(r => (r.checked = this.allPoints))
-      this.value.nodes.forEach(r => (r.checked = this.allPoints))
-      this.value.balanceGroups.forEach(r => (r.checked = this.allPoints))
+      this.value.points.forEach((r) => (r.checked = this.allPoints))
+      this.value.pointLists.forEach((r) => (r.checked = this.allPoints))
+      this.value.pointGroups.forEach((r) => (r.checked = this.allPoints))
+      this.value.nodes.forEach((r) => (r.checked = this.allPoints))
+      this.value.balanceGroups.forEach((r) => (r.checked = this.allPoints))
     },
     changeAllSubscriptions() {
-      this.subscriptions.forEach(r => (r.checked = this.allSubscriptions))
+      this.subscriptions.forEach((r) => (r.checked = this.allSubscriptions))
     },
     changeAllReports() {
-      this.value.reports.forEach(r => (r.checked = this.allReports))
+      this.value.reports.forEach((r) => (r.checked = this.allReports))
     },
     onChangeReportPage(page, size) {
       this.reportPageInfo.Size = size
@@ -634,7 +988,7 @@ export default {
         priority: 'normal',
         includeRelatedEquips: false,
         includeRelatedMeasureSchemes: false,
-        subscriptions: this.subscriptions
+        subscriptions: this.subscriptions,
       })
     },
     onRemoveSubscriptionClick() {
@@ -651,9 +1005,9 @@ export default {
         sub.checked = false
         this.subscriptions.push(sub)
       } else if (name === 'remove') {
-        this.subscriptions = this.subscriptions.filter(r => !r.checked)
+        this.subscriptions = this.subscriptions.filter((r) => !r.checked)
       } else if (name === 'edit') {
-        let subscription = this.subscriptions.find(r => r.id === data.id)
+        let subscription = this.subscriptions.find((r) => r.id === data.id)
         if (subscription) {
           Object.entries(data).forEach(([key, value]) => {
             if (Object.prototype.hasOwnProperty.call(subscription, key)) {
@@ -668,7 +1022,7 @@ export default {
     onAddReportClick() {
       this.wizardReport = wizardReportAdd(
         this.$http,
-        this.value.reports.map(r => r.id)
+        this.value.reports.map((r) => r.id)
       )
     },
     onRemoveReportClick() {
@@ -678,9 +1032,9 @@ export default {
       this.wizardReport = null
 
       if (name === 'remove') {
-        this.value.reports = this.value.reports.filter(r => !r.checked)
+        this.value.reports = this.value.reports.filter((r) => !r.checked)
       } else if (name === 'add') {
-        data.forEach(r => (r.checked = false))
+        data.forEach((r) => (r.checked = false))
         this.value.reports = this.value.reports.concat(data)
       }
 
@@ -692,11 +1046,11 @@ export default {
     onAddPointClick() {
       this.wizardPoint = wizardPointAdd(
         this.$http,
-        this.value.points.map(r => r.id),
-        this.value.pointLists.map(r => r.id),
-        this.value.pointGroups.map(r => r.id),
+        this.value.points.map((r) => r.id),
+        this.value.pointLists.map((r) => r.id),
+        this.value.pointGroups.map((r) => r.id),
         this.value.balanceGroups,
-        this.value.nodes.map(r => r.id)
+        this.value.nodes.map((r) => r.id)
       )
     },
     onRemovePointClick() {
@@ -706,14 +1060,42 @@ export default {
       this.wizardPoint = null
 
       if (name === 'remove') {
-        ['points', 'pointLists', 'pointGroups', 'balanceGroups', 'nodes'].forEach(key => (this.value[key] = this.value[key].filter(r => !r.checked)))
+        // eslint-disable-next-line no-extra-semi
+        ;[
+          'points',
+          'pointLists',
+          'pointGroups',
+          'balanceGroups',
+          'nodes',
+        ].forEach(
+          (key) => (this.value[key] = this.value[key].filter((r) => !r.checked))
+        )
       } else if (name === 'add') {
-        data.forEach(r => (r.checked = false))
-        this.value.points = this.value.points.concat(data.filter(r => this.itemTypes.point === r.type))
-        this.value.pointLists = this.value.pointLists.concat(data.filter(r => this.$store.state.env.itemTypes[r.type].type === 'pointList'))
-        this.value.pointGroups = this.value.pointGroups.concat(data.filter(r => this.$store.state.env.itemTypes[r.type].type === 'pointGroup'))
-        this.value.balanceGroups = this.value.balanceGroups.concat(data.filter(r => this.$store.state.env.itemTypes[r.type].type === 'balanceGroup'))
-        this.value.nodes = this.value.nodes.concat(data.filter(r => this.$store.state.env.itemTypes[r.type].type === 'node'))
+        data.forEach((r) => (r.checked = false))
+        this.value.points = this.value.points.concat(
+          data.filter((r) => this.itemTypes.point === r.type)
+        )
+        this.value.pointLists = this.value.pointLists.concat(
+          data.filter(
+            (r) => this.$store.state.env.itemTypes[r.type].type === 'pointList'
+          )
+        )
+        this.value.pointGroups = this.value.pointGroups.concat(
+          data.filter(
+            (r) => this.$store.state.env.itemTypes[r.type].type === 'pointGroup'
+          )
+        )
+        this.value.balanceGroups = this.value.balanceGroups.concat(
+          data.filter(
+            (r) =>
+              this.$store.state.env.itemTypes[r.type].type === 'balanceGroup'
+          )
+        )
+        this.value.nodes = this.value.nodes.concat(
+          data.filter(
+            (r) => this.$store.state.env.itemTypes[r.type].type === 'node'
+          )
+        )
       }
 
       this.hasChanges = true
@@ -724,8 +1106,8 @@ export default {
     onAddEquipClick() {
       this.wizardEquip = wizardEquipAdd(
         this.$http,
-        this.value.equips.map(r => r.id),
-        this.value.equipLists.map(r => r.id)
+        this.value.equips.map((r) => r.id),
+        this.value.equipLists.map((r) => r.id)
       )
     },
     onRemoveEquipClick() {
@@ -735,11 +1117,22 @@ export default {
       this.wizardEquip = null
 
       if (name === 'remove') {
-        ['equips', 'equipLists'].forEach(key => (this.value[key] = this.value[key].filter(r => !r.checked)))
+        // eslint-disable-next-line no-extra-semi
+        ;['equips', 'equipLists'].forEach(
+          (key) => (this.value[key] = this.value[key].filter((r) => !r.checked))
+        )
       } else if (name === 'add') {
-        data.forEach(r => (r.checked = false))
-        this.value.equips = this.value.equips.concat(data.filter(r => this.$store.state.env.itemTypes[r.type].type === 'equip'))
-        this.value.equipLists = this.value.equipLists.concat(data.filter(r => this.$store.state.env.itemTypes[r.type].type === 'equipList'))
+        data.forEach((r) => (r.checked = false))
+        this.value.equips = this.value.equips.concat(
+          data.filter(
+            (r) => this.$store.state.env.itemTypes[r.type].type === 'equip'
+          )
+        )
+        this.value.equipLists = this.value.equipLists.concat(
+          data.filter(
+            (r) => this.$store.state.env.itemTypes[r.type].type === 'equipList'
+          )
+        )
       }
 
       this.hasChanges = true
@@ -787,8 +1180,8 @@ export default {
       } else {
         this.userRights[key].allow = false
         Object.values(this.userRights)
-          .filter(r => r.parent === key)
-          .forEach(r => {
+          .filter((r) => r.parent === key)
+          .forEach((r) => {
             r.deny = true
             r.allow = false
           })
@@ -821,7 +1214,7 @@ export default {
       this.wizardCert = null
     },
     getUserRights() {
-      const keys = Object.keys(this.userRights).filter(r => {
+      const keys = Object.keys(this.userRights).filter((r) => {
         switch (r) {
           case 'userEdit':
             return this.isModerator
@@ -838,12 +1231,16 @@ export default {
         }
       })
 
-      return Object.assign({}, ...keys.map(r => ({ [r]: this.userRights[r] })))
+      return Object.assign(
+        {},
+        ...keys.map((r) => ({ [r]: this.userRights[r] }))
+      )
     },
     getGroupRights() {
       let summary = {}
-      this.value.userGroups.forEach(id => {
-        const groupRights = this.groupsRights[this.value.groups.find(r => id === r.id).typeCode]
+      this.value.userGroups.forEach((id) => {
+        const groupRights =
+          this.groupsRights[this.value.groups.find((r) => id === r.id).typeCode]
 
         if (groupRights) {
           Object.entries(groupRights).forEach(([k, v]) => {
@@ -890,7 +1287,9 @@ export default {
       r.allowedPointLists = JSON.parse(JSON.stringify(this.value.pointLists))
       r.allowedPointGroups = JSON.parse(JSON.stringify(this.value.pointGroups))
       r.allowedNodes = JSON.parse(JSON.stringify(this.value.nodes))
-      r.allowedBalanceGroups = JSON.parse(JSON.stringify(this.value.balanceGroups))
+      r.allowedBalanceGroups = JSON.parse(
+        JSON.stringify(this.value.balanceGroups)
+      )
       r.subscriptions = this.subscriptions
 
       r.type = this.matchType(this.$store.state.env.itemTypes).notification
@@ -900,7 +1299,7 @@ export default {
       this.subscriptionEdit = true
     },
     onSaveSubscriptionClick(data) {
-      Object.keys(data).forEach(k => (this.subscriptionData[k] = data[k]))
+      Object.keys(data).forEach((k) => (this.subscriptionData[k] = data[k]))
       this.hasChanges = true
       this.subscriptionEdit = false
     },
@@ -908,19 +1307,20 @@ export default {
       try {
         const {
           data: {
-            data: { user, maps }
-          }
+            data: { user, maps },
+          },
         } = await this.$http.get('user/user', { params: { id } })
 
-        if (user.equips) user.equips.forEach(r => (r.checked = false))
-        if (user.equipLists) user.equipLists.forEach(r => (r.checked = false))
-        if (user.reports) user.reports.forEach(r => (r.checked = false))
-        if (user.points) user.points.forEach(r => (r.checked = false))
-        if (user.pointGroups) user.pointGroups.forEach(r => (r.checked = false))
-        if (user.pointLists) user.pointLists.forEach(r => (r.checked = false))
-        if (user.nodes) user.nodes.forEach(r => (r.checked = false))
+        if (user.equips) user.equips.forEach((r) => (r.checked = false))
+        if (user.equipLists) user.equipLists.forEach((r) => (r.checked = false))
+        if (user.reports) user.reports.forEach((r) => (r.checked = false))
+        if (user.points) user.points.forEach((r) => (r.checked = false))
+        if (user.pointGroups)
+          user.pointGroups.forEach((r) => (r.checked = false))
+        if (user.pointLists) user.pointLists.forEach((r) => (r.checked = false))
+        if (user.nodes) user.nodes.forEach((r) => (r.checked = false))
 
-        user.subscriptions.forEach(r => (r.checked = false))
+        user.subscriptions.forEach((r) => (r.checked = false))
         this.subscriptions = user.subscriptions
 
         if (user.equipTypes) this.equipTypes = user.equipTypes
@@ -929,7 +1329,7 @@ export default {
 
         this.value = new User(user)
 
-        Object.values(maps).forEach(r => r.connections.sort())
+        Object.values(maps).forEach((r) => r.connections.sort())
         this.maps = maps
       } catch (error) {
         this.$store.commit('error', error)
@@ -958,7 +1358,11 @@ export default {
       this.waitCert = true
 
       try {
-        const { data } = await this.$http.get('asHelper/certificate', { params: { id } }, { signal: abortController.signal })
+        const { data } = await this.$http.get(
+          'asHelper/certificate',
+          { params: { id } },
+          { signal: abortController.signal }
+        )
 
         this.cert = data.data
         this.certRunned = true
@@ -974,7 +1378,11 @@ export default {
       this.waitCert = true
 
       try {
-        const { data } = await this.$http.post('asHelper/certificate', { id, password }, { signal: abortController.signal })
+        const { data } = await this.$http.post(
+          'asHelper/certificate',
+          { id, password },
+          { signal: abortController.signal }
+        )
 
         this.cert = data.data
       } catch (error) {
@@ -989,7 +1397,11 @@ export default {
       this.waitCert = true
 
       try {
-        await this.$http.post('asHelper/trustCertificate', { id, password, thumbprint }, { signal: abortController.signal })
+        await this.$http.post(
+          'asHelper/trustCertificate',
+          { id, password, thumbprint },
+          { signal: abortController.signal }
+        )
       } catch (error) {
         if (!abortController.signal.aborted) {
           this.$store.commit('error', error)
@@ -997,8 +1409,8 @@ export default {
       } finally {
         this.waitCert = false
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

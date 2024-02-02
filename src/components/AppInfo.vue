@@ -108,6 +108,12 @@
 <script>
 import CardItem from './CardItem.vue'
 import PieChart from './PieChart.vue'
+import User from '../classes/user'
+
+const sortByName = (a, b) => {
+  if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+  if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+}
 
 export default {
   components: { CardItem, PieChart },
@@ -131,29 +137,36 @@ export default {
       keyRender: 0,
       timeout: null,
       delay: 0,
+
+      value: new User(),
+      maps: {},
+      pointPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
     }
   },
 
   created() {
     this.$emitter.on('si', this.onSi)
   },
-  mounted() {
-    this.get().catch((error) => {
+  async mounted() {
+    await this.get().catch((error) => {
       this.showLoader = false
       this.$store.commit('error', error)
     })
 
-    const options = {
-      isCardSelected: true,
-    }
-    this.$store.commit('setCard', options)
-    this.isCardSelected = this.getCard.isCardSelected
+    await this.fetchLocalPoints()
 
-    if (!this.isVisible) {
-      this.timeout = setTimeout(() => {
-        this.isVisible = true
-      }, this.delay)
-    }
+    // ----------------------------------
+    const localPointIds = new Set(this.localPoints.map((point) => point.id))
+    console.log('$$ localPointIds', localPointIds)
+
+    const resultArray = this.pointLists.filter((point) =>
+      localPointIds.has(point.id)
+    )
+    console.log('$$ resultArray', JSON.stringify(resultArray))
+
+    this.pointLists = resultArray
+
+    this.setup()
   },
 
   beforeUnmount() {
@@ -179,6 +192,24 @@ export default {
     getCard() {
       return this.$store.getters.getCard
     },
+    localPoints() {
+      let rows = this.value.points
+        .concat(
+          this.value.pointGroups,
+          this.value.pointLists,
+          this.value.balanceGroups,
+          this.value.nodes
+        )
+        .sort(sortByName)
+
+      const firstIndex = (this.pointPageInfo.Page - 1) * this.pointPageInfo.Size
+      const lastIndex =
+        this.pointPageInfo.Page * this.pointPageInfo.Size > rows.length
+          ? rows.length
+          : this.pointPageInfo.Page * this.pointPageInfo.Size
+
+      return rows.slice(firstIndex, lastIndex)
+    },
   },
   watch: {
     pointLists(newVal) {
@@ -193,6 +224,26 @@ export default {
     },
   },
   methods: {
+    setup() {
+      const options = {
+        isCardSelected: true,
+      }
+      this.$store.commit('setCard', options)
+      this.isCardSelected = this.getCard.isCardSelected
+
+      if (!this.isVisible) {
+        this.timeout = setTimeout(() => {
+          this.isVisible = true
+        }, this.delay)
+      }
+    },
+    async fetchLocalPoints() {
+      const userId = 1037
+      await this.edit(userId)
+
+      const localPoints = this.localPoints
+      console.log('$$ localPoints', JSON.stringify(localPoints))
+    },
     async get() {
       this.showLoader = true
       let { data } = await this.$http.post('home/getStatistic')
@@ -241,6 +292,7 @@ export default {
             value: point.statistic[statKey],
           })),
         }))
+        console.log('$$ this.pointLists', JSON.stringify(this.pointLists))
 
         const statisticPointArray = this.pointLists.map(
           (point) => point.statistic
@@ -297,7 +349,44 @@ export default {
       }
       return result
     },
-  },
+
+    async edit(id) {
+      try {
+        const {
+          data: {
+            data: { user, maps },
+          },
+        } = await this.$http.get('user/user', { params: { id } })
+
+        if (user.equips) user.equips.forEach((r) => (r.checked = false))
+        if (user.equipLists) user.equipLists.forEach((r) => (r.checked = false))
+        if (user.reports) user.reports.forEach((r) => (r.checked = false))
+        if (user.points) user.points.forEach((r) => (r.checked = false))
+        if (user.pointGroups)
+          user.pointGroups.forEach((r) => (r.checked = false))
+        if (user.pointLists) user.pointLists.forEach((r) => (r.checked = false))
+        if (user.nodes) user.nodes.forEach((r) => (r.checked = false))
+
+        user.subscriptions.forEach((r) => (r.checked = false))
+        this.subscriptions = user.subscriptions
+
+        if (user.equipTypes) this.equipTypes = user.equipTypes
+        if (user.groupsRights) this.groupsRights = user.groupsRights
+        if (user.userRights) this.userRights = user.userRights
+
+        this.value = new User(user)
+
+        // ------------------------------
+
+        Object.values(maps).forEach((r) => r.connections.sort())
+        this.maps = maps
+      } catch (error) {
+        this.$store.commit('error', error)
+      } finally {
+        this.loading = false
+      }
+    },
+  }, // end methods
 }
 </script>
 
@@ -305,27 +394,32 @@ export default {
 * {
   box-sizing: border-box;
 }
+
 .info-wrapper {
   display: flex;
   /* flex: 1; */
   /* overflow: hidden; */
 }
+
 .info-wrapper .footer {
   display: flex;
   align-items: center;
   padding: 3px;
   white-space: nowrap;
 }
+
 .container {
   display: flex;
   justify-content: center;
   flex-direction: row;
   flex-wrap: wrap;
 }
+
 .container .container-item-small {
   height: 420px;
   width: 284px;
 }
+
 .container .container-item-large {
   height: 90vh;
   width: 25vw;

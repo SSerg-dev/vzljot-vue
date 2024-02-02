@@ -928,7 +928,6 @@
               </div>
             </expantion>
 
-            <!-- serg -->
             <expantion caption="Отображение списков точек учета в Web" :resizable="false">
               <div class="system-props-points">
                 <SystemPropsPoints />
