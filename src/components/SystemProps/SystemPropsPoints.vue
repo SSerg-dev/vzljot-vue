@@ -28,13 +28,9 @@
 </template>
 
 <script>
-import { getImage } from '../../plugins/api.js'
-import User from '../../classes/user'
-
-const sortByName = (a, b) => {
-  if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
-  if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
-}
+import { getImage } from '@/plugins/api.js'
+import User from '@/classes/user'
+import { sortByName } from '@/plugins/utils/common.functions.js'
 
 export default {
   components: {},
@@ -44,6 +40,7 @@ export default {
       value: new User(),
       maps: {},
       pointPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
+      userId: 1037 // 30
     }
   },
   computed: {
@@ -73,7 +70,7 @@ export default {
               }
               return result
             }, [])
-            this.allPointListsData = uniqueArray
+            this.allPointListsData = uniqueArray.sort(sortByName)
           }
         } catch (err) {
           console.error('Error:', err)
@@ -101,7 +98,7 @@ export default {
   },
   created() {},
   mounted() {
-    const userId = 1037
+    const userId = this.userId
     const url = 'pointList/pointLists'
     this.allPointLists = url
 

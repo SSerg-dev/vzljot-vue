@@ -280,7 +280,6 @@
               <span class="cell">{{ r.name }}</span>
             </div>
           </div>
-          <!-- <SystemPropsPoints />  -->
           <pager v-bind="pointPageInfo" @go="onChangePointPage" />
           <transition>
             <wizard
@@ -674,11 +673,8 @@ import Wizard from '../Wizard.vue'
 import UserRights from './UserRights.vue'
 import UserSubscription from './UserSubscription.vue'
 
-// import SystemPropsPoints from '../SystemProps/SystemPropsPoints.vue'
-
 export default {
   components: {
-    // SystemPropsPoints,
     ToolBar,
     Pager,
     UserProps,
@@ -1435,6 +1431,18 @@ export default {
 
 .cert-grid button {
   width: min-content;
+}
+
+.system-props-points-container {
+  padding: 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content:flex-start;
+  gap: 0 100px;
+}
+.system-props-points-item {
+  max-width: 50%;
+  /* justify-content: stretch; */
 }
 
 .footer {

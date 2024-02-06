@@ -157,7 +157,6 @@ export default {
       if (this.$store.state.env.itemTypes[item.type].type === 'user') {
         let user = this.dataItems.find(r => r.id === item.id)
         if (user) {
-          console.log('$$ item.id', JSON.stringify(user))
           user.name = item.name
           user.groups = item.groups
           user.desc = item.desc

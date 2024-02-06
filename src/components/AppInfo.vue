@@ -141,6 +141,9 @@ export default {
       value: new User(),
       maps: {},
       pointPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
+      equipPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
+
+      userId: 1037,
     }
   },
 
@@ -153,18 +156,17 @@ export default {
       this.$store.commit('error', error)
     })
 
-    await this.fetchLocalPoints()
+    await this.fetchLocalData()
 
-    // ----------------------------------
     const localPointIds = new Set(this.localPoints.map((point) => point.id))
-    console.log('$$ localPointIds', localPointIds)
-
-    const resultArray = this.pointLists.filter((point) =>
+    this.pointLists = this.pointLists.filter((point) =>
       localPointIds.has(point.id)
     )
-    console.log('$$ resultArray', JSON.stringify(resultArray))
 
-    this.pointLists = resultArray
+    const localEquipIds = new Set(this.localEquips.map((equip) => equip.id))
+    this.equipLists = this.equipLists.filter((equip) =>
+      localEquipIds.has(equip.id)
+    )
 
     this.setup()
   },
@@ -210,16 +212,38 @@ export default {
 
       return rows.slice(firstIndex, lastIndex)
     },
+    localEquips() {
+      let rows = this.value.equips
+        .concat(this.value.equipLists)
+        .sort(sortByName)
+
+      const firstIndex = (this.equipPageInfo.Page - 1) * this.equipPageInfo.Size
+      const lastIndex =
+        this.equipPageInfo.Page * this.equipPageInfo.Size > rows.length
+          ? rows.length
+          : this.equipPageInfo.Page * this.equipPageInfo.Size
+
+      return rows.slice(firstIndex, lastIndex)
+    },
   },
   watch: {
     pointLists(newVal) {
       if (newVal.length > 1) {
+        // console.log('$$ newVal', JSON.stringify(newVal))
+        this.isCardSelected = true
         this.keyRender = newVal.length
+      }
+      if (newVal.length === 0 && this.equipLists.length === 0) {
+        this.isCardSelected = false
       }
     },
     equipLists(newVal) {
       if (newVal.length > 1) {
+        this.isCardSelected = true
         this.keyRender = newVal.length
+      }
+      if (newVal.length === 0 && this.pointLists.length === 0) {
+        this.isCardSelected = false
       }
     },
   },
@@ -237,12 +261,8 @@ export default {
         }, this.delay)
       }
     },
-    async fetchLocalPoints() {
-      const userId = 1037
-      await this.edit(userId)
-
-      const localPoints = this.localPoints
-      console.log('$$ localPoints', JSON.stringify(localPoints))
+    async fetchLocalData() {
+      await this.edit(this.userId)
     },
     async get() {
       this.showLoader = true
@@ -292,7 +312,6 @@ export default {
             value: point.statistic[statKey],
           })),
         }))
-        console.log('$$ this.pointLists', JSON.stringify(this.pointLists))
 
         const statisticPointArray = this.pointLists.map(
           (point) => point.statistic
@@ -360,6 +379,7 @@ export default {
 
         if (user.equips) user.equips.forEach((r) => (r.checked = false))
         if (user.equipLists) user.equipLists.forEach((r) => (r.checked = false))
+
         if (user.reports) user.reports.forEach((r) => (r.checked = false))
         if (user.points) user.points.forEach((r) => (r.checked = false))
         if (user.pointGroups)
@@ -375,8 +395,6 @@ export default {
         if (user.userRights) this.userRights = user.userRights
 
         this.value = new User(user)
-
-        // ------------------------------
 
         Object.values(maps).forEach((r) => r.connections.sort())
         this.maps = maps

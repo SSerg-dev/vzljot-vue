@@ -928,13 +928,20 @@
               </div>
             </expantion>
 
-            <expantion caption="Отображение списков точек учета в Web" :resizable="false">
-              <div class="system-props-points">
-                <SystemPropsPoints />
+            <expantion
+              caption="Отображение списков точек учета в Web &nbsp &nbsp &nbsp &nbsp Отображение списков приборов в Web"
+              :resizable="false"
+              style="padding: 5px 0;"
+            >
+              <div class="system-props-points-container">
+                <div class="system-props-points-item">
+                  <SystemPropsPoints />
+                </div>
+                <div class="system-props-points-item">
+                  <SystemPropsEquips />
+                </div>
               </div>
             </expantion>
-            
-            
           </div>
         </tabx>
         <tabx v-if="certificates" text="Сертификаты">
@@ -978,6 +985,7 @@ import Tabs from '../Tabs/Tabs.vue'
 import Tabx from '../Tabs/Tabx.vue'
 import Wizard from '../Wizard.vue'
 import SystemPropsPoints from './SystemPropsPoints.vue'
+import SystemPropsEquips from './SystemPropsEquips.vue'
 
 const wizardSms = (phone) => {
   return {
@@ -1018,7 +1026,8 @@ export default {
     Tabs,
     Tabx,
     Wizard,
-    SystemPropsPoints
+    SystemPropsPoints,
+    SystemPropsEquips,
   },
   data() {
     return {
@@ -1571,6 +1580,16 @@ export default {
   display: grid;
   gap: 5px 3px;
   grid-template-columns: auto;
+}
+.system-props-points-container {
+  padding: 0 auto;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
+.system-props-points-item {
+  max-width: 50%;
+  /* justify-content: stretch; */
 }
 
 .system-props-temp {

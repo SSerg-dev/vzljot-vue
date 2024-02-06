@@ -28,13 +28,9 @@
 </template>
 
 <script>
-import { getImage } from '../../plugins/api.js'
-import User from '../../classes/user'
-
-const sortByName = (a, b) => {
-  if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
-  if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
-}
+import { getImage } from '@/plugins/api.js'
+import User from '@/classes/user'
+import { sortByName } from '@/plugins/utils/common.functions.js'
 
 export default {
   components: {},
@@ -44,7 +40,7 @@ export default {
       value: new User(),
       maps: {},
       equipPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
-      userId: 1037,
+      userId: 1037 // 30
     }
   },
   computed: {
@@ -57,29 +53,18 @@ export default {
           let response = await this.$http.get(url)
           response.data = response.data.filter((item) => item && item !== null)
 
-          let _localEquips = this.localEquips.filter((item) => item !== null)
+          let _localEquips = [...this.localEquips]
+          _localEquips = _localEquips.filter((item) => item && item !== null)
 
-          // console.log('$$ response.data', JSON.stringify(response.data))
-          console.log(
-            '$$ this.localEquips',
-            Array.isArray(_localEquips),
-            // JSON.stringify(_localEquips)
-            JSON.stringify(this.value.equipLists)
-          )
-
-          
-          if (this.value.equipLists && response.data) {
+          if (_localEquips && response.data) {
             let mergedArray = Array.from(
               new Set([
-                ...this.value.equipLists,
+                ..._localEquips,
                 ...response.data.map((obj) => ({ ...obj, checked: false })),
               ])
               // eslint-disable-next-line no-unused-vars
             ).map(({ equipTypes = [], ...rest }) => rest)
-            
-            console.log('$$ mergedArray', JSON.stringify(mergedArray))
 
-            
             const idMap = new Map()
             const uniqueArray = mergedArray.reduce((result, obj) => {
               if (idMap.has(obj.id)) {
@@ -90,11 +75,8 @@ export default {
               }
               return result
             }, [])
-            this.allEquipListsData = uniqueArray
-            
-            console.log('$$ this.allEquipListsData: 86', this.allEquipListsData)
+            this.allEquipListsData = uniqueArray.sort(sortByName)
           }
-          
         } catch (err) {
           console.error('Error:', err)
         }
