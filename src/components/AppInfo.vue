@@ -133,6 +133,8 @@ export default {
       equipListsPieChart: [],
 
       isCardSelected: false,
+      isInfoChanged: false,
+
       isVisible: false,
       keyRender: 0,
       timeout: null,
@@ -143,7 +145,7 @@ export default {
       pointPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
       equipPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
 
-      userId: 1037,
+      userId: 30 // 1037 // 1
     }
   },
 
@@ -151,23 +153,7 @@ export default {
     this.$emitter.on('si', this.onSi)
   },
   async mounted() {
-    await this.get().catch((error) => {
-      this.showLoader = false
-      this.$store.commit('error', error)
-    })
-
-    await this.fetchLocalData()
-
-    const localPointIds = new Set(this.localPoints.map((point) => point.id))
-    this.pointLists = this.pointLists.filter((point) =>
-      localPointIds.has(point.id)
-    )
-
-    const localEquipIds = new Set(this.localEquips.map((equip) => equip.id))
-    this.equipLists = this.equipLists.filter((equip) =>
-      localEquipIds.has(equip.id)
-    )
-
+    this.selectData()
     this.setup()
   },
 
@@ -229,7 +215,6 @@ export default {
   watch: {
     pointLists(newVal) {
       if (newVal.length > 1) {
-        // console.log('$$ newVal', JSON.stringify(newVal))
         this.isCardSelected = true
         this.keyRender = newVal.length
       }
@@ -246,14 +231,26 @@ export default {
         this.isCardSelected = false
       }
     },
+    getCard(newVal) {
+      if (newVal.isInfoChanged) {
+        this.selectData()
+        this.keyRender++
+      }
+      const options = {
+        isInfoChanged: false,
+      }
+      this.$store.commit('setCard', options)
+    },
   },
   methods: {
     setup() {
       const options = {
         isCardSelected: true,
+        isInfoChanged: false,
       }
       this.$store.commit('setCard', options)
       this.isCardSelected = this.getCard.isCardSelected
+      this.isInfoChanged = this.getCard.isInfoChanged
 
       if (!this.isVisible) {
         this.timeout = setTimeout(() => {
@@ -270,6 +267,27 @@ export default {
       this.parseData(data)
       this.showLoader = false
     },
+
+    async selectData() {
+      await this.get().catch((error) => {
+        this.showLoader = false
+        this.$store.commit('error', error)
+      })
+      
+      await this.fetchLocalData()
+
+      const localPointIds = new Set(this.localPoints.map((point) => point.id))
+      this.pointLists = this.pointLists.filter((point) =>
+        localPointIds.has(point.id)
+      )
+
+      const localEquipIds = new Set(this.localEquips.map((equip) => equip.id))
+      this.equipLists = this.equipLists.filter((equip) =>
+        localEquipIds.has(equip.id)
+      )
+      
+    },
+
     onSi(message) {
       if (message && message.event === 'statistic') {
         this.parseData(message)

@@ -4,11 +4,43 @@
       <header>
         <nav>
           <v-menus v-bind="header">
-            <v-menu v-for="[k, v] in Object.entries(menus)" :key="k" v-bind="v" @clicked="menuClicked($event)" :style="currentMenu === v.name ? selectedColors : null" />
+            <v-menu
+              v-for="[k, v] in Object.entries(menus)"
+              :key="k"
+              v-bind="v"
+              @clicked="menuClicked($event)"
+              :style="currentMenu === v.name ? selectedColors : null"
+            />
             <template #right>
-              <v-menu v-if="notificationsCount" v-bind="{ name: 'notifications', image: 'fas fa-envelope', count: notificationsCount }" @clicked="menuClicked($event)" />
-              <v-menu v-if="$store.state.user" v-bind="{ name: 'user', text: $store.state.user.name, cursor: $store.state.user?.userRights.himselfUserEdit ? 'pointer' : 'default' }" @clicked="menuClicked($event)" />
-              <v-menu v-if="$store.state.user" v-bind="{ name: 'logout', image: 'fas fa-sign-out-alt', text: 'Выход' }" @clicked="menuClicked($event)" />
+              <v-menu
+                v-if="notificationsCount"
+                v-bind="{
+                  name: 'notifications',
+                  image: 'fas fa-envelope',
+                  count: notificationsCount,
+                }"
+                @clicked="menuClicked($event)"
+              />
+              <v-menu
+                v-if="$store.state.user"
+                v-bind="{
+                  name: 'user',
+                  text: $store.state.user.name,
+                  cursor: $store.state.user?.userRights.himselfUserEdit
+                    ? 'pointer'
+                    : 'default',
+                }"
+                @clicked="menuClicked($event)"
+              />
+              <v-menu
+                v-if="$store.state.user"
+                v-bind="{
+                  name: 'logout',
+                  image: 'fas fa-sign-out-alt',
+                  text: 'Выход',
+                }"
+                @clicked="menuClicked($event)"
+              />
             </template>
           </v-menus>
         </nav>
@@ -16,7 +48,11 @@
       <main class="content-wrapper">
         <transition mode="out-in">
           <keep-alive v-if="$store.state.user">
-            <component :is="component.name" v-bind="component.data" :key="component.key" />
+            <component
+              :is="component.name"
+              v-bind="component.data"
+              :key="component.key"
+            />
           </keep-alive>
         </transition>
         <template v-if="!$store.state.user">
@@ -28,8 +64,16 @@
         <notification-panel />
       </main>
       <transition>
-        <props-component v-if="popupData" :text="popupData.text" @close="onPopupClose()">
-          <component :is="popupData.component" v-bind="popupData.data" @fullNameChange="onUserEvent" />
+        <props-component
+          v-if="popupData"
+          :text="popupData.text"
+          @close="onPopupClose()"
+        >
+          <component
+            :is="popupData.component"
+            v-bind="popupData.data"
+            @fullNameChange="onUserEvent"
+          />
         </props-component>
       </transition>
       <error />
@@ -62,16 +106,24 @@ export default {
     AppFooter,
     Carousel,
     Error,
-    ExtraLayout: asyncImport(() => import('./components/Layouts/ExtraLayout.vue')),
+    ExtraLayout: asyncImport(() =>
+      import('./components/Layouts/ExtraLayout.vue')
+    ),
     Info,
     VueMap: asyncImport(() => import('./components/Map/Map.vue')),
-    SystemMessages: asyncImport(() => import('./components/SystemMessages/SystemMessages.vue')),
+    SystemMessages: asyncImport(() =>
+      import('./components/SystemMessages/SystemMessages.vue')
+    ),
     Login,
     NotificationPanel,
-    TreeLayout: asyncImport(() => import('./components/Layouts/TreeLayout.vue')),
-    UserComponent: asyncImport(() => import('./components/Users/UserComponent.vue')),
+    TreeLayout: asyncImport(() =>
+      import('./components/Layouts/TreeLayout.vue')
+    ),
+    UserComponent: asyncImport(() =>
+      import('./components/Users/UserComponent.vue')
+    ),
     VMenu,
-    VMenus
+    VMenus,
   },
   props: {
     header: Object,
@@ -79,14 +131,22 @@ export default {
     slides: Array,
     timeout: {
       type: Number,
-      default: 0
-    }
+      default: 0,
+    },
   },
   data() {
-    const baseUrl = window.location.pathname.slice(-1) === '/' ? window.location.pathname.slice(0, window.location.pathname.length - 1) : window.location.pathname
+    const baseUrl =
+      window.location.pathname.slice(-1) === '/'
+        ? window.location.pathname.slice(0, window.location.pathname.length - 1)
+        : window.location.pathname
     return {
-      connection: new window.signalR.HubConnectionBuilder().withUrl(`${baseUrl}/serviceHub`).configureLogging(window.signalR.LogLevel.Information).withAutomaticReconnect([0, 0, 5000]).build(),
-      idle: this.timeout === 0 ? null : new Idle(this.timeout, () => this.logout()),
+      connection: new window.signalR.HubConnectionBuilder()
+        .withUrl(`${baseUrl}/serviceHub`)
+        .configureLogging(window.signalR.LogLevel.Information)
+        .withAutomaticReconnect([0, 0, 5000])
+        .build(),
+      idle:
+        this.timeout === 0 ? null : new Idle(this.timeout, () => this.logout()),
       loaderText: '',
       showLoader: true,
       currentMenu: null,
@@ -95,15 +155,17 @@ export default {
       logging: false,
       notificationsCount: 0,
       state: {
-        authentificated: false
+        authentificated: false,
       },
-      siworker: new Worker(new URL('./plugins/workers/si.worker', import.meta.url))
+      siworker: new Worker(
+        new URL('./plugins/workers/si.worker', import.meta.url)
+      ),
     }
   },
   created() {
     this.$store.commit('setColors', this.colors)
 
-    this.siworker.onmessage = r => {
+    this.siworker.onmessage = (r) => {
       if (r.data.event === 'notifications') {
         this.notificationsCount = r.data.count
       } else {
@@ -126,7 +188,7 @@ export default {
       this.connection.invoke('reconnect')
     })
 
-    this.connection.on('authentificated', value => {
+    this.connection.on('authentificated', (value) => {
       this.state.authentificated = value
 
       if (value) {
@@ -136,7 +198,7 @@ export default {
       }
     })
 
-    this.connection.on('login', r => {
+    this.connection.on('login', (r) => {
       if (r) {
         const data = JSON.parse(r)
 
@@ -158,7 +220,7 @@ export default {
       this.showLoader = false
     })
 
-    this.connection.on('vspStateChange', r => {
+    this.connection.on('vspStateChange', (r) => {
       this.$store.commit('vsp', r)
       if (r.isOpened === false) {
         this.onVspClosed()
@@ -166,12 +228,14 @@ export default {
         this.ready()
       }
     })
-    this.connection.on('updateObject', r => {
+    this.connection.on('updateObject', (r) => {
       this.$emitter.emit('updateObject', JSON.parse(r))
     })
-    this.connection.on('deleteObject', r => this.$emitter.emit('deleteObject', JSON.parse(r)))
-    this.connection.on('si', r => this.siworker.postMessage(r))
-    this.connection.on('onNotAuthentificated', user => {
+    this.connection.on('deleteObject', (r) =>
+      this.$emitter.emit('deleteObject', JSON.parse(r))
+    )
+    this.connection.on('si', (r) => this.siworker.postMessage(r))
+    this.connection.on('onNotAuthentificated', (user) => {
       if (this.$store.state.user && this.$store.state.user.name === user) {
         this.logout()
       }
@@ -179,23 +243,27 @@ export default {
 
     this.connection.on('onLogout', () => this.onLogout())
     this.connection.on('reconnected', () => this.ready())
-    this.connection.on('notAvailable', r => this.onNotAvailable(r))
-    this.connection.on('updateWeather', r => this.$store.commit('weather', JSON.parse(r)))
-    this.connection.on('message', r => this.$emitter.emit('message', JSON.parse(r)))
+    this.connection.on('notAvailable', (r) => this.onNotAvailable(r))
+    this.connection.on('updateWeather', (r) =>
+      this.$store.commit('weather', JSON.parse(r))
+    )
+    this.connection.on('message', (r) =>
+      this.$emitter.emit('message', JSON.parse(r))
+    )
   },
   computed: {
     component() {
       let component = {
         name: 'carousel',
         key: 'carousel',
-        data: { slides: this.slides }
+        data: { slides: this.slides },
       }
 
       if (this.currentMenu && this.$store.state.vsp.isOpened) {
         switch (this.currentMenu) {
           case 'info':
             component = {
-              name: 'info'
+              name: 'info',
             }
             break
           case 'points':
@@ -204,19 +272,37 @@ export default {
               key: 'points',
               data: {
                 searchData: {
-                  settings: ['balanceGroup', 'pointGroup', 'pointList', 'address', 'node', 'point'],
-                  url: 'tree/findObjects'
+                  settings: [
+                    'balanceGroup',
+                    'pointGroup',
+                    'pointList',
+                    'address',
+                    'node',
+                    'point',
+                  ],
+                  url: 'tree/findObjects',
                 },
                 treeData: {
-                  nodeTypes: ['pointLists', 'pointList', 'points', 'address', 'node', 'point', 'balanceGroups', 'balanceGroup', 'pointGroups', 'pointGroup'],
+                  nodeTypes: [
+                    'pointLists',
+                    'pointList',
+                    'points',
+                    'address',
+                    'node',
+                    'point',
+                    'balanceGroups',
+                    'balanceGroup',
+                    'pointGroups',
+                    'pointGroup',
+                  ],
                   urls: {
                     init: 'tree/getPointTree',
                     load: 'tree/getChildren',
                     loadAll: 'tree/getAllChildren',
-                    search: 'tree/getParents'
-                  }
-                }
-              }
+                    search: 'tree/getParents',
+                  },
+                },
+              },
             }
             break
           case 'equips':
@@ -225,32 +311,46 @@ export default {
               key: 'equips',
               data: {
                 searchData: {
-                  settings: ['equipList', 'systemNode', 'groupConnection', 'equip'],
-                  url: 'tree/findObjects'
+                  settings: [
+                    'equipList',
+                    'systemNode',
+                    'groupConnection',
+                    'equip',
+                  ],
+                  url: 'tree/findObjects',
                 },
                 treeData: {
-                  nodeTypes: ['equipLists', 'equipList', 'equips', 'systemNode', 'groupConnection', 'equip', 'set', 'symbolSchema'],
+                  nodeTypes: [
+                    'equipLists',
+                    'equipList',
+                    'equips',
+                    'systemNode',
+                    'groupConnection',
+                    'equip',
+                    'set',
+                    'symbolSchema',
+                  ],
                   urls: {
                     init: 'tree/getEquipTree',
                     load: 'tree/getChildren',
                     loadAll: 'tree/getAllChildren',
-                    search: 'tree/getParents'
-                  }
-                }
-              }
+                    search: 'tree/getParents',
+                  },
+                },
+              },
             }
             break
           case 'extra':
             component = {
-              name: 'extra-layout'
+              name: 'extra-layout',
             }
             break
           case 'map':
             component = {
               name: 'vue-map',
               data: {
-                userMap: this.$store.state.user.map
-              }
+                userMap: this.$store.state.user.map,
+              },
             }
             break
         }
@@ -260,9 +360,9 @@ export default {
     selectedColors() {
       return {
         color: this.$store.state.colors.fill,
-        'background-color': this.$store.state.colors.text
+        'background-color': this.$store.state.colors.text,
       }
-    }
+    },
   },
   async mounted() {
     await this.start()
@@ -272,17 +372,21 @@ export default {
       this.notificationsCount = value
     },
     notificationsCount(value, oldVal) {
-      if (this.$store.state.user && this.$store.state.user.notification.sound && value > oldVal) {
+      if (
+        this.$store.state.user &&
+        this.$store.state.user.notification.sound &&
+        value > oldVal
+      ) {
         const audio = document.querySelector('audio')
         audio.muted = false
         let promise = audio.play()
         if (promise !== undefined) {
-          promise.catch(error => {
+          promise.catch((error) => {
             console.log('audio err', error)
           })
         }
       }
-    }
+    },
   },
   methods: {
     async start() {
@@ -324,17 +428,21 @@ export default {
     },
     menuClicked(name) {
       switch (name) {
-        case 'info': 
+        case 'info':
+          this.onInfo(true)
+          this.currentMenu = name
+          break
         case 'points':
         case 'equips':
         case 'extra':
         case 'map':
+          this.onInfo(false)
           this.currentMenu = name
           break
         case 'notifications':
           this.popupData = {
             text: 'Уведомления:',
-            component: 'systemMessages'
+            component: 'systemMessages',
           }
           break
         case 'user':
@@ -342,10 +450,10 @@ export default {
             this.popupData = {
               text: `Пользователь: ${this.$store.state.user.name}`,
               component: 'userComponent',
-              data: { 
+              data: {
                 id: this.$store.state.user.id,
-                type: 30
-              }
+                type: 30,
+              },
             }
           }
           break
@@ -356,7 +464,7 @@ export default {
     },
     onNotAvailable(message) {
       this.$store.commit('error', {
-        message: message
+        message: message,
       })
       this.showLoader = false
     },
@@ -369,11 +477,16 @@ export default {
     onConnected() {
       this.menus = []
 
-      if (this.$store.state.user.menus.info) this.menus.push({ name: 'info', text: 'Информация' })
-      if (this.$store.state.user.menus.points) this.menus.push({ name: 'points', text: 'Точки учета' })
-      if (this.$store.state.user.menus.equips) this.menus.push({ name: 'equips', text: 'Приборы' })
-      if (this.$store.state.user.menus.extra) this.menus.push({ name: 'extra', text: 'Дополнительно' })
-      if (this.$store.state.user.menus.map) this.menus.push({ name: 'map', text: 'Карта' })
+      if (this.$store.state.user.menus.info)
+        this.menus.push({ name: 'info', text: 'Информация' })
+      if (this.$store.state.user.menus.points)
+        this.menus.push({ name: 'points', text: 'Точки учета' })
+      if (this.$store.state.user.menus.equips)
+        this.menus.push({ name: 'equips', text: 'Приборы' })
+      if (this.$store.state.user.menus.extra)
+        this.menus.push({ name: 'extra', text: 'Дополнительно' })
+      if (this.$store.state.user.menus.map)
+        this.menus.push({ name: 'map', text: 'Карта' })
 
       if (this.menus.length > 0) {
         this.currentMenu = this.menus[0].name
@@ -400,7 +513,16 @@ export default {
         this.$store.commit('error', error.response.data)
       }
     },
-  } 
+    onInfo(flag) {
+      let options = {
+        isInfoChanged: false,
+      }
+      flag ? (options.isInfoChanged = true) : (options.isInfoChanged = false)
+      if (typeof flag === 'boolean') {
+        this.$store.commit('setCard', options)
+      }
+    },
+  }, // end methods
 }
 </script>
 

@@ -40,7 +40,7 @@ export default {
       value: new User(),
       maps: {},
       equipPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
-      userId: 1037 // 30
+      userId: 30 // 1037 // 1
     }
   },
   computed: {

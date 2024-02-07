@@ -61,11 +61,12 @@ const env: Env = {
 
 interface Card {
   isCardSelected: boolean | null
-  isCardChanged: boolean | null
+  isInfoChanged: boolean | null
+  
 }
 const card: Card = {
   isCardSelected: false,
-  isCardChanged: false
+  isInfoChanged: false
 }
 
 interface State {
@@ -154,7 +155,7 @@ export const store = createStore<State>({
     },
     setCard(state, payload)  {
       state.card.isCardSelected = payload.isCardSelected
-      state.card.isCardChanged = payload.isCardChanged
+      state.card.isInfoChanged = payload.isInfoChanged
     },
   },
   getters: {
@@ -167,7 +168,7 @@ export const store = createStore<State>({
     getCard: state => {
       return {
         isCardSelected: state.card.isCardSelected,
-        isCardChanged: state.card.isCardChanged
+        isInfoChanged: state.card.isInfoChanged
       }
     },
 
