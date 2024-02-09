@@ -515,12 +515,9 @@ export default {
     },
     onInfo(flag) {
       let options = {
-        isInfoChanged: false,
+        isInfoChanged: flag,
       }
-      flag ? (options.isInfoChanged = true) : (options.isInfoChanged = false)
-      if (typeof flag === 'boolean') {
-        this.$store.commit('setCard', options)
-      }
+      this.$store.commit('setCard', options) 
     },
   }, // end methods
 }

@@ -1,21 +1,52 @@
 <template>
   <div class="component-detail">
     <tool-bar v-if="$store.state.user?.userRights.setEdit">
-      <div :class="['button', 'fas', 'fa-plus-circle', { disabled: wait }]" title="Добавить..." @click="onAddClick()" />
-      <div :class="['button', 'fas', 'fa-times-circle', { disabled: !hasSelected || wait }]" title="Удалить" @click="onRemoveClick()" />
+      <div
+        :class="['button', 'fas', 'fa-plus-circle', { disabled: wait }]"
+        title="Добавить..."
+        @click="onAddClick()"
+      />
+      <div
+        :class="[
+          'button',
+          'fas',
+          'fa-times-circle',
+          { disabled: !hasSelected || wait },
+        ]"
+        title="Удалить"
+        @click="onRemoveClick()"
+      />
     </tool-bar>
-    <div class="table-grid" :style="{ 'grid-template-columns': `repeat(4, max-content)` }">
+    <div
+      class="table-grid"
+      :style="{ 'grid-template-columns': `repeat(4, max-content)` }"
+    >
       <header class="header" />
       <header class="header">
-        <input type="checkbox" v-model="all" @change="changeAll(all)" :disabled="wait" />
+        <input
+          type="checkbox"
+          v-model="all"
+          @change="changeAll(all)"
+          :disabled="wait"
+        />
       </header>
       <header class="header">Наименование</header>
       <header class="header">Тип</header>
       <div v-for="(r, index) in localItems" :key="index" class="table-row">
         <span class="cell icon">
-          <div :class="`fas ${getImage(r)} clickable-icon`" @click="viewClick(r)" title="Просмотр..." />
+          <div
+            :class="`fas ${getImage(r)} clickable-icon`"
+            @click="viewClick(r)"
+            title="Просмотр..."
+          />
         </span>
-        <span class="cell"><input v-if="r.type === itemTypes['setEquip'] && !r.availableForAll" type="checkbox" v-model="r.checked" :disabled="wait" /></span>
+        <span class="cell"
+          ><input
+            v-if="r.type === itemTypes['setEquip'] && !r.availableForAll"
+            type="checkbox"
+            v-model="r.checked"
+            :disabled="wait"
+        /></span>
         <span class="cell">{{ r.name }}</span>
         <span class="cell">{{ getType(r) }}</span>
       </div>
@@ -23,9 +54,18 @@
     <pager-component v-bind="pageInfo" @go="onChangePage" />
     <spinner :show="wait" :text="'Загрузка списка...'" />
     <transition-group>
-      <wizard v-if="wizard" v-bind="wizard" @cancel="cancelWizard" @end="onWizardEnd" />
+      <wizard
+        v-if="wizard"
+        v-bind="wizard"
+        @cancel="cancelWizard"
+        @end="onWizardEnd"
+      />
       <props-component v-if="edit" v-bind="componentData" @close="close">
-        <component :is="componentData.component" v-bind="componentData.data" @saved="onSaved" />
+        <component
+          :is="componentData.component"
+          v-bind="componentData.data"
+          @saved="onSaved"
+        />
       </props-component>
     </transition-group>
   </div>
@@ -46,7 +86,7 @@ import Wizard from '../Wizard.vue'
 let wizardAdd = (http, set, ids) => {
   const types = [
     { type: 'create', text: 'Новый' },
-    { type: 'add', text: 'Существующий' }
+    { type: 'add', text: 'Существующий' },
   ]
 
   return {
@@ -57,14 +97,14 @@ let wizardAdd = (http, set, ids) => {
       event: 'selectionChanged',
       data: {
         options: types,
-        defaultOption: types[0]
+        defaultOption: types[0],
       },
       next(data) {
         if (data === 'create') {
           return {
             component: 'set-detail',
             event: 'changed',
-            data: { set }
+            data: { set },
           }
         }
 
@@ -76,20 +116,25 @@ let wizardAdd = (http, set, ids) => {
             data: {
               singleMode: true,
               loader: async () => {
-                let { data } = await http.get(`set/getSetsToAdd?equipTypeId=${set.equipTypeId}&${ids.reduce((sum, cur, i) => `${sum}${i === 0 ? '' : '&'}ids=${cur}`, '')}`)
+                let { data } = await http.get(
+                  `set/getSetsToAdd?equipTypeId=${set.equipTypeId}&${ids.reduce(
+                    (sum, cur, i) => `${sum}${i === 0 ? '' : '&'}ids=${cur}`,
+                    ''
+                  )}`
+                )
                 return data
               },
               columns: [
                 {
                   prop: 'text',
-                  text: 'Наименование'
-                }
-              ]
-            }
+                  text: 'Наименование',
+                },
+              ],
+            },
           }
         }
-      }
-    }
+      },
+    },
   }
 }
 
@@ -100,9 +145,9 @@ const wizardRemove = () => {
       text: 'Удаление наборов:',
       component: 'message',
       data: {
-        text: 'Вы действительно хотите удалить выбранные объекты?'
-      }
-    }
+        text: 'Вы действительно хотите удалить выбранные объекты?',
+      },
+    },
   }
 }
 
@@ -113,11 +158,11 @@ export default {
     SetComponent: asyncImport(() => import('../Set/SetComponent.vue')),
     PropsComponent,
     ToolBar,
-    Wizard
+    Wizard,
   },
   extends: ListComponent,
   props: {
-    id: Number
+    id: Number,
   },
   data() {
     return {
@@ -125,12 +170,12 @@ export default {
       componentData: {
         component: null,
         text: null,
-        data: null
+        data: null,
       },
       edit: false,
       equipTypeId: null,
       equipType: null,
-      wizard: null
+      wizard: null,
     }
   },
   async mounted() {
@@ -142,7 +187,7 @@ export default {
     },
     setTypes() {
       return this.matchType(this.$store.state.env.setTypes)
-    }
+    },
   },
   methods: {
     async create(equipId, setId) {
@@ -174,9 +219,17 @@ export default {
           type: this.setTypes.equipType,
           equipId: this.id,
           equipTypeId: this.equipTypeId,
-          equipType: this.equipType
+          equipType: this.equipType,
         }),
-        this.dataItems.filter(r => (this.itemTypes['set'] === r.type || this.itemTypes['setEquip'] === r.type) && this.setTypes['equipType'] === r.setType && !r.availableForAll).map(r => r.id)
+        this.dataItems
+          .filter(
+            (r) =>
+              (this.itemTypes['set'] === r.type ||
+                this.itemTypes['setEquip'] === r.type) &&
+              this.setTypes['equipType'] === r.setType &&
+              !r.availableForAll
+          )
+          .map((r) => r.id)
       )
     },
     onRemoveClick() {
@@ -191,14 +244,24 @@ export default {
       if (name === 'add' && data && Array.isArray(data) && data.length) {
         this.create(this.id, data[0].id)
       } else if (name === 'remove') {
-        this.remove(this.dataItems.filter(r => r.checked === true && r.type === this.itemTypes['setEquip']).map(r => r.setEquipId))
+        this.remove(
+          this.dataItems
+            .filter(
+              (r) => r.checked === true && r.type === this.itemTypes['setEquip']
+            )
+            .map((r) => r.setEquipId)
+        )
       }
     },
     getType(r) {
-      return r.setType === this.setTypes.none ? 'Шаблон' : this.$store.state.env.setTypes[r.setType].text
+      return r.setType === this.setTypes.none
+        ? 'Шаблон'
+        : this.$store.state.env.setTypes[r.setType].text
     },
     onSaved(data) {
-      this.componentData.text = `${data instanceof Set ? 'Набор' : 'Мнемосхема'}: ${data.name}`
+      this.componentData.text = `${
+        data instanceof Set ? 'Набор' : 'Мнемосхема'
+      }: ${data.name}`
     },
     viewClick(r) {
       const type = this.$store.state.env.itemTypes[r.type]
@@ -213,8 +276,8 @@ export default {
           id: r.id,
           purposeGroup: r.setType,
           equipId: this.id,
-          equipTypeId: this.equipTypeId
-        }
+          equipTypeId: this.equipTypeId,
+        },
       }
 
       this.edit = true
@@ -226,9 +289,13 @@ export default {
       this.wait = true
 
       try {
-        const { data } = await this.$http.get('equip/getSetsAndSchemas', { params: { equipId: this.id } })
+        const { data } = await this.$http.get('equip/getSetsAndSchemas', {
+          params: { equipId: this.id },
+        })
 
-        this.dataItems = data.data.values.map(r => Object.assign(r, { checked: this.all }))
+        this.dataItems = data.data.values.map((r) =>
+          Object.assign(r, { checked: this.all })
+        )
         this.equipTypeId = data.data.equipTypeId
         this.equipType = data.data.equipType
       } catch (error) {
@@ -238,18 +305,29 @@ export default {
       }
     },
     onUpdate(item) {
-      if (this.itemTypes['setEquip'] === item.type && item.equipId === this.id) {
-        if (!this.dataItems.find(r => r.setEquipId === item.setEquipId)) {
+      if (
+        this.itemTypes['setEquip'] === item.type &&
+        item.equipId === this.id
+      ) {
+        if (!this.dataItems.find((r) => r.setEquipId === item.setEquipId)) {
           this.dataItems.push(Object.assign(item, { checked: false }))
         }
       }
 
       if (this.itemTypes['set'] === item.type) {
-        const set = this.dataItems.find(r => r.id === item.id && (this.itemTypes['set'] === r.type || this.itemTypes['setEquip'] === r.type))
+        const set = this.dataItems.find(
+          (r) =>
+            r.id === item.id &&
+            (this.itemTypes['set'] === r.type ||
+              this.itemTypes['setEquip'] === r.type)
+        )
 
         if (set) {
-          if (set.type === this.itemTypes['set'] && item.availableForAll === false) {
-            const index = this.dataItems.findIndex(r => r.id === set.id)
+          if (
+            set.type === this.itemTypes['set'] &&
+            item.availableForAll === false
+          ) {
+            const index = this.dataItems.findIndex((r) => r.id === set.id)
             if (index >= 0) {
               this.dataItems.splice(index, 1)
             }
@@ -258,24 +336,29 @@ export default {
           set.name = item.name
           set.setType = item.setType
           set.availableForAll = item.availableForAll
-        } else if (item.equipTypeId === this.equipTypeId && item.availableForAll) {
+        } else if (
+          item.equipTypeId === this.equipTypeId &&
+          item.availableForAll
+        ) {
           this.dataItems.push(Object.assign(item, { checked: false }))
         }
       }
     },
     onDelete(obj) {
       if (this.itemTypes['setEquip'] === obj.type) {
-        const index = this.dataItems.findIndex(r => r.setEquipId === obj.id)
+        const index = this.dataItems.findIndex((r) => r.setEquipId === obj.id)
         if (index >= 0) {
           this.dataItems.splice(index, 1)
         }
       } else if (this.itemTypes['set'] === obj.type) {
-        const index = this.dataItems.findIndex(r => r.id === obj.id && r.type === obj.type)
+        const index = this.dataItems.findIndex(
+          (r) => r.id === obj.id && r.type === obj.type
+        )
         if (index >= 0) {
           this.dataItems.splice(index, 1)
         }
       }
-    }
-  }
+    },
+  },
 }
 </script>

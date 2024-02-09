@@ -931,7 +931,7 @@
             <expantion
               caption="Отображение списков точек учета в Web &nbsp &nbsp &nbsp &nbsp Отображение списков приборов в Web"
               :resizable="false"
-              style="padding: 5px 0;"
+              style="padding: 5px 0"
             >
               <div class="system-props-points-container">
                 <div class="system-props-points-item">
@@ -1379,7 +1379,6 @@ export default {
     async edit() {
       try {
         const { data } = await this.$http.get('system/props')
-
         this.server = data.server
         this.commonData = data.commonData
         this.pollData = data.pollData

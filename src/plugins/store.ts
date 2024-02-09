@@ -5,35 +5,35 @@ import { matchType } from './api.js'
 
 type EnumType = {
   [key: string]: any
-};
+}
 
 type UnitGroupType = {
   [key: string]: {
-    default: number,
-    text: string,
-    type: string,
-    units: Array<number>,
+    default: number
+    text: string
+    type: string
+    units: Array<number>
     value: number
   }
-};
+}
 
 interface Env {
   archiveTypes: any
-  connectionGroupTypes: any,
-  equipTypeCodes: any,
-  exportFileFormats: EnumType,
+  connectionGroupTypes: any
+  equipTypeCodes: any
+  exportFileFormats: EnumType
   itemTypes: EnumType
-  mUnitGroups: UnitGroupType,
+  mUnitGroups: UnitGroupType
   pollDataTypes: any
   reportDataSource: any
   reportObjectTypes: any
-  reportPeriodTypes: EnumType,
-  reportTaskRunPeriod: EnumType,
-  reportTaskRunTypes: EnumType,
-  reportTaskSourceEquip: EnumType,
-  reportTaskSourcePoint: EnumType,
-  reportTypes: EnumType,
-  resultTypes: any,
+  reportPeriodTypes: EnumType
+  reportTaskRunPeriod: EnumType
+  reportTaskRunTypes: EnumType
+  reportTaskSourceEquip: EnumType
+  reportTaskSourcePoint: EnumType
+  reportTypes: EnumType
+  resultTypes: any
   seasonTypes: any
   setTypes: EnumType
 }
@@ -54,19 +54,23 @@ const env: Env = {
   reportTaskSourceEquip: {},
   reportTaskSourcePoint: {},
   reportTypes: {},
-  resultTypes: {"0":{"type":"success","text":"Success"},"1":{"type":"error","text":"Error"}},
+  resultTypes: {
+    '0': { type: 'success', text: 'Success' },
+    '1': { type: 'error', text: 'Error' },
+  },
   seasonTypes: {},
-  setTypes: {}
+  setTypes: {},
 }
 
 interface Card {
   isCardSelected: boolean | null
   isInfoChanged: boolean | null
-  
+  viewData: Object | null
 }
 const card: Card = {
   isCardSelected: false,
-  isInfoChanged: false
+  isInfoChanged: false,
+  viewData: {},
 }
 
 interface State {
@@ -94,17 +98,17 @@ export const store = createStore<State>({
         year: 'numeric',
         month: '2-digit',
         day: '2-digit',
-        hour: '2-digit'
+        hour: '2-digit',
       },
       day: {
         year: 'numeric',
         month: '2-digit',
-        day: '2-digit'
+        day: '2-digit',
       },
       month: {
         year: 'numeric',
-        month: 'long'
-      }
+        month: 'long',
+      },
     },
     env,
     error: null,
@@ -112,15 +116,14 @@ export const store = createStore<State>({
     pageInfo: {
       Page: 1,
       Size: 50,
-      Items: 0
+      Items: 0,
     },
     user: null,
     vsp: {
-      isOpened: false
+      isOpened: false,
     },
     weather: null,
-    card
-    
+    card,
   },
   mutations: {
     notification(state, payload) {
@@ -139,7 +142,7 @@ export const store = createStore<State>({
       state.connection = payload
     },
     env(state, payload) {
-      Object.keys(payload.mUnits).forEach(r => {
+      Object.keys(payload.mUnits).forEach((r) => {
         payload.mUnits[r] = new Mu(payload.mUnits[r])
       })
       state.env = payload
@@ -153,35 +156,36 @@ export const store = createStore<State>({
     weather(state, payload) {
       state.weather = payload
     },
-    setCard(state, payload)  {
-      state.card.isCardSelected = payload.isCardSelected
-      state.card.isInfoChanged = payload.isInfoChanged
+    setCard(state, payload) {
+      if ( typeof payload.isCardSelected === 'boolean')
+        state.card.isCardSelected = payload.isCardSelected
+      if ( typeof payload.isInfoChanged === 'boolean')
+        state.card.isInfoChanged = payload.isInfoChanged
+      if (payload.viewData) state.card.viewData = payload.viewData
     },
   },
   getters: {
-    styleColors: state => {
+    styleColors: (state) => {
       return {
         color: state.colors.text,
-        backgroundColor: state.colors.fill
+        backgroundColor: state.colors.fill,
       }
     },
-    getCard: state => {
+    getCard: (state) => {
       return {
         isCardSelected: state.card.isCardSelected,
-        isInfoChanged: state.card.isInfoChanged
+        isInfoChanged: state.card.isInfoChanged,
+        viewData: state.card.viewData,
       }
     },
 
-    reversedArchiveTypes: state => matchType(state.env.archiveTypes),
-    reversedItemTypes: state => matchType(state.env.itemTypes),
-    reversedReportDataSource: state => matchType(state.env.reportDataSource),
-    reversedSeasonTypes: state => matchType(state.env.seasonTypes),
-    pageInfo: state => Object.assign({}, state.pageInfo),
-    pollDataTypes: state => matchType(state.env.pollDataTypes),
-    dateFormat: state => JSON.parse(JSON.stringify(state.dateFormat)),
-
-    
-
+    reversedArchiveTypes: (state) => matchType(state.env.archiveTypes),
+    reversedItemTypes: (state) => matchType(state.env.itemTypes),
+    reversedReportDataSource: (state) => matchType(state.env.reportDataSource),
+    reversedSeasonTypes: (state) => matchType(state.env.seasonTypes),
+    pageInfo: (state) => Object.assign({}, state.pageInfo),
+    pollDataTypes: (state) => matchType(state.env.pollDataTypes),
+    dateFormat: (state) => JSON.parse(JSON.stringify(state.dateFormat)),
   },
   actions: {},
 })

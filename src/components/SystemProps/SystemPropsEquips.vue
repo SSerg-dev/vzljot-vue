@@ -8,7 +8,7 @@
         <input
           type="checkbox"
           v-model="r.checked"
-          :disabled="!value.limitEquips"
+          :disabled="false"
           @click="handleCheckBox(i)"
         />
       </span>
@@ -22,7 +22,7 @@
           } table-icon`"
         />
       </span>
-      <span class="cell">{{ r.name }}</span>
+      <span class="cell">{{ `id: ${r.id} name: ${r.name}` }}</span>
     </div>
   </div>
 </template>
@@ -34,13 +34,15 @@ import { sortByName } from '@/plugins/utils/common.functions.js'
 
 export default {
   components: {},
+  props: {},
   data() {
     return {
       allEquipListsData: null,
       value: new User(),
       maps: {},
       equipPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
-      userId: 30 // 1037 // 1
+      wait: false,
+      infoEquipListIds: [],
     }
   },
   computed: {
@@ -53,58 +55,39 @@ export default {
           let response = await this.$http.get(url)
           response.data = response.data.filter((item) => item && item !== null)
 
-          let _localEquips = [...this.localEquips]
-          _localEquips = _localEquips.filter((item) => item && item !== null)
-
-          if (_localEquips && response.data) {
-            let mergedArray = Array.from(
+          if (response.data) {
+            let updatedArray = Array.from(
               new Set([
-                ..._localEquips,
                 ...response.data.map((obj) => ({ ...obj, checked: false })),
               ])
               // eslint-disable-next-line no-unused-vars
             ).map(({ equipTypes = [], ...rest }) => rest)
 
-            const idMap = new Map()
-            const uniqueArray = mergedArray.reduce((result, obj) => {
-              if (idMap.has(obj.id)) {
-                idMap.get(obj.id).checked = true
-              } else {
-                idMap.set(obj.id, obj)
-                result.push(obj)
-              }
-              return result
-            }, [])
-            this.allEquipListsData = uniqueArray.sort(sortByName)
+            this.allEquipListsData = updatedArray.sort(sortByName)
           }
+          this.infoEquipListIds =
+            this.$store.getters.getCard.viewData.infoEquipListIds
+
+          const infoEquipListIds = this.infoEquipListIds
+
+          const updatedEquipListsData = this.allEquipListsData.map(
+            (equipList) => {
+              return {
+                ...equipList,
+                checked: infoEquipListIds.includes(equipList.id),
+              }
+            }
+          )
+          this.allEquipListsData = updatedEquipListsData
+
         } catch (err) {
           console.error('Error:', err)
         }
       },
     },
-    localEquips() {
-      let rows = this.value.equips
-        .concat(
-          this.value.equipGroups,
-          this.value.equipLists,
-          this.value.balanceGroups,
-          this.value.nodes
-        )
-        .sort(sortByName)
-
-      const firstIndex = (this.equipPageInfo.Page - 1) * this.equipPageInfo.Size
-      const lastIndex =
-        this.equipPageInfo.Page * this.equipPageInfo.Size > rows.length
-          ? rows.length
-          : this.equipPageInfo.Page * this.equipPageInfo.Size
-      return rows.slice(firstIndex, lastIndex)
-    },
   },
   created() {},
   async mounted() {
-    const userId = this.userId
-    await this.edit(userId)
-
     const url = 'user/equipLists'
     this.allEquipLists = url
 
@@ -112,51 +95,21 @@ export default {
   },
 
   methods: {
+    getCard() {
+      return this.$store.getters.getCard
+    },
     handleCheckBox(index) {
-      !!this.allEquipListsData[index].checked === true
-        ? (this.allEquipListsData[index].checked = 'true')
-        : (this.allEquipListsData[index].checked = 'false')
+      index
+      // !!this.allEquipListsData[index].checked === true
+      //   ? (this.allEquipListsData[index].checked = 'true')
+      //   : (this.allEquipListsData[index].checked = 'false')
+      // console.log('$$ index', index)
     },
 
     getImage(item) {
       return getImage.call(this, item)
     },
-
-    async edit(id) {
-      try {
-        const {
-          data: {
-            data: { user, maps },
-          },
-        } = await this.$http.get('user/user', { params: { id } })
-
-        if (user.equips) user.equips.forEach((r) => (r.checked = false))
-        if (user.equipLists) user.equipLists.forEach((r) => (r.checked = false))
-        if (user.reports) user.reports.forEach((r) => (r.checked = false))
-        if (user.points) user.points.forEach((r) => (r.checked = false))
-        if (user.pointGroups)
-          user.pointGroups.forEach((r) => (r.checked = false))
-        if (user.pointLists) user.pointLists.forEach((r) => (r.checked = false))
-        if (user.nodes) user.nodes.forEach((r) => (r.checked = false))
-
-        user.subscriptions.forEach((r) => (r.checked = false))
-        this.subscriptions = user.subscriptions
-
-        if (user.equipTypes) this.equipTypes = user.equipTypes
-        if (user.groupsRights) this.groupsRights = user.groupsRights
-        if (user.userRights) this.userRights = user.userRights
-
-        this.value = new User(user)
-
-        Object.values(maps).forEach((r) => r.connections.sort())
-        this.maps = maps
-      } catch (error) {
-        this.$store.commit('error', error)
-      } finally {
-        this.loading = false
-      }
-    },
-  },
+  }, // end methods
 }
 </script>
 

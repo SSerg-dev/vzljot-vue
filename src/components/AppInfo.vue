@@ -109,11 +109,7 @@
 import CardItem from './CardItem.vue'
 import PieChart from './PieChart.vue'
 import User from '../classes/user'
-
-const sortByName = (a, b) => {
-  if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
-  if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
-}
+import { sortByName } from '@/plugins/utils/common.functions.js'
 
 export default {
   components: { CardItem, PieChart },
@@ -145,7 +141,14 @@ export default {
       pointPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
       equipPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
 
-      userId: 30 // 1037 // 1
+      certificates: null,
+      viewData: {},
+      loading: false,
+
+      userId: 30, // 1037 // 1
+      isSelectData: false,
+
+      infoPointListIds: [],
     }
   },
 
@@ -233,13 +236,9 @@ export default {
     },
     getCard(newVal) {
       if (newVal.isInfoChanged) {
-        this.selectData()
+        if (!this.isSelectData) this.selectData()
         this.keyRender++
       }
-      const options = {
-        isInfoChanged: false,
-      }
-      this.$store.commit('setCard', options)
     },
   },
   methods: {
@@ -258,8 +257,30 @@ export default {
         }, this.delay)
       }
     },
-    async fetchLocalData() {
-      await this.edit(this.userId)
+    async fetchData() {
+      await this.fetchUser(this.userId)
+      await this.fetchProps()
+
+      const options = {
+        viewData: this.viewData,
+      }
+      this.$store.commit('setCard', options)
+
+      // --------------------------------
+      this.infoPointListIds =
+        this.$store.getters.getCard.viewData.infoMeasureSchemeListIds
+      // console.log('$$ this.infoPointListIds', JSON.stringify(this.infoPointListIds) )
+      const infoPointListIds = this.infoPointListIds
+
+      const updatedPointListsData = this.pointLists.map((pointList) => {
+        return {
+          ...pointList,
+          checked: infoPointListIds.includes(pointList.id),
+        }
+      })
+      this.pointLists = updatedPointListsData
+
+      // --------------------------------
     },
     async get() {
       this.showLoader = true
@@ -273,8 +294,12 @@ export default {
         this.showLoader = false
         this.$store.commit('error', error)
       })
-      
-      await this.fetchLocalData()
+      this.isSelectData = true
+
+      await this.fetchData()
+
+      // console.log('$$ this.localPoints', JSON.stringify(this.localPoints))
+      // console.log('$$ this.pointLists', JSON.stringify(this.pointLists))
 
       const localPointIds = new Set(this.localPoints.map((point) => point.id))
       this.pointLists = this.pointLists.filter((point) =>
@@ -285,7 +310,6 @@ export default {
       this.equipLists = this.equipLists.filter((equip) =>
         localEquipIds.has(equip.id)
       )
-      
     },
 
     onSi(message) {
@@ -387,7 +411,7 @@ export default {
       return result
     },
 
-    async edit(id) {
+    async fetchUser(id) {
       try {
         const {
           data: {
@@ -416,6 +440,23 @@ export default {
 
         Object.values(maps).forEach((r) => r.connections.sort())
         this.maps = maps
+      } catch (error) {
+        this.$store.commit('error', error)
+      } finally {
+        this.loading = false
+      }
+    },
+    async fetchProps() {
+      try {
+        const { data } = await this.$http.get('system/props')
+        this.viewData = data.viewData
+
+        this.certificates = Object.prototype.hasOwnProperty.call(
+          data,
+          'certificates'
+        )
+          ? data.certificates
+          : null
       } catch (error) {
         this.$store.commit('error', error)
       } finally {
