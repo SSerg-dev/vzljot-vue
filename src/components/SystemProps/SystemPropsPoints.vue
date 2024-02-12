@@ -1,6 +1,12 @@
 <template>
   <div class="table-grid" style="grid-template-columns: repeat(3, max-content)">
-    <header class="header"></header>
+    <header class="header">
+              <input
+                type="checkbox"
+                v-model="allPoints"
+                @change="handleAllPoints($event)"
+              />
+            </header>
     <header class="header"></header>
     <header class="header">Наименование</header>
     <div v-for="(r, i) in allPointLists" :key="i" class="table-row">
@@ -43,6 +49,7 @@ export default {
       pointPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
       wait: false,
       infoPointListIds: [],
+      allPoints: false,
     }
   },
   computed: {
@@ -68,13 +75,11 @@ export default {
           this.infoPointListIds =
             this.$store.getters.getCard.viewData.infoMeasureSchemeListIds
 
-          const infoPointListIds = this.infoPointListIds
-
           const updatedPointListsData = this.allPointListsData.map(
             (pointList) => {
               return {
                 ...pointList,
-                checked: infoPointListIds.includes(pointList.id),
+                checked: this.infoPointListIds.includes(pointList.id),
               }
             }
           )
@@ -98,11 +103,31 @@ export default {
       return this.$store.getters.getCard
     },
     handleCheckBox(index) {
-      index
-      // !!this.allPointListsData[index].checked === true
-      //   ? (this.allPointListsData[index].checked = 'true')
-      //   : (this.allPointListsData[index].checked = 'false')
-      // console.log('$$ index', index)
+      let changedPoints = this.allPointLists.map(({ id, checked }) => ({
+        id,
+        checked,
+      }))
+      changedPoints[index].checked = !changedPoints[index].checked
+
+      changedPoints = changedPoints
+        .filter((point) => point.checked)
+        .map((point) => point.id)
+
+      this.$emit('points-updated', changedPoints)
+    },
+    handleAllPoints(event) {
+      console.log('$$ handleAllPoints', JSON.stringify(event))
+      // let changedPoints = this.allPointLists.map(({ id, checked }) => ({
+      //   id,
+      //   checked,
+      // }))
+      // changedPoints[index].checked = !changedPoints[index].checked
+
+      // changedPoints = changedPoints
+      //   .filter((point) => point.checked)
+      //   .map((point) => point.id)
+
+      // this.$emit('points-updated', changedPoints)
     },
 
     getImage(item) {

@@ -935,10 +935,10 @@
             >
               <div class="system-props-points-container">
                 <div class="system-props-points-item">
-                  <SystemPropsPoints />
+                  <SystemPropsPoints @points-updated="handlePointsUpdated" />
                 </div>
                 <div class="system-props-points-item">
-                  <SystemPropsEquips />
+                  <SystemPropsEquips @equips-updated="handleEquipsUpdated" />
                 </div>
               </div>
             </expantion>
@@ -1219,6 +1219,8 @@ export default {
         equips: true,
         extra: true,
         map: true,
+        infoEquipListIds: [],
+        infoMeasureSchemeListIds: [],
       },
       certificates: null,
     }
@@ -1376,6 +1378,13 @@ export default {
     },
   },
   methods: {
+    handlePointsUpdated(changedPoints) {
+      this.viewData.infoMeasureSchemeListIds = changedPoints
+    },
+    handleEquipsUpdated(changedEquips) {
+      this.viewData.infoEquipListIds = changedEquips
+    },
+
     async edit() {
       try {
         const { data } = await this.$http.get('system/props')
@@ -1441,6 +1450,8 @@ export default {
             equips: this.viewData.equips,
             extra: this.viewData.extra,
             map: this.viewData.map,
+            infoEquipListIds: this.viewData.infoEquipListIds,
+            infoMeasureSchemeListIds: this.viewData.infoMeasureSchemeListIds,
           },
           commonData: this.commonData,
           reportData: this.reportData,
@@ -1450,6 +1461,8 @@ export default {
         }
 
         obj.pollData.dateStart = new Date(this.pollData.dateStart).getTime()
+
+        // console.log('$$ obj', JSON.stringify(obj))
 
         await this.$http.post('system/props', obj)
 

@@ -1,4 +1,5 @@
 <template>
+  footer
   <div class="info-wrapper not-selectable">
     <div class="container" :key="keyRender">
       <div>
@@ -108,7 +109,6 @@
 <script>
 import CardItem from './CardItem.vue'
 import PieChart from './PieChart.vue'
-import User from '../classes/user'
 import { sortByName } from '@/plugins/utils/common.functions.js'
 
 export default {
@@ -136,20 +136,14 @@ export default {
       timeout: null,
       delay: 0,
 
-      value: new User(),
-      maps: {},
-      pointPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
-      equipPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
-
       certificates: null,
       viewData: {},
       loading: false,
 
-      userId: 30, // 1037 // 1
       isSelectData: false,
 
       infoPointListIds: [],
-
+      infoEquipListIds: [],
     }
   },
 
@@ -184,41 +178,12 @@ export default {
     getCard() {
       return this.$store.getters.getCard
     },
-    localPoints() {
-      let rows = this.value.points
-        .concat(
-          this.value.pointGroups,
-          this.value.pointLists,
-          this.value.balanceGroups,
-          this.value.nodes
-        )
-        .sort(sortByName)
-
-      const firstIndex = (this.pointPageInfo.Page - 1) * this.pointPageInfo.Size
-      const lastIndex =
-        this.pointPageInfo.Page * this.pointPageInfo.Size > rows.length
-          ? rows.length
-          : this.pointPageInfo.Page * this.pointPageInfo.Size
-
-      return rows.slice(firstIndex, lastIndex)
-    },
-    localEquips() {
-      let rows = this.value.equips
-        .concat(this.value.equipLists)
-        .sort(sortByName)
-
-      const firstIndex = (this.equipPageInfo.Page - 1) * this.equipPageInfo.Size
-      const lastIndex =
-        this.equipPageInfo.Page * this.equipPageInfo.Size > rows.length
-          ? rows.length
-          : this.equipPageInfo.Page * this.equipPageInfo.Size
-
-      return rows.slice(firstIndex, lastIndex)
-    },
   },
+
   watch: {
     pointLists(newVal) {
       if (newVal.length > 1) {
+        console.log('$$ newVal', JSON.stringify(newVal))
         this.isCardSelected = true
         this.keyRender = newVal.length
       }
@@ -226,6 +191,7 @@ export default {
         this.isCardSelected = false
       }
     },
+
     equipLists(newVal) {
       if (newVal.length > 1) {
         this.isCardSelected = true
@@ -235,17 +201,21 @@ export default {
         this.isCardSelected = false
       }
     },
+
     getCard(newVal) {
       if (newVal.isInfoChanged) {
-        if (!this.isSelectData) this.selectData()
-        this.keyRender++
+        if (!this.isSelectData) {
+          this.isSelectData = true
+          this.selectData()
+          this.keyRender++
+        }
       }
     },
   },
   methods: {
     setup() {
       const options = {
-        isCardSelected: true,
+        isCardSelected: false,
         isInfoChanged: false,
       }
       this.$store.commit('setCard', options)
@@ -259,35 +229,17 @@ export default {
       }
     },
     async fetchData() {
-      await this.fetchUser(this.userId)
       await this.fetchProps()
 
       const options = {
         viewData: this.viewData,
       }
       this.$store.commit('setCard', options)
-
-      // --------------------------------
-      this.infoPointListIds =
-            this.$store.getters.getCard.viewData.infoMeasureSchemeListIds
-      // console.log('$$ this.infoPointListIds', JSON.stringify(this.infoPointListIds) )
-      const infoPointListIds = this.infoPointListIds
-
-      const updatedPointListsData = this.pointLists.map(
-            (pointList) => {
-              return {
-                ...pointList,
-                checked: infoPointListIds.includes(pointList.id),
-              }
-            }
-          )
-          this.pointLists = updatedPointListsData
-
-      // --------------------------------
     },
     async get() {
       this.showLoader = true
       let { data } = await this.$http.post('home/getStatistic')
+
       this.parseData(data)
       this.showLoader = false
     },
@@ -297,22 +249,11 @@ export default {
         this.showLoader = false
         this.$store.commit('error', error)
       })
-      this.isSelectData = true
 
       await this.fetchData()
 
-      // console.log('$$ this.localPoints', JSON.stringify(this.localPoints))
-      // console.log('$$ this.pointLists', JSON.stringify(this.pointLists))
-
-      const localPointIds = new Set(this.localPoints.map((point) => point.id))
-      this.pointLists = this.pointLists.filter((point) =>
-        localPointIds.has(point.id)
-      )
-
-      const localEquipIds = new Set(this.localEquips.map((equip) => equip.id))
-      this.equipLists = this.equipLists.filter((equip) =>
-        localEquipIds.has(equip.id)
-      )
+      this.updatePointLists()
+      this.updateEquipLists()
     },
 
     onSi(message) {
@@ -414,41 +355,6 @@ export default {
       return result
     },
 
-    async fetchUser(id) {
-      try {
-        const {
-          data: {
-            data: { user, maps },
-          },
-        } = await this.$http.get('user/user', { params: { id } })
-
-        if (user.equips) user.equips.forEach((r) => (r.checked = false))
-        if (user.equipLists) user.equipLists.forEach((r) => (r.checked = false))
-
-        if (user.reports) user.reports.forEach((r) => (r.checked = false))
-        if (user.points) user.points.forEach((r) => (r.checked = false))
-        if (user.pointGroups)
-          user.pointGroups.forEach((r) => (r.checked = false))
-        if (user.pointLists) user.pointLists.forEach((r) => (r.checked = false))
-        if (user.nodes) user.nodes.forEach((r) => (r.checked = false))
-
-        user.subscriptions.forEach((r) => (r.checked = false))
-        this.subscriptions = user.subscriptions
-
-        if (user.equipTypes) this.equipTypes = user.equipTypes
-        if (user.groupsRights) this.groupsRights = user.groupsRights
-        if (user.userRights) this.userRights = user.userRights
-
-        this.value = new User(user)
-
-        Object.values(maps).forEach((r) => r.connections.sort())
-        this.maps = maps
-      } catch (error) {
-        this.$store.commit('error', error)
-      } finally {
-        this.loading = false
-      }
-    },
     async fetchProps() {
       try {
         const { data } = await this.$http.get('system/props')
@@ -465,6 +371,37 @@ export default {
       } finally {
         this.loading = false
       }
+    },
+    updatePointLists() {
+      this.infoPointListIds =
+        this.$store.getters.getCard.viewData.infoMeasureSchemeListIds
+
+      let updatedPointListsData = this.pointLists.map((pointList) => {
+        return {
+          ...pointList,
+          checked: this.infoPointListIds.includes(pointList.id),
+        }
+      })
+
+      this.pointLists = updatedPointListsData
+        .filter((point) => this.infoPointListIds.includes(point.id))
+        .sort(sortByName)
+    },
+
+    updateEquipLists() {
+      this.infoEquipListIds =
+        this.$store.getters.getCard.viewData.infoEquipListIds
+
+      let updatedEquipListsData = this.equipLists.map((equipList) => {
+        return {
+          ...equipList,
+          checked: this.infoEquipListIds.includes(equipList.id),
+        }
+      })
+
+      this.equipLists = updatedEquipListsData
+        .filter((equip) => this.infoEquipListIds.includes(equip.id))
+        .sort(sortByName)
     },
   }, // end methods
 }

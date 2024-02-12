@@ -68,18 +68,15 @@ export default {
           this.infoEquipListIds =
             this.$store.getters.getCard.viewData.infoEquipListIds
 
-          const infoEquipListIds = this.infoEquipListIds
-
           const updatedEquipListsData = this.allEquipListsData.map(
             (equipList) => {
               return {
                 ...equipList,
-                checked: infoEquipListIds.includes(equipList.id),
+                checked: this.infoEquipListIds.includes(equipList.id),
               }
             }
           )
           this.allEquipListsData = updatedEquipListsData
-
         } catch (err) {
           console.error('Error:', err)
         }
@@ -99,11 +96,17 @@ export default {
       return this.$store.getters.getCard
     },
     handleCheckBox(index) {
-      index
-      // !!this.allEquipListsData[index].checked === true
-      //   ? (this.allEquipListsData[index].checked = 'true')
-      //   : (this.allEquipListsData[index].checked = 'false')
-      // console.log('$$ index', index)
+      let changedEquips = this.allEquipLists.map(({ id, checked }) => ({
+        id,
+        checked,
+      }))
+      changedEquips[index].checked = !changedEquips[index].checked
+
+      changedEquips = changedEquips
+        .filter((equip) => equip.checked)
+        .map((equip) => equip.id)
+
+      this.$emit('equips-updated', changedEquips)
     },
 
     getImage(item) {
