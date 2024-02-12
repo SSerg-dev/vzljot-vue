@@ -426,7 +426,7 @@ export default {
     onUserEvent(value) {
       this.popupData.text = `Пользователь: ${value}`
     },
-    menuClicked(name) {
+    menuClicked(name) { 
       switch (name) {
         case 'info':
           this.onInfo(true)

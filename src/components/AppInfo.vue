@@ -182,7 +182,6 @@ export default {
   watch: {
     pointLists(newVal) {
       if (newVal.length > 1) {
-        console.log('$$ newVal', JSON.stringify(newVal))
         this.isCardSelected = true
         this.keyRender = newVal.length
       }

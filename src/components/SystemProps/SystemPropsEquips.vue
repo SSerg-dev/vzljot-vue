@@ -1,6 +1,8 @@
 <template>
   <div class="table-grid" style="grid-template-columns: repeat(3, max-content)">
-    <header class="header"></header>
+    <header class="header">
+      <input type="checkbox" @change="handleAllEquips($event)" />
+    </header>
     <header class="header"></header>
     <header class="header">Наименование</header>
     <div v-for="(r, i) in allEquipLists" :key="i" class="table-row">
@@ -22,7 +24,7 @@
           } table-icon`"
         />
       </span>
-      <span class="cell">{{ `id: ${r.id} name: ${r.name}` }}</span>
+      <span class="cell">{{ `${r.name}` }}</span>
     </div>
   </div>
 </template>
@@ -107,6 +109,29 @@ export default {
         .map((equip) => equip.id)
 
       this.$emit('equips-updated', changedEquips)
+    },
+    changeChecked(changedEquips, hasChecked) {
+      const updatedEquips = changedEquips.map((equip) => ({
+        ...equip,
+        checked: hasChecked,
+      }))
+      return updatedEquips
+    },
+    handleAllEquips(event) {
+      let changedEquips = this.allEquipLists.map(({ id }) => ({
+        id,
+        checked: event.target.checked,
+      }))
+
+      this.allEquipListsData = this.changeChecked(
+        this.allEquipLists,
+        event.target.checked
+      )
+      const equips = event.target.checked
+        ? changedEquips.map((equip) => equip.id)
+        : []
+
+      this.$emit('equips-updated', equips)
     },
 
     getImage(item) {

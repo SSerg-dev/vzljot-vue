@@ -1,12 +1,8 @@
 <template>
   <div class="table-grid" style="grid-template-columns: repeat(3, max-content)">
     <header class="header">
-              <input
-                type="checkbox"
-                v-model="allPoints"
-                @change="handleAllPoints($event)"
-              />
-            </header>
+      <input type="checkbox" @change="handleAllPoints($event)" />
+    </header>
     <header class="header"></header>
     <header class="header">Наименование</header>
     <div v-for="(r, i) in allPointLists" :key="i" class="table-row">
@@ -28,7 +24,7 @@
           } table-icon`"
         />
       </span>
-      <span class="cell">{{ `id: ${r.id} name: ${r.name}` }}</span>
+      <span class="cell">{{ `${r.name}` }}</span>
     </div>
   </div>
 </template>
@@ -49,7 +45,6 @@ export default {
       pointPageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
       wait: false,
       infoPointListIds: [],
-      allPoints: false,
     }
   },
   computed: {
@@ -115,19 +110,28 @@ export default {
 
       this.$emit('points-updated', changedPoints)
     },
+    changeChecked(changedPoints, hasChecked) {
+      const updatedPoints = changedPoints.map((point) => ({
+        ...point,
+        checked: hasChecked,
+      }))
+      return updatedPoints
+    },
     handleAllPoints(event) {
-      console.log('$$ handleAllPoints', JSON.stringify(event))
-      // let changedPoints = this.allPointLists.map(({ id, checked }) => ({
-      //   id,
-      //   checked,
-      // }))
-      // changedPoints[index].checked = !changedPoints[index].checked
+      let changedPoints = this.allPointLists.map(({ id }) => ({
+        id,
+        checked: event.target.checked,
+      }))
 
-      // changedPoints = changedPoints
-      //   .filter((point) => point.checked)
-      //   .map((point) => point.id)
+      this.allPointListsData = this.changeChecked(
+        this.allPointLists,
+        event.target.checked
+      )
+      const points = event.target.checked
+        ? changedPoints.map((point) => point.id)
+        : []
 
-      // this.$emit('points-updated', changedPoints)
+      this.$emit('points-updated', points)
     },
 
     getImage(item) {

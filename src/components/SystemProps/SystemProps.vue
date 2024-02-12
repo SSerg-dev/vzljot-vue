@@ -1462,8 +1462,6 @@ export default {
 
         obj.pollData.dateStart = new Date(this.pollData.dateStart).getTime()
 
-        // console.log('$$ obj', JSON.stringify(obj))
-
         await this.$http.post('system/props', obj)
 
         this.hasChanges = false
