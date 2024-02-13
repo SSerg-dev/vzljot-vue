@@ -109,7 +109,6 @@
 import CardItem from './CardItem.vue'
 import PieChart from './PieChart.vue'
 import { sortByName } from '@/plugins/utils/common.functions.js'
-// import EventBus from '@/plugins/EventBus'
 
 export default {
   components: { CardItem, PieChart },
@@ -143,7 +142,9 @@ export default {
       isSelectData: false,
 
       infoPointListIds: [],
-      infoEquipListIds: [], 
+      infoEquipListIds: [],
+
+      statisticData: {},
     }
   },
 
@@ -152,7 +153,6 @@ export default {
 
     this.$emitter.on('info:open', (options) => {
       if (options.isInfoChanged) {
-        console.log('$$ options.isInfoChanged', options.isInfoChanged)
         this.selectData()
       }
     })
@@ -160,8 +160,6 @@ export default {
   async mounted() {
     this.selectData()
     this.setup()
-
-    
   },
 
   beforeUnmount() {
@@ -209,15 +207,6 @@ export default {
         this.isCardSelected = false
       }
     },
-    /*
-    getCard(newVal) {
-      if (newVal.isInfoChanged && !this.isSelectData) {
-        this.isSelectData = true
-        this.selectData()
-        this.keyRender++
-      }
-    },
-    */
   },
   methods: {
     setup() {
@@ -227,7 +216,7 @@ export default {
       }
       this.$store.commit('setCard', options)
       this.isCardSelected = this.getCard.isCardSelected
-      // this.isInfoChanged = this.getCard.isInfoChanged
+      this.isInfoChanged = this.getCard.isInfoChanged
 
       if (!this.isVisible) {
         this.timeout = setTimeout(() => {
@@ -235,17 +224,25 @@ export default {
         }, this.delay)
       }
     },
-    async fetchData() {
-      await this.fetchProps()
+
+    async getIds() {
+      this.viewData.infoMeasureSchemeListIds =
+        this.statisticData.pointLists.map((item) => item.id)
+
+      this.viewData.infoEquipListIds = this.statisticData.equipLists.map(
+        (item) => item.id
+      )
 
       const options = {
         viewData: this.viewData,
       }
       this.$store.commit('setCard', options)
     },
+
     async get() {
       this.showLoader = true
       let { data } = await this.$http.post('home/getStatistic')
+      this.statisticData = data
 
       this.parseData(data)
       this.showLoader = false
@@ -257,7 +254,7 @@ export default {
         this.$store.commit('error', error)
       })
 
-      await this.fetchData()
+      await this.getIds()
 
       this.updatePointLists()
       this.updateEquipLists()
@@ -362,26 +359,10 @@ export default {
       return result
     },
 
-    async fetchProps() {
-      try {
-        const { data } = await this.$http.get('system/props')
-        this.viewData = data.viewData
-
-        this.certificates = Object.prototype.hasOwnProperty.call(
-          data,
-          'certificates'
-        )
-          ? data.certificates
-          : null
-      } catch (error) {
-        this.$store.commit('error', error)
-      } finally {
-        this.loading = false
-      }
-    },
     updatePointLists() {
-      this.infoPointListIds =
-        this.$store.getters.getCard.viewData.infoMeasureSchemeListIds
+      this.infoPointListIds = this.statisticData.pointLists.map(
+        (item) => item.id
+      )
 
       let updatedPointListsData = this.pointLists.map((pointList) => {
         return {
@@ -396,8 +377,9 @@ export default {
     },
 
     updateEquipLists() {
-      this.infoEquipListIds =
-        this.$store.getters.getCard.viewData.infoEquipListIds
+      this.infoEquipListIds = this.statisticData.equipLists.map(
+        (item) => item.id
+      )
 
       let updatedEquipListsData = this.equipLists.map((equipList) => {
         return {
@@ -410,7 +392,7 @@ export default {
         .filter((equip) => this.infoEquipListIds.includes(equip.id))
         .sort(sortByName)
     },
-  }, // end methods
+  },
 }
 </script>
 
@@ -421,8 +403,6 @@ export default {
 
 .info-wrapper {
   display: flex;
-  /* flex: 1; */
-  /* overflow: hidden; */
 }
 
 .info-wrapper .footer {
