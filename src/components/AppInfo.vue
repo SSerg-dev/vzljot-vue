@@ -109,6 +109,7 @@
 import CardItem from './CardItem.vue'
 import PieChart from './PieChart.vue'
 import { sortByName } from '@/plugins/utils/common.functions.js'
+// import EventBus from '@/plugins/EventBus'
 
 export default {
   components: { CardItem, PieChart },
@@ -142,16 +143,25 @@ export default {
       isSelectData: false,
 
       infoPointListIds: [],
-      infoEquipListIds: [],
+      infoEquipListIds: [], 
     }
   },
 
   created() {
     this.$emitter.on('si', this.onSi)
+
+    this.$emitter.on('info:open', (options) => {
+      if (options.isInfoChanged) {
+        console.log('$$ options.isInfoChanged', options.isInfoChanged)
+        this.selectData()
+      }
+    })
   },
   async mounted() {
     this.selectData()
     this.setup()
+
+    
   },
 
   beforeUnmount() {
@@ -181,7 +191,7 @@ export default {
 
   watch: {
     pointLists(newVal) {
-      if (newVal.length > 1) {
+      if (newVal.length >= 1) {
         this.isCardSelected = true
         this.keyRender = newVal.length
       }
@@ -191,7 +201,7 @@ export default {
     },
 
     equipLists(newVal) {
-      if (newVal.length > 1) {
+      if (newVal.length >= 1) {
         this.isCardSelected = true
         this.keyRender = newVal.length
       }
@@ -199,16 +209,15 @@ export default {
         this.isCardSelected = false
       }
     },
-
+    /*
     getCard(newVal) {
-      if (newVal.isInfoChanged) {
-        if (!this.isSelectData) {
-          this.isSelectData = true
-          this.selectData()
-          this.keyRender++
-        }
+      if (newVal.isInfoChanged && !this.isSelectData) {
+        this.isSelectData = true
+        this.selectData()
+        this.keyRender++
       }
     },
+    */
   },
   methods: {
     setup() {
@@ -218,7 +227,7 @@ export default {
       }
       this.$store.commit('setCard', options)
       this.isCardSelected = this.getCard.isCardSelected
-      this.isInfoChanged = this.getCard.isInfoChanged
+      // this.isInfoChanged = this.getCard.isInfoChanged
 
       if (!this.isVisible) {
         this.timeout = setTimeout(() => {

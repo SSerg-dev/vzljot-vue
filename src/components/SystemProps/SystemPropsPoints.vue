@@ -127,11 +127,11 @@ export default {
         this.allPointLists,
         event.target.checked
       )
-      const points = event.target.checked
-        ? changedPoints.map((point) => point.id)
+      const pointIds = event.target.checked
+        ? changedPoints.map((point) => point.id) 
         : []
 
-      this.$emit('points-updated', points)
+      this.$emit('points-updated', pointIds)
     },
 
     getImage(item) {

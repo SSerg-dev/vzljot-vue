@@ -127,11 +127,11 @@ export default {
         this.allEquipLists,
         event.target.checked
       )
-      const equips = event.target.checked
+      const equipIds = event.target.checked
         ? changedEquips.map((equip) => equip.id)
         : []
 
-      this.$emit('equips-updated', equips)
+      this.$emit('equips-updated', equipIds)
     },
 
     getImage(item) {
