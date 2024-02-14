@@ -241,7 +241,7 @@ export default {
 
     async get() {
       this.showLoader = true
-      let { data } = await this.$http.post('home/getStatistic')
+      let { data } = await this.$http.post('home/getStatistic') 
       this.statisticData = data
 
       this.parseData(data)
