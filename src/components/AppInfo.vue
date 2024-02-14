@@ -2,20 +2,14 @@
   <div class="info-wrapper not-selectable">
     <div class="container" :key="keyRender">
       <div>
-        <card-item
-          :title="'Точки учета: ' + pointsCount"
-          :class="[
-            { 'container-item-small': isCardSelected },
-            { 'container-item-large': !isCardSelected },
-          ]"
-        >
+        <card-item :title="'Точки учета: ' + pointsCount" :class="[
+          { 'container-item-small': isCardSelected },
+          { 'container-item-large': !isCardSelected },
+        ]">
           <pie-chart :values="points" :statuses="statuses"></pie-chart>
           <template #footer>
             <div class="footer" v-if="this.time" title="Время обновления">
-              <span
-                style="font-size: 22px; padding: 0 3px 0 0"
-                class="fas fa-clock icon"
-              />
+              <span style="font-size: 22px; padding: 0 3px 0 0" class="fas fa-clock icon" />
               <span>{{ this.time ? this.time.toLocaleString() : '' }}</span>
             </div>
           </template>
@@ -23,20 +17,14 @@
       </div>
 
       <div>
-        <card-item
-          :title="'Приборы: ' + equipsCount"
-          :class="[
-            { 'container-item-small': isCardSelected },
-            { 'container-item-large': !isCardSelected },
-          ]"
-        >
+        <card-item :title="'Приборы: ' + equipsCount" :class="[
+          { 'container-item-small': isCardSelected },
+          { 'container-item-large': !isCardSelected },
+        ]">
           <pie-chart :values="equips" :statuses="statuses"></pie-chart>
           <template #footer>
             <div class="footer" v-if="this.time" title="Время обновления">
-              <span
-                style="font-size: 22px; padding: 0 3px 0 0"
-                class="fas fa-clock icon"
-              />
+              <span style="font-size: 22px; padding: 0 3px 0 0" class="fas fa-clock icon" />
               <span>{{ this.time ? this.time.toLocaleString() : '' }}</span>
             </div>
           </template>
@@ -44,24 +32,13 @@
       </div>
 
       <div v-for="(point, index) in pointLists" :key="point.id">
-        <card-item
-          :title="
-            index + 1 + '.' + 'Точки ' + point.name + ': ' + point.count + 'шт.'
-          "
-          v-if="isCardSelected"
-          class="container-item-small"
-        >
-          <pie-chart
-            :values="pointListsPieChart[index]"
-            :statuses="statuses"
-          ></pie-chart>
+        <card-item :title="index + 1 + '.' + 'Точки ' + point.name + ': ' + point.count + 'шт.'
+          " v-if="isCardSelected" class="container-item-small">
+          <pie-chart :values="pointListsPieChart[index]" :statuses="statuses"></pie-chart>
 
           <template #footer>
             <div class="footer" v-if="time" title="Update Time">
-              <span
-                style="font-size: 22px; padding: 0 3px 0 0"
-                class="fas fa-clock icon"
-              />
+              <span style="font-size: 22px; padding: 0 3px 0 0" class="fas fa-clock icon" />
               <span>{{ time ? time.toLocaleString() : '' }}</span>
             </div>
           </template>
@@ -69,31 +46,20 @@
       </div>
 
       <div v-for="(equip, index) in equipLists" :key="equip.id">
-        <card-item
-          :title="
-            index +
-            1 +
-            '.' +
-            ' Приборы ' +
-            equip.name +
-            ': ' +
-            equip.count +
-            'шт.'
-          "
-          v-if="isCardSelected"
-          class="container-item-small"
-        >
-          <pie-chart
-            :values="equipListsPieChart[index]"
-            :statuses="statuses"
-          ></pie-chart>
+        <card-item :title="index +
+          1 +
+          '.' +
+          ' Приборы ' +
+          equip.name +
+          ': ' +
+          equip.count +
+          'шт.'
+          " v-if="isCardSelected" class="container-item-small">
+          <pie-chart :values="equipListsPieChart[index]" :statuses="statuses"></pie-chart>
 
           <template #footer>
             <div class="footer" v-if="time" title="Update Time">
-              <span
-                style="font-size: 22px; padding: 0 3px 0 0"
-                class="fas fa-clock icon"
-              />
+              <span style="font-size: 22px; padding: 0 3px 0 0" class="fas fa-clock icon" />
               <span>{{ time ? time.toLocaleString() : '' }}</span>
             </div>
           </template>
@@ -169,14 +135,14 @@ export default {
     statuses() {
       return this.$store.state.env
         ? Object.assign(
-            {},
-            ...Object.keys(this.$store.state.env.statuses)
-              .sort()
-              .filter((r, index) => index > 0)
-              .map((r) => {
-                return { [r]: this.$store.state.env.statuses[r] }
-              })
-          )
+          {},
+          ...Object.keys(this.$store.state.env.statuses)
+            .sort()
+            .filter((r, index) => index > 0)
+            .map((r) => {
+              return { [r]: this.$store.state.env.statuses[r] }
+            })
+        )
         : {}
     },
     styleColors() {
@@ -208,6 +174,7 @@ export default {
       }
     },
   },
+  
   methods: {
     setup() {
       const options = {
@@ -241,7 +208,7 @@ export default {
 
     async get() {
       this.showLoader = true
-      let { data } = await this.$http.post('home/getStatistic') 
+      let { data } = await this.$http.post('home/getStatistic')
       this.statisticData = data
 
       this.parseData(data)
