@@ -21,7 +21,8 @@ module.exports = defineConfig({
       title: 'Взлет СП4 Web',
     }
   },
-  publicPath: process.env.NODE_ENV === 'production' ? '/sp/js/sp/dist/' : '/js/sp/dist/',
+  //publicPath: process.env.NODE_ENV === 'production' ? '/sp/js/sp/dist/' : '/js/sp/dist/',
+  publicPath: '/js/sp/dist/',
   outputDir: 'dist',
   configureWebpack: config => {
     if (process.env.NODE_ENV === 'production') {
