@@ -66,11 +66,17 @@ interface Card {
   isCardSelected: boolean | null
   isInfoChanged: boolean | null
   viewData: Object | null
+  selectedNodeId: number | null
+  modifications: [] | null
+  interval: 0 | null
 }
 const card: Card = {
   isCardSelected: false,
   isInfoChanged: false,
   viewData: {},
+  selectedNodeId: null,
+  modifications: [],
+  interval: 0
 }
 
 interface State {
@@ -157,11 +163,14 @@ export const store = createStore<State>({
       state.weather = payload
     },
     setCard(state, payload) {
-      if ( typeof payload.isCardSelected === 'boolean')
+      if (typeof payload.isCardSelected === 'boolean')
         state.card.isCardSelected = payload.isCardSelected
-      if ( typeof payload.isInfoChanged === 'boolean')
+      if (typeof payload.isInfoChanged === 'boolean')
         state.card.isInfoChanged = payload.isInfoChanged
       if (payload.viewData) state.card.viewData = payload.viewData
+      if (payload.selectedNodeId) state.card.selectedNodeId = payload.selectedNodeId
+      if (payload.modifications) state.card.modifications = payload.modifications
+      if (payload.interval) state.card.interval = payload.interval
     },
   },
   getters: {
@@ -176,6 +185,9 @@ export const store = createStore<State>({
         isCardSelected: state.card.isCardSelected,
         isInfoChanged: state.card.isInfoChanged,
         viewData: state.card.viewData,
+        selectedNodeId: state.card.selectedNodeId,
+        modifications: state.card.modifications,
+        interval: state.card.interval
       }
     },
 

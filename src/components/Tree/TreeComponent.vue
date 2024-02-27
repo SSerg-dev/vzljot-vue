@@ -1,34 +1,14 @@
 <template>
-  <div
-    class="tree-wrapper"
-    tabIndex="0"
-    @keydown.up.prevent="up(selectedNode)"
-    @keydown.down.prevent="down(selectedNode)"
-    @keydown.enter.prevent="enter(selectedNode)"
-    @keyup.left="left(selectedNode)"
-    @keyup.right="right(selectedNode)"
-    @click="onClick"
-    @mouseover="mouseover($event)"
-    @mouseout="mouseout($event)"
-  >
-    <div v-if="hoveredNode" class="button-panel" :style="hoverRect ? { top: `${hoverRect.top - offsetTop + $el.scrollTop}px` } : null">
-      <fab-button
-        v-if="hoveredNode && hoveredNode.canAdd()"
-        @click="$emit('create', hoveredNode)"
-        :fabStyle="fabStyle"
-        class="fas fa-plus"
-        title="Добавить..."
-        :style="styleColors"
-      >
+  <div class="tree-wrapper" tabIndex="0" @keydown.up.prevent="up(selectedNode)" @keydown.down.prevent="down(selectedNode)"
+    @keydown.enter.prevent="enter(selectedNode)" @keyup.left="left(selectedNode)" @keyup.right="right(selectedNode)"
+    @click="onClick" @mouseover="mouseover($event)" @mouseout="mouseout($event)">
+    <div v-if="hoveredNode" class="button-panel"
+      :style="hoverRect ? { top: `${hoverRect.top - offsetTop + $el.scrollTop}px` } : null">
+      <fab-button v-if="hoveredNode && hoveredNode.canAdd()" @click="$emit('create', hoveredNode)" :fabStyle="fabStyle"
+        class="fas fa-plus" title="Добавить..." :style="styleColors">
       </fab-button>
-      <fab-button
-        v-if="hoveredNode && hoveredNode.canDelete()"
-        @click="$emit('delete', hoveredNode)"
-        :fabStyle="fabStyle"
-        class="fas fa-times"
-        title="Удалить..."
-        :style="styleColors"
-      >
+      <fab-button v-if="hoveredNode && hoveredNode.canDelete()" @click="$emit('delete', hoveredNode)" :fabStyle="fabStyle"
+        class="fas fa-times" title="Удалить..." :style="styleColors">
       </fab-button>
     </div>
   </div>
@@ -223,6 +203,7 @@ export default {
       try {
         toggle.classList.add('loading')
         let { data } = await this.$http.get(url, { params: node })
+
         let children = data.map(child => new Node(child, node, node.$el))
         this.getList(children)
         node.expanded = true
@@ -421,6 +402,13 @@ export default {
       node.select(true)
       this.selectedNode = node
       this.$emit('nodeSelect', node)
+      
+      this.$emitter.emit('tree-component:change-node', this.selectedNode.id)
+      const options = {
+        selectedNodeId: this.selectedNode.id,
+      }
+      this.$store.commit('setCard', options)
+
       this.scroll(node)
     },
     scroll(node) {
@@ -539,7 +527,7 @@ export default {
   outline: #777 dotted 1px;
 }
 
-.node .body > div {
+.node .body>div {
   margin: 0 5px 0 0;
 }
 

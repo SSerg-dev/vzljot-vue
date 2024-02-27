@@ -329,6 +329,15 @@
                       v-bind="periodColdWaterData"
                     />
                   </tabx>
+                  <tabx
+                    text="База параметров"
+                    v-if="pollData.equipDatabaseParams"
+                  >
+                    <poll-period-props
+                      @change="onPeriodEquipDatabaseParamsChange"
+                      v-bind="periodEquipDatabaseParamsData"
+                    />
+                  </tabx>
                 </tabs>
                 <div
                   style="
@@ -928,20 +937,24 @@
               </div>
             </expantion>
 
-            <expantion
-              caption="Отображение списков точек учета в Web &nbsp &nbsp &nbsp &nbsp Отображение списков приборов в Web"
-              :resizable="false"
-              style="padding: 5px 0"
-            >
-              <div class="system-props-points-container">
-                <div class="system-props-points-item">
-                  <SystemPropsPoints @points-updated="handlePointsUpdated" />
-                </div>
-                <div class="system-props-points-item">
-                  <SystemPropsEquips @equips-updated="handleEquipsUpdated" />
-                </div>
-              </div>
-            </expantion>
+            <div class="system-props-points-container">
+              <expantion
+                class="system-props-points-item"
+                caption="Отображение списков точек учета"
+                :resizable="false"
+                style="padding: 5px 0"
+              >
+                <system-props-points @points-updated="handlePointsUpdated" />
+              </expantion>
+              <expantion
+                class="system-props-points-item"
+                caption="Отображение списков приборов в Web"
+                :resizable="false"
+                style="padding: 5px 0"
+              >
+                <system-props-equips @equips-updated="handleEquipsUpdated" />
+              </expantion>
+            </div>
           </div>
         </tabx>
         <tabx v-if="certificates" text="Сертификаты">
@@ -1055,6 +1068,7 @@ export default {
         periodEquipCustomizing: null,
         periodSetDataColdWater: null,
         periodColdWater: null,
+        periodEquipDatabaseParams: null,
       },
       months:
         'Январь_Февраль_Март_Апрель_Май_Июнь_Июль_Август_Сентябрь_Октябрь_Ноябрь_Декабрь'.split(
@@ -1077,6 +1091,7 @@ export default {
         equipCustomizing: true,
         setDataColdWater: true,
         coldWater: true,
+        equipDatabaseParams: true,
         depth: 0,
         dateStart: null,
         allowStartHour: 0,
@@ -1138,6 +1153,16 @@ export default {
           retryMin: 0,
         },
         periodColdWater: {
+          periodNum: 0,
+          periodHour: 0,
+          periodMin: 0,
+          periodSec: 0,
+          periodType: matchType(this.$store.state.env.pollDataPeriodTypes)
+            .everyHour,
+          retryHour: 0,
+          retryMin: 0,
+        },
+        periodEquipDatabaseParams: {
           periodNum: 0,
           periodHour: 0,
           periodMin: 0,
@@ -1376,6 +1401,18 @@ export default {
         this.pollData.periodColdWater
       )
     },
+    periodEquipDatabaseParamsData() {
+      return Object.assign(
+        {
+          enabled: this.pollData.enabled && this.pollData.control,
+          error: Object.assign(
+            { pollDataPeriod: this.error.periodEquipDatabaseParams },
+            this.error
+          ),
+        },
+        this.pollData.periodEquipDatabaseParams
+      )
+    },
   },
   methods: {
     handlePointsUpdated(changedPoints) {
@@ -1541,6 +1578,9 @@ export default {
     onPeriodColdWaterChange(value, prop) {
       this.pollData.periodColdWater[prop] = value
     },
+    onPeriodEquipDatabaseParamsChange(value, prop) {
+      this.pollData.periodEquipDatabaseParams[prop] = value
+    },
   },
 }
 </script>
@@ -1591,12 +1631,14 @@ export default {
   gap: 5px 3px;
   grid-template-columns: auto;
 }
+
 .system-props-points-container {
   padding: 0 auto;
   display: flex;
   flex-direction: row;
   justify-content: space-between;
 }
+
 .system-props-points-item {
   max-width: 50%;
   /* justify-content: stretch; */

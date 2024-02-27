@@ -97,7 +97,8 @@ export default {
         || this.value.equipEvents
         || this.value.equipCustomizing
         || this.value.setDataColdWater
-        || this.value.coldWater) && !this.disabled) {
+        || this.value.coldWater
+        || this.value.equipDatabaseParams) && !this.disabled) {
         this.error.data.value = true
         this.error.data.title = 'Необходимо выбрать хотя бы один тип данных.'
       }

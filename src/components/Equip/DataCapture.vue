@@ -3,7 +3,7 @@
     <div class="grid">
       <div class="grid two">
         <label>Состояние:</label>
-        <select v-model="value.enabled" @change="onChange()">
+        <select v-model="value.enabled" @change="onChange()">   
           <option :value="false">отключен</option>
           <option :value="true">включен</option>
         </select>
@@ -15,8 +15,8 @@
           <template v-for="[k, v] in Object.entries($store.state.env.pollDataTypes)">
             <check-box v-if="value[v.type] !== null" :key="k" v-model="value[v.type]" :disabled="disabled" @update:modelValue="onChange()" :class="{ 'validation-error': error.pollDataType }" :title="error.pollDataType">{{ v.text }}</check-box>
           </template>
-        </div>
-      </div>
+        </div> 
+      </div>   
     </div>
     <div class="grid">
       <div class="grid two">
@@ -84,6 +84,9 @@
           </tabx>
           <tabx text="Параметры ХВ" v-if="pollData.coldWater">
             <poll-period-props @change="onPeriodColdWaterChange" v-bind="periodColdWaterData" />
+          </tabx>
+          <tabx text="База параметров" v-if="pollData.equipDatabaseParams">
+            <poll-period-props @change="onPeriodEquipDatabaseParamsChange" v-bind="periodEquipDatabaseParamsData" />
           </tabx>
         </tabs>
         <div style="margin: 10px 0 10px 0; height: 1px; background-color: #ecf0f6" />
@@ -178,6 +181,9 @@ export default {
     },
     periodColdWaterData() {
       return Object.assign({ enabled: this.pollData.enabled && this.pollData.control && !this.value.controlSystem, error: Object.assign({ pollDataPeriod: this.error.periodColdWater }, this.error) }, this.pollData.periodColdWater)
+    },
+    periodEquipDatabaseParamsData() {
+      return Object.assign({ enabled: this.pollData.enabled && this.pollData.control && !this.value.controlSystem, error: Object.assign({ pollDataPeriod: this.error.periodEquipDatabaseParams }, this.error) }, this.pollData.periodEquipDatabaseParams)
     }
   },
   methods: {
@@ -206,6 +212,10 @@ export default {
     },
     onPeriodColdWaterChange(value, prop) {
       this.value.periodColdWater[prop] = value
+      this.onChange()
+    },
+    onPeriodEquipDatabaseParamsChange(value, prop) {
+      this.value.periodEquipDatabaseParams[prop] = value
       this.onChange()
     }
   }

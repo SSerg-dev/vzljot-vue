@@ -27,8 +27,7 @@ module.exports = defineConfig({
     if (process.env.NODE_ENV === 'production') {
       config.output.chunkFilename = './chunks/[name].[chunkhash].js'
     }
-  },
-  // ------------------------------------
+  }
   // devServer: {
   //   proxy: 'http://localhost:16385'
   // }

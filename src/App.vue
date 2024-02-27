@@ -517,7 +517,6 @@ export default {
       let options = {
         isInfoChanged: flag, 
       }
-      // this.$store.commit('setCard', options)
       this.$emitter.emit('info:open', options)
     },
   }, // end methods

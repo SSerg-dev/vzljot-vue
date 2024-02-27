@@ -14,10 +14,11 @@ export class EquipError {
   periodEquipCustomizing?: string
   periodSetDataColdWater?: string
   periodColdWater?: string
+  periodEquipDatabaseParams?: string
   set?: string
   margin?: string
   password?: string
-  group?: object
+  group?: object 
 
   constructor({
     name = '',
@@ -31,6 +32,7 @@ export class EquipError {
     periodEquipCustomizing = '',
     periodSetDataColdWater = '',
     periodColdWater = '',
+    periodEquipDatabaseParams = '',
     set = '',
     margin = '',
     password = '',
@@ -47,6 +49,7 @@ export class EquipError {
     periodEquipCustomizing?: string
     periodSetDataColdWater?: string
     periodColdWater?: string
+    periodEquipDatabaseParams?: string
     set?: string
     margin?: string
     password?: string
@@ -63,6 +66,7 @@ export class EquipError {
     if (periodEquipCustomizing) this.periodEquipCustomizing = periodEquipCustomizing
     if (periodSetDataColdWater) this.periodSetDataColdWater = periodSetDataColdWater
     if (periodColdWater) this.periodColdWater = periodColdWater
+    if (periodEquipDatabaseParams) this.periodEquipDatabaseParams = periodEquipDatabaseParams
     if (set) this.set = set
     if (margin) this.margin = margin
     if (password) this.password = password
@@ -101,6 +105,9 @@ interface IEquip {
   pollData?: any
   analyze?: any
   customProps?: Array<any>
+  timeLastChecking?: Date | null
+  timeNextChecking?: Date | null 
+  equipTypeModificationId?: number | null
 }
 
 export class Equip extends BaseObject {
@@ -127,6 +134,9 @@ export class Equip extends BaseObject {
   pollData: any
   analyze: any
   customProps: Array<any>
+  timeLastChecking?: Date | null
+  timeNextChecking?: Date | null
+  equipTypeModificationId?: number | null
 
   constructor({
     uuid = undefined,
@@ -161,7 +171,11 @@ export class Equip extends BaseObject {
       },
       margin: 0.1
     },
-    customProps = []
+    customProps = [],
+    timeLastChecking = null,
+    timeNextChecking = null,
+    equipTypeModificationId = null
+
   }: IEquip) {
     super(uuid)
 
@@ -186,6 +200,9 @@ export class Equip extends BaseObject {
     this.pollData = pollData
     this.analyze = analyze
     this.customProps = customProps
+    this.timeLastChecking = timeLastChecking
+    this.timeNextChecking = timeNextChecking
+    this.equipTypeModificationId = equipTypeModificationId
   }
 
   isBusAddressVisible(type: number) {
@@ -233,7 +250,6 @@ export class Equip extends BaseObject {
 
   async init(id: number): Promise<void> {
     const { data } = await this.http.get('equip/equip', { params: { id } })
-
     this.id = data.id
     this.name = data.name
     this.note = data.note
@@ -253,6 +269,9 @@ export class Equip extends BaseObject {
     this.pollData = data.pollData
     this.analyze = data.analyze
     this.customProps = data.customProps
+    this.timeLastChecking = data.timeLastChecking
+    this.timeNextChecking = data.timeNextChecking
+    this.equipTypeModificationId = data.equipTypeModificationId
   }
 
   async save() {
@@ -276,8 +295,11 @@ export class Equip extends BaseObject {
       pollData?: any
       analyze: any
       customProps?: Array<any>
+      timeLastChecking?: Date | null
+      timeNextChecking?: Date | null
+      equipTypeModificationId?: number | null
     }
-
+    
     const props: Props = {
       id: this.id,
       parentId: this.parentId,
@@ -321,6 +343,16 @@ export class Equip extends BaseObject {
       }
     }
 
+    if (this.timeLastChecking !== null) {
+      props.timeLastChecking = this.timeLastChecking
+    }
+    if (this.timeNextChecking !== null) {
+      props.timeNextChecking = this.timeNextChecking
+    }
+    if (this.equipTypeModificationId !== null) {
+      props.equipTypeModificationId = this.equipTypeModificationId
+    }
+
     if (this.connectionTypes.length > 0) {
       const index = this.connectionTypes.findIndex((r: any) => r.type === this.groupType)
 
@@ -341,8 +373,9 @@ export class Equip extends BaseObject {
       margin: this.analyze.margin
     }
 
+
     if (this.customProps) {
-      props.customProps = this.customProps.map(prop => {
+      props.customProps = this.customProps.map(prop => { 
         const obj = Object.assign(
           {},
           ...Object.entries(prop).map(([k, v]) => {

@@ -35,7 +35,7 @@ export default class EquipType extends BaseObject {
     isVolume = false,
     isWeight = false,
     isSystem = false,
-    modifications = []
+    modifications = [],
   }: EquipTypeType) {
     super(uuid)
 
@@ -50,10 +50,19 @@ export default class EquipType extends BaseObject {
     this.modifications = modifications
   }
 
-  async init(id: number) {
+  async init(id: number, code?: string) {
     if (!Number.isNaN(id)) {
-      const { data } = await this.http.get<EquipType>('equipType/equipType', { params: { id } })
+      let url
+      if (typeof code !== 'undefined') {
+        url = 'equipType/equipTypeByCode'
+      } else {
+        url = 'equipType/equipType'
+      }
 
+      const { data } = await this.http.get<EquipType>(url, {
+        params: { id },
+      })
+      
       this.id = data.id
       this.name = data.name
       this.interval = data.interval
@@ -63,7 +72,7 @@ export default class EquipType extends BaseObject {
       this.isWeight = data.isWeight
       this.isSystem = data.isSystem
 
-      data.modifications.forEach(r => {
+      data.modifications.forEach((r) => {
         r.isTemperature = data.isTemperature
         r.isPressure = data.isPressure
         r.isVolume = data.isVolume
@@ -83,7 +92,7 @@ export default class EquipType extends BaseObject {
       isPressure: this.isPressure,
       isVolume: this.isVolume,
       isWeight: this.isWeight,
-      modifications: this.modifications.filter(r => !r.isSystem)
+      modifications: this.modifications.filter((r) => !r.isSystem),
     }
 
     return await this.http.post('equipType/equipType', model)
@@ -94,6 +103,8 @@ export default class EquipType extends BaseObject {
   }
 
   removeModifications(modifications: Array<number | null>) {
-    this.modifications = this.modifications.filter(r => !modifications.includes(r.id))
+    this.modifications = this.modifications.filter(
+      (r) => !modifications.includes(r.id)
+    )
   }
 }

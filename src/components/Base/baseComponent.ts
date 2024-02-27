@@ -244,7 +244,7 @@ export function setupTreeComponent<TObject extends object, TError extends object
       saving.value = true
 
       localError.value = new localError.value.constructor({})
-
+      
       await localItem.value.save()
 
       hasChanges.value = false
