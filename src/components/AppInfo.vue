@@ -43,7 +43,7 @@
         </card-item>
       </div>
 
-      <div v-for="(point, index) in pointLists" :key="point.id">
+      <div v-for="(point, index) in pointListsView" :key="point.id">
         <card-item
           :title="index + 1 + '.' + 'Точки ' + point.name + ': ' + point.count"
           v-if="isCardSelected"
@@ -55,7 +55,7 @@
           ></pie-chart>
 
           <template #footer>
-            <div class="footer" v-if="time" title="Update Time"> 
+            <div class="footer" v-if="time" title="Update Time">
               <span
                 style="font-size: 22px; padding: 0 3px 0 0"
                 class="fas fa-clock icon"
@@ -66,7 +66,7 @@
         </card-item>
       </div>
 
-      <div v-for="(equip, index) in equipLists" :key="equip.id">
+      <div v-for="(equip, index) in equipListsView" :key="equip.id">
         <card-item
           :title="
             index + 1 + '.' + 'Приборы ' + equip.name + ': ' + equip.count
@@ -114,6 +114,9 @@ export default {
 
       pointLists: [],
       equipLists: [],
+
+      pointListsView: [],
+      equipListsView: [],
 
       pointListsPieChart: [],
       equipListsPieChart: [],
@@ -291,10 +294,10 @@ export default {
           count: point.count,
           statistic: Object.keys(point.statistic).map((statKey) => ({
             key: statKey,
-            value: point.statistic[statKey], 
+            value: point.statistic[statKey],
           })),
         }))
-        this.pointLists = this.pointLists.reverse()
+        this.pointListsView = this.pointLists.reverse()
 
         this.pointListsPieChart = this.pointLists
           .map((point) => point.statistic)
@@ -307,7 +310,7 @@ export default {
             }))
           )
 
-        this.equipLists = data.equipLists.map((equip) => ({ 
+        this.equipLists = data.equipLists.map((equip) => ({
           id: equip.id,
           name: equip.name,
           count: equip.count,
@@ -316,7 +319,7 @@ export default {
             value: equip.statistic[statKey],
           })),
         }))
-        this.equipLists = this.equipLists.reverse()
+        this.equipListsView = this.equipLists.reverse()
 
         this.equipListsPieChart = this.equipLists
           .map((equip) => equip.statistic)
@@ -328,7 +331,6 @@ export default {
               percent: this.calcPercent(item, index),
             }))
           )
-
       } catch {
         console.error(err)
       }
@@ -352,14 +354,12 @@ export default {
       this.infoPointListIds = this.statisticData.pointLists.map(
         (item) => item.id
       )
-
       let updatedPointListsData = this.pointLists.map((pointList) => {
         return {
           ...pointList,
           checked: this.infoPointListIds.includes(pointList.id),
         }
       })
-
       this.pointLists = updatedPointListsData
         .filter((point) => this.infoPointListIds.includes(point.id))
         .sort(sortByName)
@@ -369,14 +369,12 @@ export default {
       this.infoEquipListIds = this.statisticData.equipLists.map(
         (item) => item.id
       )
-
       let updatedEquipListsData = this.equipLists.map((equipList) => {
         return {
           ...equipList,
           checked: this.infoEquipListIds.includes(equipList.id),
         }
       })
-
       this.equipLists = updatedEquipListsData
         .filter((equip) => this.infoEquipListIds.includes(equip.id))
         .sort(sortByName)
