@@ -105,8 +105,8 @@ interface IEquip {
   pollData?: any
   analyze?: any
   customProps?: Array<any>
-  timeLastChecking?: Date | null
-  timeNextChecking?: Date | null 
+  timeLastChecking?: Number | null
+  timeNextChecking?: Number | null 
   equipTypeModificationId?: number | null
 }
 
@@ -134,8 +134,8 @@ export class Equip extends BaseObject {
   pollData: any
   analyze: any
   customProps: Array<any>
-  timeLastChecking?: Date | null
-  timeNextChecking?: Date | null
+  timeLastChecking?: Number | null
+  timeNextChecking?: Number | null
   equipTypeModificationId?: number | null
 
   constructor({
@@ -295,8 +295,8 @@ export class Equip extends BaseObject {
       pollData?: any
       analyze: any
       customProps?: Array<any>
-      timeLastChecking?: Date | null
-      timeNextChecking?: Date | null
+      timeLastChecking?: Number | null
+      timeNextChecking?: Number | null
       equipTypeModificationId?: number | null
     }
     

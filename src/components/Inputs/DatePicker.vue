@@ -21,7 +21,7 @@ export default {
     inputClass: [String],
     popupClass: [String],
     modelValue: {
-      type: [Date, Array, String],
+      type: [Date, Array, String, Number],
       default: () => new Date()
     },
     disabled: [Boolean],

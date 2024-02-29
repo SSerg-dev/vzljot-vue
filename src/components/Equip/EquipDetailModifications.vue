@@ -14,10 +14,7 @@
               :data-id="item.id"
               :selected="item.selected"
             >
-              {{ `${item.id}  ` }}
-              <!-- {{ current }} -->
               {{ item.name }}
-
             </option>
           </select>
         </div>
@@ -25,13 +22,23 @@
           <label>Последняя поверка:</label>
         </div>
         <div class="three-item-4 date-picker">
-          <date-picker v-model="timeLastChecking" :format="dateFormat" @update:modelValue="handleLastCheckingChange"/>
+          <date-picker
+            v-model="timeLastChecking"
+            :format="dateFormat"
+            clearable
+            @update:modelValue="handleLastCheckingChange"
+          />
         </div>
         <div class="three-item-5">
           <label>Следующая поверка:</label>
         </div>
         <div class="three-item-6 date-picker">
-          <date-picker v-model="timeNextChecking" :format="dateFormat" @update:modelValue="handleNextCheckingChange"/>
+          <date-picker
+            v-model="timeNextChecking"
+            :format="dateFormat"
+            clearable
+            @update:modelValue="handleNextCheckingChange"
+          />
         </div>
       </div>
     </expantion-panel>
@@ -54,19 +61,23 @@ export default {
   extends: BaseComponent,
   data() {
     return {
-      localTimeStart: this.timeStart,
-      localTimeEnd: this.timeEnd,
       dateFormat: 'DD.MM.YYYY',
 
       equipType: new EquipType({}),
       modifications: [],
-      
-      timeLastChecking: null, 
-      timeNextChecking: null,  // new Date(),
+
+      timeLastChecking: null,
+      timeNextChecking: null,
       equipTypeModificationId: null,
 
-      // selectedNodeId: null,
-      // current: 22
+      localData: null,
+
+      firstModifications: {
+        id: -1,
+        name: '<Нет>',
+        selected: false,
+      },
+      dateStart: 10800000,
     }
   },
   computed: {
@@ -74,29 +85,28 @@ export default {
       getCard: 'getCard',
     }),
   },
-  watch: {
-    // selectedNodeId(newVal) {
-    //   console.log('$$ newVal', newVal)
-    // },
-    // current(numberId) {
-    //   console.log('$$ current', numberId)
-    // }
-  },
-  async created() {
-     
-    //this.selectedNodeId = this.$store.getters.getCard.selectedNodeId
-    //if (this.selectedNodeId) {
-    await this.changeNode(this.$store.getters.getCard.selectedNodeId)
-    //}
-    this.$emitter.on('tree-component:change-node', (id) => {
-      this.changeNode(id)
-    })
+  watch: {},
+  created() {
+    // this.$emitter.on('tree-component:change-node', (id) => {
+    //   console.log('$$ created: this.changeNode')
+    //   this.changeNode(id)
+    // })
 
-    // this.current = this.selectedNodeId
+    // this.$emitter.on('equip:open', (options) => {
+    //   if (
+    //     options.isEquipChanged &&
+    //     this.$store.getters.getCard.selectedNodeId
+    //   ) {
+    //     this.changeNode(this.$store.getters.getCard.selectedNodeId)
+    //   }
+    // })  
   },
 
-  async mounted() {
-    
+  mounted() {
+    if (this.$store.getters.getCard.selectedNodeId) {
+      console.log('$$ mounted: this.changeNode')
+      this.changeNode(this.$store.getters.getCard.selectedNodeId)
+    }
   },
   methods: {
     handleOptionChange(event) {
@@ -106,60 +116,59 @@ export default {
         )
       const selectedValue = event.target.value
       const changedModifications = { id: selectedId, name: selectedValue }
-      
+
       this.$emit('modifications-updated', changedModifications)
     },
     handleLastCheckingChange(event) {
-      const changedLastChecking = event
+      let changedLastChecking = new Date(event).getTime()
       this.$emit('last-checking-updated', changedLastChecking)
     },
     handleNextCheckingChange(event) {
-      const changedNextChecking = event
+      let changedNextChecking = new Date(event).getTime()
       this.$emit('next-checking-updated', changedNextChecking)
     },
 
     async changeNode(id) {
       try {
         const { data } = await this.$http.get('equip/equip', { params: { id } })
-        
-        await this.equipType.init(data.equipType, 'code') 
-        // await this.equipType.init(data.equipType)
+        console.log('$$ id', id, this.$store.getters.getCard.selectedLastNodeId)
 
-        this.timeLastChecking = data.timeLastChecking
-        this.timeNextChecking = data.timeNextChecking
-        this.equipTypeModificationId = data.equipTypeModificationId
+        //if (id !== this.$store.getters.getCard.selectedLastNodeId) {
+          await this.equipType.init(data.equipType, 'code')
+          // await this.equipType.init(data.equipType)
 
-        // console.log('$$ this.equipTypeModificationId', this.equipTypeModificationId)
-        //this.current = this.equipTypeModificationId
+          this.timeLastChecking = data.timeLastChecking
+            ? new Date(data.timeLastChecking)
+            : null
 
-        if (this.timeLastChecking && !this.timeNextChecking) {
-          let currentDate = {...this.timeLastChecking}
-          currentDate.setFullYear(
-            currentDate.getFullYear() + this.equipType.interval
-          )
-          this.timeNextChecking = currentDate
-        } else {
           this.timeNextChecking = data.timeNextChecking
-        }
-        
-        this.modifications = this.equipType.modifications.map((item) => ({
-          id: item.id,
-          name: item.name,
-          selected: this.equipTypeModificationId === item.id ? true : false
-        }))
-        // console.log('$$ this.modifications', JSON.stringify(this.modifications))
+            ? new Date(data.timeNextChecking)
+            : null
 
-        const options = {
-          modifications: this.modifications,
-        }
-        this.$store.commit('setCard', options)
-        
+          this.equipTypeModificationId = data.equipTypeModificationId
 
+          this.modifications = this.equipType.modifications.map((item) => ({
+            id: item.id,
+            name: item.name,
+            selected: this.equipTypeModificationId === item.id ? true : false,
+          }))
+
+          this.modifications.unshift(this.firstModifications)
+
+          const options = {
+            modifications: this.modifications,
+            timeLastChecking: this.timeLastChecking,
+            timeNextChecking: this.timeNextChecking,
+            equipTypeModificationId: this.equipTypeModificationId,
+            selectedLastNodeId: id,
+          }
+          this.$store.commit('setCard', options)
+        //}
       } catch (error) {
         store.commit('error', error)
       }
     },
-  },
+  }, // end methods
 }
 </script>
 

@@ -434,9 +434,13 @@ export default {
           break
         case 'points':
         case 'equips':
+          this.onEquip(true)
+          this.currentMenu = name
+          break
         case 'extra':
         case 'map':
           this.onInfo(false)
+          this.onEquip(false)
           this.currentMenu = name
           break
         case 'notifications':
@@ -518,6 +522,12 @@ export default {
         isInfoChanged: flag, 
       }
       this.$emitter.emit('info:open', options)
+    },
+    onEquip(flag) {
+      let options = {
+        isEquipChanged: flag, 
+      }
+      this.$emitter.emit('equip:open', options)
     },
   }, // end methods
 }

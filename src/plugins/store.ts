@@ -67,16 +67,25 @@ interface Card {
   isInfoChanged: boolean | null
   viewData: Object | null
   selectedNodeId: number | null
+  selectedLastNodeId: number | null
   modifications: [] | null
   interval: 0 | null
+  equipTypeModificationId: number | null
+  timeLastChecking: number | null
+  timeNextChecking: number | null
+
 }
 const card: Card = {
   isCardSelected: false,
   isInfoChanged: false,
   viewData: {},
   selectedNodeId: null,
+  selectedLastNodeId: null,
   modifications: [],
-  interval: 0
+  interval: 0,
+  equipTypeModificationId: null,
+  timeLastChecking: null,
+  timeNextChecking: null
 }
 
 interface State {
@@ -169,8 +178,12 @@ export const store = createStore<State>({
         state.card.isInfoChanged = payload.isInfoChanged
       if (payload.viewData) state.card.viewData = payload.viewData
       if (payload.selectedNodeId) state.card.selectedNodeId = payload.selectedNodeId
+      if (payload.selectedLastNodeId) state.card.selectedLastNodeId = payload.selectedLastNodeId
       if (payload.modifications) state.card.modifications = payload.modifications
       if (payload.interval) state.card.interval = payload.interval
+      if (payload.equipTypeModificationId) state.card.equipTypeModificationId = payload.equipTypeModificationId
+      if (payload.timeLastChecking) state.card.timeLastChecking = payload.timeLastChecking
+      if (payload.timeNextChecking) state.card.timeNextChecking = payload.timeNextChecking
     },
   },
   getters: {
@@ -186,8 +199,12 @@ export const store = createStore<State>({
         isInfoChanged: state.card.isInfoChanged,
         viewData: state.card.viewData,
         selectedNodeId: state.card.selectedNodeId,
+        selectedLastNodeId: state.card.selectedLastNodeId,
         modifications: state.card.modifications,
-        interval: state.card.interval
+        interval: state.card.interval,
+        equipTypeModificationId: state.card.equipTypeModificationId,
+        timeLastChecking: state.card.timeLastChecking,
+        timeNextChecking: state.card.timeNextChecking
       }
     },
 

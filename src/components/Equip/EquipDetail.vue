@@ -1,5 +1,3 @@
-<!-- eslint-disable vue/no-mutating-props -->
-<!-- eslint-disable vue/no-mutating-props -->
 <template>
   <div class="fit">
     <expantion-panel caption="Основные параметры" :staticHeight="false">
@@ -180,11 +178,11 @@
       </div>
     </expantion-panel>
 
-    <!-- <equip-detail-modifications
+    <equip-detail-modifications
       @modifications-updated="handleModificationsUpdated"
       @last-checking-updated="handleLastCheckingUpdated"
       @next-checking-updated="handleNextCheckingUpdated"
-    /> -->
+    />
 
     <expantion-panel
       v-if="equip.id !== null"
@@ -331,9 +329,7 @@ import ExpantionPanel from '../ExpantionPanel.vue'
 import ConnectionType from '../GroupConnection/ConnectionType.vue'
 import ObjectProps from '../CustomProps/ObjectProps.vue'
 import Wizard from '../Wizard.vue'
-// eslint-disable-next-line no-unused-vars
 import DatePicker from '@/components/Inputs/DatePicker.vue'
-// eslint-disable-next-line no-unused-vars
 import EquipDetailModifications from '@/components/Equip/EquipDetailModifications.vue'
 
 const wizardSelectSet = (http, id, type) => {
@@ -375,9 +371,7 @@ export default {
     ExpantionPanel,
     ObjectProps,
     Wizard,
-    // eslint-disable-next-line vue/no-unused-components
     DatePicker,
-    // eslint-disable-next-line vue/no-unused-components
     EquipDetailModifications,
   },
   props: {
@@ -607,7 +601,7 @@ export default {
           }
         }
       }
-    }, 
+    },
 
     handleModificationsUpdated(changedModifications) {
       // eslint-disable-next-line vue/no-mutating-props
@@ -616,15 +610,15 @@ export default {
     },
     handleLastCheckingUpdated(changedLastChecking) {
       // eslint-disable-next-line vue/no-mutating-props
-      this.equip.timeLastChecking = changedLastChecking 
+      this.equip.timeLastChecking = changedLastChecking
       this.onChange('last-checking', this.equip.timeLastChecking)
     },
     handleNextCheckingUpdated(changedNextChecking) {
       // eslint-disable-next-line vue/no-mutating-props
       this.equip.timeNextChecking = changedNextChecking
       this.onChange('next-checking', this.equip.timeNextChecking)
-    }
-  }, // end methods  
+    },
+  }, // end methods
 }
 </script>
 

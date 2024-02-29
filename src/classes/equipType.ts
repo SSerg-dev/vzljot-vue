@@ -51,6 +51,8 @@ export default class EquipType extends BaseObject {
   }
 
   async init(id: number, code?: string) {
+    console.log('$$ init', id) 
+
     if (!Number.isNaN(id)) {
       let url
       if (typeof code !== 'undefined') {
@@ -62,7 +64,7 @@ export default class EquipType extends BaseObject {
       const { data } = await this.http.get<EquipType>(url, {
         params: { id },
       })
-      
+
       this.id = data.id
       this.name = data.name
       this.interval = data.interval
