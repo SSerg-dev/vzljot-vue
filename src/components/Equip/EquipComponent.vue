@@ -135,7 +135,7 @@ export default defineComponent({
         hasChanges.value = true
       }
     }
-
+    
     return {
       DBTYPE: 'DbEquip',
       hasChanges,

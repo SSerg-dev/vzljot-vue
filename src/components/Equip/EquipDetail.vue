@@ -389,6 +389,7 @@ export default {
       localEquip: new Equip(this.equip),
       localError: JSON.parse(JSON.stringify(this.error)),
       wizard: null,
+      
     }
   },
   created() {
@@ -401,7 +402,7 @@ export default {
     this.$watch(
       () => this.error,
       (value) => (this.localError = JSON.parse(JSON.stringify(value))),
-      { deep: true }
+      { deep: true } 
     )
   },
   computed: {
@@ -483,7 +484,6 @@ export default {
       this.wizard = null
     },
     onChange(prop, value) {
-      // console.log('$$ prop, value', value)
       this.$emit('changed', prop, value)
     },
     onGroupTypeChange(groupType) {
@@ -577,7 +577,7 @@ export default {
     async create(parentId, type) {
       try {
         await this.localEquip.create(this.$http, parentId, type)
-
+        
         this.oldLocalEquipType = this.localEquip.equipType
 
         this.$emit('loaded')
@@ -611,7 +611,7 @@ export default {
     handleLastCheckingUpdated(changedLastChecking) {
       // eslint-disable-next-line vue/no-mutating-props
       this.equip.timeLastChecking = changedLastChecking
-      this.onChange('last-checking', this.equip.timeLastChecking)
+      this.onChange('last-checking', changedLastChecking)
     },
     handleNextCheckingUpdated(changedNextChecking) {
       // eslint-disable-next-line vue/no-mutating-props

@@ -402,7 +402,7 @@ export default {
       node.select(true)
       this.selectedNode = node
       this.$emit('nodeSelect', node)
-      
+
       this.$emitter.emit('tree-component:change-node', this.selectedNode.id)
       const options = {
         selectedNodeId: this.selectedNode.id,

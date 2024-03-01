@@ -70,7 +70,6 @@ export function setupComponent<TObject extends { id?: number; uuid?: string, edi
   onMounted(async () => {
     try {
       await localItem.value.init(item.id)
-
       watch(
         () => localItem.value,
         value => {
@@ -170,9 +169,15 @@ export function setupTreeComponent<TObject extends object, TError extends object
   const saving = ref(false)
   const wizard = ref<any>()
 
-  onMounted(async () => {
+  onMounted(async () => { 
     try {
       await localItem.value.init(id)
+
+      // $$
+      const options = {
+        nodeChange: localItem.value
+      }
+      await store.commit('setCard', options)
 
       watch(
         () => localItem.value,
@@ -260,7 +265,7 @@ export function setupTreeComponent<TObject extends object, TError extends object
         }
       }
     } finally {
-      saving.value = false
+      saving.value = false 
     }
   }
 

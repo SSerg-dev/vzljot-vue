@@ -97,7 +97,7 @@ export default defineComponent({
     function onRemoveEquips(equips: Array<number>) {
       localItem.value.equips = localItem.value.equips.filter(r => !equips.includes(r.id))
     }
-
+    
     return {
       DBTYPE: 'DbNode',
       hasChanges,

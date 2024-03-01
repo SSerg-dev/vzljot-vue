@@ -50,6 +50,7 @@ import BaseComponent from '@/components/Base/BaseComponent.vue'
 import ExpantionPanel from '@/components/ExpantionPanel.vue'
 import DatePicker from '@/components/Inputs/DatePicker.vue'
 import EquipType from '@/classes/equipType'
+// import Equip from '@/classes/equip'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -77,7 +78,7 @@ export default {
         name: '<Нет>',
         selected: false,
       },
-      dateStart: 10800000,
+      nodeChange: null,
     }
   },
   computed: {
@@ -85,26 +86,24 @@ export default {
       getCard: 'getCard',
     }),
   },
-  watch: {},
-  created() {
-    // this.$emitter.on('tree-component:change-node', (id) => {
-    //   console.log('$$ created: this.changeNode')
-    //   this.changeNode(id)
-    // })
-
-    // this.$emitter.on('equip:open', (options) => {
-    //   if (
-    //     options.isEquipChanged &&
-    //     this.$store.getters.getCard.selectedNodeId
-    //   ) {
-    //     this.changeNode(this.$store.getters.getCard.selectedNodeId)
-    //   }
-    // })  
+  watch: {
+    getCard(newVal) {
+      // this.localData = newVal
+      if (newVal.nodeChange) {
+        this.equipType = newVal.nodeChange.equipType
+        this.timeLastChecking = newVal.nodeChange.timeLastChecking
+        this.timeNextChecking = newVal.nodeChange.timeNextChecking
+        this.equipTypeModificationId = newVal.nodeChange.equipTypeModificationId
+        
+        this.changeNode(newVal.nodeChange.id)
+        // console.log('$$ getCard', JSON.stringify(data),JSON.stringify(newVal.nodeChange))
+      }
+    },
   },
+  created() {},
 
   mounted() {
     if (this.$store.getters.getCard.selectedNodeId) {
-      console.log('$$ mounted: this.changeNode')
       this.changeNode(this.$store.getters.getCard.selectedNodeId)
     }
   },
@@ -130,10 +129,8 @@ export default {
 
     async changeNode(id) {
       try {
-        const { data } = await this.$http.get('equip/equip', { params: { id } })
-        console.log('$$ id', id, this.$store.getters.getCard.selectedLastNodeId)
+          const { data } = await this.$http.get('equip/equip', { params: { id } })
 
-        //if (id !== this.$store.getters.getCard.selectedLastNodeId) {
           await this.equipType.init(data.equipType, 'code')
           // await this.equipType.init(data.equipType)
 
@@ -144,6 +141,18 @@ export default {
           this.timeNextChecking = data.timeNextChecking
             ? new Date(data.timeNextChecking)
             : null
+
+          /*
+         if (this.timeLastChecking && !this.timeNextChecking) {
+          let currentDate = {...this.timeLastChecking}
+          currentDate.setFullYear(
+            currentDate.getFullYear() + this.equipType.interval
+          )
+          this.timeNextChecking = currentDate
+        } else {
+          this.timeNextChecking = data.timeNextChecking
+        }
+        */
 
           this.equipTypeModificationId = data.equipTypeModificationId
 
@@ -163,7 +172,7 @@ export default {
             selectedLastNodeId: id,
           }
           this.$store.commit('setCard', options)
-        //}
+        
       } catch (error) {
         store.commit('error', error)
       }
