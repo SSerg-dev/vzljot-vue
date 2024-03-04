@@ -14,7 +14,7 @@
               :data-id="item.id"
               :selected="item.selected"
             >
-              {{ item.name }}
+              {{ item.name }} 
             </option>
           </select>
         </div>
@@ -50,7 +50,6 @@ import BaseComponent from '@/components/Base/BaseComponent.vue'
 import ExpantionPanel from '@/components/ExpantionPanel.vue'
 import DatePicker from '@/components/Inputs/DatePicker.vue'
 import EquipType from '@/classes/equipType'
-// import Equip from '@/classes/equip'
 import { mapGetters } from 'vuex'
 
 export default {
@@ -72,13 +71,16 @@ export default {
       equipTypeModificationId: null,
 
       localData: null,
+      equipTypeId: null,
 
       firstModifications: {
         id: -1,
         name: '<Нет>',
         selected: false,
       },
-      nodeChange: null,
+
+      timeout: null,
+      delay: 500
     }
   },
   computed: {
@@ -88,25 +90,31 @@ export default {
   },
   watch: {
     getCard(newVal) {
-      // this.localData = newVal
       if (newVal.nodeChange) {
-        this.equipType = newVal.nodeChange.equipType
+        this.equipTypeId = newVal.nodeChange.equipType
         this.timeLastChecking = newVal.nodeChange.timeLastChecking
         this.timeNextChecking = newVal.nodeChange.timeNextChecking
         this.equipTypeModificationId = newVal.nodeChange.equipTypeModificationId
-        
-        this.changeNode(newVal.nodeChange.id)
-        // console.log('$$ getCard', JSON.stringify(data),JSON.stringify(newVal.nodeChange))
       }
     },
   },
-  created() {},
+  created() {}, 
 
   mounted() {
-    if (this.$store.getters.getCard.selectedNodeId) {
-      this.changeNode(this.$store.getters.getCard.selectedNodeId)
-    }
+    this.timeout = setTimeout(() => {
+      if (
+        this.$store.getters.getCard.selectedNodeId &&
+        this.$store.getters.getCard.nodeChange
+      ) {
+        this.changeNode(this.$store.getters.getCard.selectedNodeId)
+      }
+    }, this.delay)
   },
+
+  beforeUnmount() {
+    clearTimeout(this.timeout)
+  },
+
   methods: {
     handleOptionChange(event) {
       const selectedId =
@@ -129,50 +137,36 @@ export default {
 
     async changeNode(id) {
       try {
-          const { data } = await this.$http.get('equip/equip', { params: { id } })
+        const equipTypeId = this.$store.getters.getCard.nodeChange.equipType
+        await this.equipType.init(equipTypeId, 'code')
 
-          await this.equipType.init(data.equipType, 'code')
-          // await this.equipType.init(data.equipType)
+        this.timeLastChecking = this.timeLastChecking
+          ? new Date(this.timeLastChecking)
+          : null
 
-          this.timeLastChecking = data.timeLastChecking
-            ? new Date(data.timeLastChecking)
-            : null
+        this.timeNextChecking = this.timeNextChecking
+          ? new Date(this.timeNextChecking)
+          : null
 
-          this.timeNextChecking = data.timeNextChecking
-            ? new Date(data.timeNextChecking)
-            : null
+        this.equipTypeModificationId =
+          this.$store.getters.getCard.nodeChange.equipTypeModificationId
 
-          /*
-         if (this.timeLastChecking && !this.timeNextChecking) {
-          let currentDate = {...this.timeLastChecking}
-          currentDate.setFullYear(
-            currentDate.getFullYear() + this.equipType.interval
-          )
-          this.timeNextChecking = currentDate
-        } else {
-          this.timeNextChecking = data.timeNextChecking
+        this.modifications = this.equipType.modifications.map((item) => ({
+          id: item.id,
+          name: item.name,
+          selected: this.equipTypeModificationId === item.id ? true : false,
+        }))
+
+        this.modifications.unshift(this.firstModifications)
+
+        const options = {
+          modifications: this.modifications,
+          timeLastChecking: this.timeLastChecking,
+          timeNextChecking: this.timeNextChecking,
+          equipTypeModificationId: this.equipTypeModificationId,
+          selectedLastNodeId: id,
         }
-        */
-
-          this.equipTypeModificationId = data.equipTypeModificationId
-
-          this.modifications = this.equipType.modifications.map((item) => ({
-            id: item.id,
-            name: item.name,
-            selected: this.equipTypeModificationId === item.id ? true : false,
-          }))
-
-          this.modifications.unshift(this.firstModifications)
-
-          const options = {
-            modifications: this.modifications,
-            timeLastChecking: this.timeLastChecking,
-            timeNextChecking: this.timeNextChecking,
-            equipTypeModificationId: this.equipTypeModificationId,
-            selectedLastNodeId: id,
-          }
-          this.$store.commit('setCard', options)
-        
+        this.$store.commit('setCard', options)
       } catch (error) {
         store.commit('error', error)
       }

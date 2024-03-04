@@ -173,7 +173,6 @@ export function setupTreeComponent<TObject extends object, TError extends object
     try {
       await localItem.value.init(id)
 
-      // $$
       const options = {
         nodeChange: localItem.value
       }

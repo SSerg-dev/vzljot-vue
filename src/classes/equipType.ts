@@ -51,7 +51,7 @@ export default class EquipType extends BaseObject {
   }
 
   async init(id: number, code?: string) {
-    console.log('$$ init', id) 
+    // console.log('$$ init', id) 
 
     if (!Number.isNaN(id)) {
       let url
