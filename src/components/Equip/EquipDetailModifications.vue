@@ -6,10 +6,10 @@
           <label>Исполнение:</label>
         </div>
         <div class="three-item-2">
-          <select 
-          style="width: 100%" 
-          @change="handleOptionChange"
-          :key="getCard.modifications.length" 
+          <select
+            style="width: 100%"
+            @change="handleOptionChange"
+            :key="getCard.modifications.length"
           >
             <option
               v-for="(item, index) in getCard.modifications"
@@ -93,10 +93,9 @@ export default {
       },
 
       timeout: null,
-      delay: 400, 
+      delay: 400,
 
       isFillButtonEnable: false,
-      
     }
   },
   computed: {
@@ -164,7 +163,6 @@ export default {
           modifications: this.modifications,
         }
         this.$store.commit('setCard', options)
-
       } catch (error) {
         store.commit('error', error)
       }
@@ -182,9 +180,9 @@ export default {
     setNextChecking() {
       let nextTime
       if (this.timeLastChecking) {
-        nextTime = new Date(this.timeLastChecking) 
+        nextTime = new Date(this.timeLastChecking)
         if (!this.equipType.interval) {
-          this.equipType.interval = 4
+          this.equipType.interval = 0
         }
         nextTime.setFullYear(nextTime.getFullYear() + this.equipType.interval)
         this.timeNextChecking = nextTime
@@ -213,7 +211,7 @@ export default {
     handleLastCheckingChange(event) {
       let changedLastChecking = new Date(event).getTime()
       this.$emit('last-checking-updated', changedLastChecking)
-      this.isFillButtonEnable = false
+      this.isFillButtonEnable = changedLastChecking ? false : true
     },
     handleNextCheckingChange(event) {
       let changedNextChecking = new Date(event).getTime()
