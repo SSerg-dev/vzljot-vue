@@ -1,5 +1,6 @@
 import BaseObject from './base/baseObject'
 import { CustomPropertyTypeEnum } from './enum/CustomPropertyTypeEnum'
+import { store } from '@/plugins/store'
 
 export class EquipError {
   name?: string
@@ -233,6 +234,12 @@ export class Equip extends BaseObject {
     this.equipTypes = data.equipTypes
     this.equipType = data.equipType
 
+    const options = {
+      nodeCreate: data
+    }
+    store.commit('setCard', options)
+
+    
     if (this.equipTypes.length > 0) {
       const index = this.equipTypes.findIndex((r: any) => r.code === this.equipType)
 

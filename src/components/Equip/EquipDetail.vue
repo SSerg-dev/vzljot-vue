@@ -21,7 +21,7 @@
         <label>Модель:</label>
         <select
           v-if="!localEquip.id"
-          v-model="localEquip.equipType"
+          v-model="localEquip.equipType" 
           @change="onEquipTypeChange(localEquip.parentId, localEquip.type)"
           :class="{ 'validation-error': localError.equipType }"
           :title="localError.equipType"
@@ -389,7 +389,7 @@ export default {
       localEquip: new Equip(this.equip),
       localError: JSON.parse(JSON.stringify(this.error)),
       wizard: null,
-      
+      action: '',
     }
   },
   created() {
@@ -402,7 +402,7 @@ export default {
     this.$watch(
       () => this.error,
       (value) => (this.localError = JSON.parse(JSON.stringify(value))),
-      { deep: true } 
+      { deep: true }
     )
   },
   computed: {
@@ -485,6 +485,9 @@ export default {
     },
     onChange(prop, value) {
       this.$emit('changed', prop, value)
+      if (this.action !== 'create') {
+        this.action = 'change'
+      }
     },
     onGroupTypeChange(groupType) {
       this.localEquip.groupType = groupType
@@ -498,6 +501,17 @@ export default {
         const { data } = await this.$http.get('equip/getConnectionTypes', {
           params: { parentId, type, code: this.localEquip.equipType },
         })
+
+        const options = {
+          nodeChange: {
+            equipType: this.localEquip.equipType,
+          },
+        }
+        this.$store.commit('setCard', options)
+        this.$emitter.emit(
+          'equip-detail:change-equip-type',
+          this.localEquip.equipType
+        )
 
         this.localEquip.connectionTypes = data
 
@@ -577,7 +591,17 @@ export default {
     async create(parentId, type) {
       try {
         await this.localEquip.create(this.$http, parentId, type)
-        
+
+        this.action = 'create'
+        const options = {
+          nodeChange: {
+            timeLastChecking: null,
+            timeNextChecking: null,
+          },
+        }
+        this.$store.commit('setCard', options)
+        this.$emitter.emit('equip-detail:create-equip', type)
+
         this.oldLocalEquipType = this.localEquip.equipType
 
         this.$emit('loaded')
@@ -588,7 +612,7 @@ export default {
     async save() {
       try {
         this.localError = {}
-
+        this.action = ''
         await this.localEquip.save()
 
         return true
@@ -604,19 +628,62 @@ export default {
     },
 
     handleModificationsUpdated(changedModifications) {
-      // eslint-disable-next-line vue/no-mutating-props
-      this.equip.equipTypeModificationId = changedModifications.id
-      this.onChange('modifications', changedModifications.id)
+      const type = this.action
+
+      switch (type) {
+        case 'change':
+          //eslint-disable-next-line vue/no-mutating-props
+          this.equip.equipTypeModificationId = changedModifications.id
+          this.onChange('modifications', changedModifications.id)
+          break
+        case 'create':
+          this.localEquip.equipTypeModificationId = changedModifications.id
+          this.onChange('modifications', changedModifications.id)
+          break
+        default:
+          //eslint-disable-next-line vue/no-mutating-props
+          this.equip.equipTypeModificationId = changedModifications.id
+          this.onChange('modifications', changedModifications.id)
+          break
+      }
     },
     handleLastCheckingUpdated(changedLastChecking) {
-      // eslint-disable-next-line vue/no-mutating-props
-      this.equip.timeLastChecking = changedLastChecking
-      this.onChange('last-checking', changedLastChecking)
+      const type = this.action
+      switch (type) {
+        case 'change':
+          // eslint-disable-next-line vue/no-mutating-props
+          this.equip.timeLastChecking = changedLastChecking
+          this.onChange('last-checking', changedLastChecking)
+          break
+        case 'create':
+          this.localEquip.timeLastChecking = changedLastChecking
+          this.onChange('last-checking', changedLastChecking)
+          break
+        default:
+          // eslint-disable-next-line vue/no-mutating-props
+          this.equip.timeLastChecking = changedLastChecking
+          this.onChange('last-checking', changedLastChecking)
+          break
+      }
     },
     handleNextCheckingUpdated(changedNextChecking) {
-      // eslint-disable-next-line vue/no-mutating-props
-      this.equip.timeNextChecking = changedNextChecking
-      this.onChange('next-checking', this.equip.timeNextChecking)
+      const type = this.action
+      switch (type) {
+        case 'change':
+          // eslint-disable-next-line vue/no-mutating-props
+          this.equip.timeNextChecking = changedNextChecking
+          this.onChange('next-checking', changedNextChecking)
+          break
+        case 'create':
+          this.localEquip.timeNextChecking = changedNextChecking
+          this.onChange('next-checking', changedNextChecking)
+          break
+        default:
+          // eslint-disable-next-line vue/no-mutating-props
+          this.equip.timeNextChecking = changedNextChecking
+          this.onChange('next-checking', changedNextChecking)
+          break
+      }
     },
   }, // end methods
 }

@@ -88,6 +88,7 @@ const wizardCreate = async (http, node) => {
           data: { equip: new Equip({ parentId: node.id, type: node.type }) }
         }
       }
+      
     } else if (itemType === 'systemNode') {
       const getType = type => Object.values(store.state.env.itemTypes).find(r => r.type === type)
       const types = ['equip', 'groupConnection'].map(r => getType(r))

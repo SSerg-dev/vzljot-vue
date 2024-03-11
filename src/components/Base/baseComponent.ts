@@ -176,7 +176,7 @@ export function setupTreeComponent<TObject extends object, TError extends object
       const options = {
         nodeChange: localItem.value
       }
-      await store.commit('setCard', options)
+      store.commit('setCard', options)
 
       watch(
         () => localItem.value,

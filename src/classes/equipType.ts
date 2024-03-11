@@ -1,5 +1,6 @@
 import BaseObject from './base/baseObject'
 import Modification from './modification'
+import { store } from '@/plugins/store'
 
 type EquipTypeType = {
   uuid?: string
@@ -50,15 +51,16 @@ export default class EquipType extends BaseObject {
     this.modifications = modifications
   }
 
-  async init(id: number, code?: string) {
-    // console.log('$$ init', id) 
-
+  async init(id: number | string, code?: string) {
     if (!Number.isNaN(id)) {
       let url
-      if (typeof code !== 'undefined') {
-        url = 'equipType/equipTypeByCode'
-      } else {
-        url = 'equipType/equipType'
+      url =
+        typeof code !== 'undefined'
+          ? (url = 'equipType/equipTypeByCode')
+          : (url = 'equipType/equipType')
+
+      if (!id) {
+        id = store.state.card.nodeCreate.equipType
       }
 
       const { data } = await this.http.get<EquipType>(url, {

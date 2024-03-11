@@ -74,6 +74,7 @@ interface Card {
   timeLastChecking: number | null
   timeNextChecking: number | null
   nodeChange: any | null
+  nodeCreate: any | null
 
 }
 const card: Card = {
@@ -87,7 +88,8 @@ const card: Card = {
   equipTypeModificationId: null,
   timeLastChecking: null,
   timeNextChecking: null,
-  nodeChange: null
+  nodeChange: null,
+  nodeCreate: null
 }
 
 interface State {
@@ -187,6 +189,7 @@ export const store = createStore<State>({
       if (payload.timeLastChecking) state.card.timeLastChecking = payload.timeLastChecking
       if (payload.timeNextChecking) state.card.timeNextChecking = payload.timeNextChecking
       if (payload.nodeChange) state.card.nodeChange = payload.nodeChange
+      if (payload.nodeCreate) state.card.nodeCreate = payload.nodeCreate
     },
   },
   getters: {
@@ -208,7 +211,8 @@ export const store = createStore<State>({
         equipTypeModificationId: state.card.equipTypeModificationId,
         timeLastChecking: state.card.timeLastChecking,
         timeNextChecking: state.card.timeNextChecking,
-        nodeChange: state.card.nodeChange
+        nodeChange: state.card.nodeChange,
+        nodeCreate: state.card.nodeCreate
       }
     },
 
