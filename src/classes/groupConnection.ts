@@ -4,7 +4,13 @@ export class GroupConnectionError {
   name?: string
   component?: any
 
-  constructor({ name = '', component = undefined }: { name?: string; component?: any }) {
+  constructor({
+    name = '',
+    component = undefined,
+  }: {
+    name?: string
+    component?: any
+  }) {
     if (name) this.name = name
     if (component) this.component = component
   }
@@ -19,7 +25,21 @@ export class GroupConnection extends BaseObject {
   systemNode?: number
   connectionTypes: any
 
-  constructor({ uuid = undefined, id = undefined, name = '', groupType = 10, systemNode = undefined, connectionTypes = null }: { uuid?: string; id?: number; name?: string; groupType?: number; systemNode?: number; connectionTypes?: any }) {
+  constructor({
+    uuid = undefined,
+    id = undefined,
+    name = '',
+    groupType = 10,
+    systemNode = undefined,
+    connectionTypes = null,
+  }: {
+    uuid?: string
+    id?: number
+    name?: string
+    groupType?: number
+    systemNode?: number
+    connectionTypes?: any
+  }) {
     super(uuid)
 
     this.id = id
@@ -30,7 +50,9 @@ export class GroupConnection extends BaseObject {
   }
 
   async create() {
-    const { data } = await this.http.get('groupConnection/create', { params: { systemNodeId: this.systemNode } })
+    const { data } = await this.http.get('groupConnection/create', {
+      params: { systemNodeId: this.systemNode },
+    })
 
     this.name = data.name
     this.groupType = data.groupType
@@ -38,7 +60,9 @@ export class GroupConnection extends BaseObject {
   }
 
   async init(id: number) {
-    const { data } = await this.http.get('groupConnection/edit', { params: { id } })
+    const { data } = await this.http.get('groupConnection/edit', {
+      params: { id },
+    })
 
     this.id = id
     this.name = data.name
@@ -47,12 +71,16 @@ export class GroupConnection extends BaseObject {
   }
 
   async save() {
-    const model = this.connectionTypes.find((r: any) => r.type === this.groupType)
+    const model = this.connectionTypes.find(
+      (r: any) => r.type === this.groupType
+    )
 
     model.data.group.name = this.name
 
-    const { data } = await this.http.post('groupConnection/save', model.data.group)
-
+    const { data } = await this.http.post(
+      'groupConnection/save',
+      model.data.group
+    )
     return data
   }
 }

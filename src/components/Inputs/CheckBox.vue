@@ -1,8 +1,22 @@
 <template>
   <label :class="['checkbox-wrapper', { 'is-disabled': disabled }]">
     <span :class="['checkbox-container', { 'is-checked': isChecked }]">
-      <span class="checkbox-checkbox" :style="[{ 'border-color': color }, { 'background-color': isChecked ? color : '#fff' }]"></span>
-      <input class="checkbox-original" type="checkbox" :disabled="disabled" :true-value="trueLabel" :false-value="falseLabel" :checked="modelValue === trueLabel" @change="handleChange" />
+      <span
+        class="checkbox-checkbox"
+        :style="[
+          { 'border-color': color },
+          { 'background-color': isChecked ? color : '#fff' },
+        ]"
+      ></span>
+      <input
+        class="checkbox-original"
+        type="checkbox"
+        :disabled="disabled"
+        :true-value="trueLabel"
+        :false-value="falseLabel"
+        :checked="modelValue === trueLabel"
+        @change="handleChange"
+      />
     </span>
     <span v-if="!!$slots.default" class="checkbox-text">
       <slot></slot>
@@ -14,21 +28,21 @@ export default {
   props: {
     color: {
       type: String,
-      default: 'lightslategray'
+      default: 'lightslategray',
     },
     modelValue: {
       type: [String, Number, Boolean],
-      default: false
+      default: false,
     },
     disabled: Boolean,
     trueLabel: {
       type: [String, Number, Boolean],
-      default: true
+      default: true,
     },
     falseLabel: {
       type: [String, Number, Boolean],
-      default: false
-    }
+      default: false,
+    },
   },
   emits: ['update:modelValue'],
   computed: {
@@ -40,13 +54,16 @@ export default {
       }
 
       return false
-    }
+    },
   },
   methods: {
     handleChange(e) {
-      this.$emit('update:modelValue', e.target.checked ? this.trueLabel : this.falseLabel)
-    }
-  }
+      this.$emit(
+        'update:modelValue',
+        e.target.checked ? this.trueLabel : this.falseLabel
+      )
+    },
+  },
 }
 </script>
 
@@ -85,7 +102,8 @@ export default {
   width: 16px;
   height: 16px;
   z-index: 1;
-  transition: border-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46), background-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46);
+  transition: border-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46),
+    background-color 0.25s cubic-bezier(0.71, -0.46, 0.29, 1.46);
 }
 
 .checkbox-wrapper .checkbox-checkbox:after {

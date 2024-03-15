@@ -1,6 +1,7 @@
 import BaseObject from './base/baseObject'
 import Modification from './modification'
 import { store } from '@/plugins/store'
+// import { debounce } from './utils/common.functions'
 
 type EquipTypeType = {
   uuid?: string
@@ -26,6 +27,9 @@ export default class EquipType extends BaseObject {
   isSystem: boolean
   modifications: Array<Modification>
 
+  static instance: any
+  static exists: boolean
+
   constructor({
     uuid = undefined,
     id = undefined,
@@ -49,8 +53,14 @@ export default class EquipType extends BaseObject {
     this.isWeight = isWeight
     this.isSystem = isSystem
     this.modifications = modifications
-  }
 
+    if (EquipType.exists) {
+      return EquipType.instance
+    }
+    EquipType.instance = this
+    EquipType.exists = true
+  }
+  // @debounce(100)
   async init(id: number | string, code?: string) {
     if (!Number.isNaN(id)) {
       let url
@@ -64,7 +74,7 @@ export default class EquipType extends BaseObject {
       }
 
       const { data } = await this.http.get<EquipType>(url, {
-        params: { id },
+        params: { id }, 
       })
 
       this.id = data.id

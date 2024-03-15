@@ -156,7 +156,7 @@ export default {
   },
   methods: {
     onChange(prop, value) {
-      this.$emit('changed', prop, value)
+      this.$emit('changed', prop, value) 
     }
   }
 }

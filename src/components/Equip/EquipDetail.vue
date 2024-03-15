@@ -329,7 +329,6 @@ import ExpantionPanel from '../ExpantionPanel.vue'
 import ConnectionType from '../GroupConnection/ConnectionType.vue'
 import ObjectProps from '../CustomProps/ObjectProps.vue'
 import Wizard from '../Wizard.vue'
-import DatePicker from '@/components/Inputs/DatePicker.vue'
 import EquipDetailModifications from '@/components/Equip/EquipDetailModifications.vue'
 
 const wizardSelectSet = (http, id, type) => {
@@ -371,7 +370,6 @@ export default {
     ExpantionPanel,
     ObjectProps,
     Wizard,
-    DatePicker,
     EquipDetailModifications,
   },
   props: {

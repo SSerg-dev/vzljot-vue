@@ -1,6 +1,7 @@
 <template>
   <div>
-    <expantion-panel caption="Средства измерений" :opened="true">
+    <expantion-panel caption="Средства измерений" :opened="isOpened">
+      <spinner :show="loading" :text="'Загрузка...'" key="1" />
       <div class="equip-grid three-container">
         <div class="three-item-1">
           <label>Исполнение:</label>
@@ -47,7 +48,7 @@
         <div class="three-item-7">
           <button
             @click="onFillClick"
-            :disabled="isFillButtonEnable"
+            :disabled="!(timeLastChecking && interval)"
             style="justify-self: right; margin-bottom: 1px"
           >
             Заполнить
@@ -93,9 +94,13 @@ export default {
       },
 
       timeout: null,
-      delay: 400,
+      delay: 1000,
 
-      isFillButtonEnable: false,
+      isOpened: false,
+      isFillClick: true,
+      interval: 0,
+
+      loading: true,
     }
   },
   computed: {
@@ -114,32 +119,47 @@ export default {
     },
     // eslint-disable-next-line no-unused-vars
     equipTypeId(newVal) {
-      // this.changeTypeEquip(newVal)
+      this.$emitter.off(
+        'equip-detail:change-equip-type',
+        this.onChangeEquipType
+      )
       this.$emitter.on('equip-detail:change-equip-type', this.onChangeEquipType)
     },
   },
   created() {
+    this.$emitter.off('equip-detail:create-equip', this.onCreateEquip)
+    this.$emitter.off('equip-detail:change-equip-type', this.onChangeEquipType)
+
     this.$emitter.on('equip-detail:create-equip', this.onCreateEquip)
     this.$emitter.on('equip-detail:change-equip-type', this.onChangeEquipType)
+
+    this.$watch(
+      () => this.equipType.interval,
+      (value) => (this.interval = value),
+      { deep: true }
+    )
   },
 
   mounted() {
+    this.isOpened = true
     this.timeout = setTimeout(() => {
       if (
         this.$store.getters.getCard.selectedNodeId &&
         this.$store.getters.getCard.nodeChange
       ) {
         this.changeNode(this.$store.getters.getCard.selectedNodeId)
-        if (this.timeLastChecking || this.timeNextChecking) {
-          this.isFillButtonEnable = false
-        }
+        this.interval = this.equipType.interval
+        this.loading = false
       }
     }, this.delay)
   },
 
   beforeUnmount() {
+    this.isOpened = false
     clearTimeout(this.timeout)
-    this.isFillButtonEnable = false
+
+    this.$emitter.off('equip-detail:create-equip', this.onCreateEquip)
+    this.$emitter.off('equip-detail:change-equip-type', this.onChangeEquipType)
   },
 
   methods: {
@@ -170,19 +190,25 @@ export default {
 
     // eslint-disable-next-line no-unused-vars
     onCreateEquip(type) {
+      if (this.interval === 0) {
+        this.interval = -1
+      }
       this.createNode(-1)
-      this.$emitter.off('equip-detail:create-equip')
+      this.$emitter.off('equip-detail:create-equip', this.onCreateEquip)
     },
     onChangeEquipType(id) {
       this.changeTypeEquip(id)
-      this.$emitter.off('equip-detail:change-equip-type')
+      this.$emitter.off(
+        'equip-detail:change-equip-type',
+        this.onChangeEquipType
+      )
     },
     setNextChecking() {
       let nextTime
       if (this.timeLastChecking) {
         nextTime = new Date(this.timeLastChecking)
         if (!this.equipType.interval) {
-          this.equipType.interval = 0
+          timeLastChecking = 0
         }
         nextTime.setFullYear(nextTime.getFullYear() + this.equipType.interval)
         this.timeNextChecking = nextTime
@@ -190,8 +216,9 @@ export default {
       }
       return
     },
+    // eslint-disable-next-line no-unused-vars
     onFillClick(event) {
-      this.isFillButtonEnable = !!event.isTrusted
+      // this.isFillClick = !!event.isTrusted
       const result = this.setNextChecking()
       if (result) {
         this.handleNextCheckingChange(result.getTime())
@@ -211,12 +238,11 @@ export default {
     handleLastCheckingChange(event) {
       let changedLastChecking = new Date(event).getTime()
       this.$emit('last-checking-updated', changedLastChecking)
-      this.isFillButtonEnable = changedLastChecking ? false : true
+      // this.timeLastChecking = changedLastChecking
     },
     handleNextCheckingChange(event) {
       let changedNextChecking = new Date(event).getTime()
       this.$emit('next-checking-updated', changedNextChecking)
-      this.isFillButtonEnable = false
     },
 
     // eslint-disable-next-line no-unused-vars
@@ -261,6 +287,7 @@ export default {
     async createNode(id) {
       try {
         const equipTypeId = this.$store.getters.getCard.nodeChange.equipType
+
         await this.equipType.init(equipTypeId, 'code')
 
         this.timeLastChecking = null

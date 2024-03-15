@@ -4,6 +4,7 @@ export const sortByName = (a, b) => {
   if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
 }
 
+
 export function debounce(fn, wait) {
   let timeout
   return function(...args) {
