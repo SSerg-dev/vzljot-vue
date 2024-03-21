@@ -298,7 +298,6 @@
         </div>
       </div>
     </expantion-panel>
-    <!-- $$ -->
     <expantion-panel
       caption="Рассылка параметров холодной воды"
       :opened="false"
@@ -307,7 +306,8 @@
         v-bind="{ equip: localEquip, error: localError }"
         @cold-water-source-select="handleColdWaterSourceSelect"
         @cold-water-source-clear="handleColdWaterSourceClear"
-        @changed="onChange"
+        @cold-water-temperature-check="handleColdWaterTemperatureCheck"
+        @cold-water-pressure-check="handleColdWaterPressureCheck"
       />
     </expantion-panel>
 
@@ -516,7 +516,6 @@ export default {
         standard: { id: null, name: null },
       })
     },
-    // $$
     selectColdWaterSource(id, type) {
       this.wizard =
         type === 'source'
@@ -536,9 +535,21 @@ export default {
         project: { id: null, name: null },
       })
     },
-    onWizardEnd(data, name) {
+    onWizardEnd(data, name) { 
       this.wizard = null
+      
+      // $$
+      console.log('$$ this.localEquip.coldWater ->', JSON.stringify(this.localEquip.coldWater))
 
+      if (name === 'source') {
+        this.onChange('source', {
+
+        ...this.localEquip.coldWater,
+        [name]: { id: data[0].id, name: data[0].name },
+      })  
+        
+        return
+      }
       this.onChange('analyze', {
         ...this.localEquip.analyze,
         [name]: { id: data[0].id, name: data[0].name },
@@ -548,7 +559,6 @@ export default {
       this.wizard = null
     },
     onChange(prop, value) {
-      
       this.$emit('changed', prop, value)
       if (this.action !== 'create') {
         this.action = 'change'
@@ -755,6 +765,20 @@ export default {
     },
     handleColdWaterSourceClear() {
       this.clearColdWaterSource()
+    },
+    handleColdWaterTemperatureCheck(prop, options) {
+      this.onChange(prop, options)
+      delete options['type']
+      delete options['checked']
+      this.localEquip.coldWater = options
+      
+    },
+    handleColdWaterPressureCheck(prop, options) {
+      this.onChange(prop, options)
+      delete options['type']
+      delete options['checked']
+      this.localEquip.coldWater = options 
+
     },
   }, // end methods
 }

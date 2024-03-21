@@ -5,13 +5,13 @@
         <check-box
           v-model="localCheckedTemperature"
           @update:modelValue="
-            onChange('source', {
+            handleColdWaterCheck('source', {
               ...localEquip.coldWater,
               type: 'temperature',
               checked: $event,
             })
           "
-          >Выполнять рассылку температуры ХВ</check-box 
+          >Выполнять рассылку температуры ХВ</check-box
         >
       </div>
 
@@ -19,7 +19,7 @@
         <check-box
           v-model="localCheckedPressure"
           @update:modelValue="
-            onChange('source', {
+            handleColdWaterCheck('source', {
               ...localEquip.coldWater,
               type: 'pressure',
               checked: $event,
@@ -111,22 +111,22 @@ export default {
     )
   },
   methods: {
-    onChange(type, options) {
-      this.$emit('changed', type, options)
-      switch (type) {
+    handleColdWaterCheck(prop, options) {
+      switch (options.type) {
         case 'temperature':
           this.localCheckedTemperature = options.checked
-          // this.$emit('cold-water-source-temperature', options)
+          options.checkedTemperature = options.checked
+          this.$emit('cold-water-temperature-check', prop, options)
           break
         case 'pressure':
           this.localCheckedPressure = options.checked
-          // this.$emit('cold-water-source-pressure', options)
+          options.checkedPressure = options.checked
+          this.$emit('cold-water-pressure-check', prop, options)
           break
 
         default:
           break
       }
-      // console.log('$$ this.action -> ', type, JSON.stringify(options))
     },
     handleColdWaterSourceSelect(id, type) {
       const options = {
