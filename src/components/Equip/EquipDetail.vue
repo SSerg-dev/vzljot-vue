@@ -21,7 +21,7 @@
         <label>Модель:</label>
         <select
           v-if="!localEquip.id"
-          v-model="localEquip.equipType" 
+          v-model="localEquip.equipType"
           @change="onEquipTypeChange(localEquip.parentId, localEquip.type)"
           :class="{ 'validation-error': localError.equipType }"
           :title="localError.equipType"
@@ -177,12 +177,14 @@
         />
       </div>
     </expantion-panel>
-
-    <equip-detail-modifications
-      @modifications-updated="handleModificationsUpdated"
-      @last-checking-updated="handleLastCheckingUpdated"
-      @next-checking-updated="handleNextCheckingUpdated"
-    />
+    <expantion-panel caption="Средства измерений" :opened="false">
+      <equip-detail-modifications
+        v-bind="{ equip: localEquip }"
+        @modifications-updated="handleModificationsUpdated"
+        @last-checking-updated="handleLastCheckingUpdated"
+        @next-checking-updated="handleNextCheckingUpdated"
+      />
+    </expantion-panel>
 
     <expantion-panel
       v-if="equip.id !== null"
@@ -296,6 +298,19 @@
         </div>
       </div>
     </expantion-panel>
+    <!-- $$ -->
+    <expantion-panel
+      caption="Рассылка параметров холодной воды"
+      :opened="false"
+    >
+      <equip-detail-cold-water
+        v-bind="{ equip: localEquip, error: localError }"
+        @cold-water-source-select="handleColdWaterSourceSelect"
+        @cold-water-source-clear="handleColdWaterSourceClear"
+        @changed="onChange"
+      />
+    </expantion-panel>
+
     <expantion-panel
       v-if="localEquip.customProps && localEquip.customProps.length > 0"
       caption="Пользовательские параметры"
@@ -330,34 +345,70 @@ import ConnectionType from '../GroupConnection/ConnectionType.vue'
 import ObjectProps from '../CustomProps/ObjectProps.vue'
 import Wizard from '../Wizard.vue'
 import EquipDetailModifications from '@/components/Equip/EquipDetailModifications.vue'
+import EquipDetailColdWater from '@/components/Equip/EquipDetailColdWater.vue'
 
 const wizardSelectSet = (http, id, type) => {
-  return {
-    name: type,
-    component: {
-      text: 'Выбор набора:',
-      component: 'selector',
-      event: 'selectionChanged',
-      data: {
-        loader: async () => {
-          const { data } = await http.get('equip/analyzeSets', {
-            params: { id },
-          })
-          return data.sort((a, b) => {
-            if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
-            if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
-          })
-        },
-        searchColumn: 'name',
-        singleMode: true,
-        columns: [
-          {
-            prop: 'name',
-            text: 'Наименование',
+  if (type === 'standard') {
+    return {
+      name: type,
+      component: {
+        text: 'Выбор набора:',
+        component: 'selector',
+        event: 'selectionChanged',
+        data: {
+          loader: async () => {
+            const { data } = await http.get('equip/analyzeSets', {
+              params: { id },
+            })
+
+            return data.sort((a, b) => {
+              if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+              if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+            })
           },
-        ],
+          searchColumn: 'name',
+          singleMode: true,
+          columns: [
+            {
+              prop: 'name',
+              text: 'Наименование',
+            },
+          ],
+        },
       },
-    },
+    }
+  } else if (type === 'source') {
+    return {
+      name: type,
+      component: {
+        text: 'Выбор источника:',
+        component: 'selector',
+        event: 'selectionChanged',
+        data: {
+          loader: async () => {
+            let { data } = await http.get('equip/coldWaterSource')
+            data = data.map((item) => ({
+              ...item,
+              type: 23,
+              setType: 1,
+            }))
+
+            return data.sort((a, b) => {
+              if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
+              if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
+            })
+          },
+          searchColumn: 'name',
+          singleMode: true,
+          columns: [
+            {
+              prop: 'name',
+              text: 'Наименование',
+            },
+          ],
+        },
+      },
+    }
   }
 }
 
@@ -371,6 +422,7 @@ export default {
     ObjectProps,
     Wizard,
     EquipDetailModifications,
+    EquipDetailColdWater,
   },
   props: {
     equip: {
@@ -464,6 +516,20 @@ export default {
         standard: { id: null, name: null },
       })
     },
+    // $$
+    selectColdWaterSource(id, type) {
+      this.wizard =
+        type === 'source'
+          ? wizardSelectSet(this.$http, id, type)
+          : wizardSelectSet(this.$http, id, type)
+    },
+    clearColdWaterSource() {
+      this.onChange('analyze', {
+        ...this.localEquip.analyze,
+        standard: { id: null, name: null },
+      })
+    },
+
     clearProjectSet() {
       this.onChange('analyze', {
         ...this.localEquip.analyze,
@@ -482,6 +548,7 @@ export default {
       this.wizard = null
     },
     onChange(prop, value) {
+      
       this.$emit('changed', prop, value)
       if (this.action !== 'create') {
         this.action = 'change'
@@ -682,6 +749,12 @@ export default {
           this.onChange('next-checking', changedNextChecking)
           break
       }
+    },
+    handleColdWaterSourceSelect(options) {
+      this.selectColdWaterSource(options.id, options.type)
+    },
+    handleColdWaterSourceClear() {
+      this.clearColdWaterSource()
     },
   }, // end methods
 }

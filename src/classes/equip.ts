@@ -19,7 +19,7 @@ export class EquipError {
   set?: string
   margin?: string
   password?: string
-  group?: object 
+  group?: object
 
   constructor({
     name = '',
@@ -37,7 +37,7 @@ export class EquipError {
     set = '',
     margin = '',
     password = '',
-    group = undefined
+    group = undefined,
   }: {
     name?: string
     equipType?: string
@@ -64,10 +64,13 @@ export class EquipError {
     if (periodArchive) this.periodArchive = periodArchive
     if (periodSetParams) this.periodSetParams = periodSetParams
     if (periodEquipEvents) this.periodEquipEvents = periodEquipEvents
-    if (periodEquipCustomizing) this.periodEquipCustomizing = periodEquipCustomizing
-    if (periodSetDataColdWater) this.periodSetDataColdWater = periodSetDataColdWater
+    if (periodEquipCustomizing)
+      this.periodEquipCustomizing = periodEquipCustomizing
+    if (periodSetDataColdWater)
+      this.periodSetDataColdWater = periodSetDataColdWater
     if (periodColdWater) this.periodColdWater = periodColdWater
-    if (periodEquipDatabaseParams) this.periodEquipDatabaseParams = periodEquipDatabaseParams
+    if (periodEquipDatabaseParams)
+      this.periodEquipDatabaseParams = periodEquipDatabaseParams
     if (set) this.set = set
     if (margin) this.margin = margin
     if (password) this.password = password
@@ -105,9 +108,10 @@ interface IEquip {
   connectionTypes?: Array<any>
   pollData?: any
   analyze?: any
+  coldWater?: any
   customProps?: Array<any>
   timeLastChecking?: Number | null
-  timeNextChecking?: Number | null 
+  timeNextChecking?: Number | null
   equipTypeModificationId?: number | null
 }
 
@@ -134,6 +138,7 @@ export class Equip extends BaseObject {
   connectionTypes: Array<any>
   pollData: any
   analyze: any
+  coldWater: any
   customProps: Array<any>
   timeLastChecking?: Number | null
   timeNextChecking?: Number | null
@@ -164,19 +169,26 @@ export class Equip extends BaseObject {
       checked: false,
       standard: {
         id: null,
-        name: null
+        name: null,
       },
       project: {
         id: null,
-        name: null
+        name: null,
       },
-      margin: 0.1
+      margin: 0.1,
+    },
+    coldWater = {
+      checkedTemperature: false,
+      checkedPressure: false,
+      source: {
+        id: null,
+        name: null,
+      },
     },
     customProps = [],
     timeLastChecking = null,
     timeNextChecking = null,
-    equipTypeModificationId = null
-
+    equipTypeModificationId = null,
   }: IEquip) {
     super(uuid)
 
@@ -200,6 +212,7 @@ export class Equip extends BaseObject {
     this.connectionTypes = connectionTypes
     this.pollData = pollData
     this.analyze = analyze
+    this.coldWater = coldWater
     this.customProps = customProps
     this.timeLastChecking = timeLastChecking
     this.timeNextChecking = timeNextChecking
@@ -210,14 +223,25 @@ export class Equip extends BaseObject {
     if (type !== null) {
       const types: any = Equip.matchType(Equip.store.state.env.equipTypeCodes)
 
-      return ![types.vzljotASDT, types.multical601, types.multical602, types.multical66CDE, types.multicalIII, types.EK270_LIS200, types.SKU_01, types.vzljot_ASSV2].includes(type)
+      return ![
+        types.vzljotASDT,
+        types.multical601,
+        types.multical602,
+        types.multical66CDE,
+        types.multicalIII,
+        types.EK270_LIS200,
+        types.SKU_01,
+        types.vzljot_ASSV2,
+      ].includes(type)
     }
     return false
   }
 
   isGroupType(type: string) {
     if (this.groupType) {
-      return Equip.store.state.env.connectionGroupTypes[this.groupType].type === type
+      return (
+        Equip.store.state.env.connectionGroupTypes[this.groupType].type === type
+      )
     }
     return false
   }
@@ -228,20 +252,23 @@ export class Equip extends BaseObject {
   }
 
   async create() {
-    const { data } = await this.http.get('equip/create', { params: { parentId: this.parentId, type: this.type } })
+    const { data } = await this.http.get('equip/create', {
+      params: { parentId: this.parentId, type: this.type },
+    })
 
     this.showGroup = data.showGroupConnection
     this.equipTypes = data.equipTypes
     this.equipType = data.equipType
 
     const options = {
-      nodeCreate: data
+      nodeCreate: data,
     }
     store.commit('setCard', options)
 
-    
     if (this.equipTypes.length > 0) {
-      const index = this.equipTypes.findIndex((r: any) => r.code === this.equipType)
+      const index = this.equipTypes.findIndex(
+        (r: any) => r.code === this.equipType
+      )
 
       if (index !== -1) {
         this.name = this.equipTypes[index].name
@@ -275,6 +302,7 @@ export class Equip extends BaseObject {
     this.connectionTypes = data.connectionTypes
     this.pollData = data.pollData
     this.analyze = data.analyze
+    this.coldWater = data.coldWater
     this.customProps = data.customProps
     this.timeLastChecking = data.timeLastChecking
     this.timeNextChecking = data.timeNextChecking
@@ -301,12 +329,13 @@ export class Equip extends BaseObject {
       group?: object
       pollData?: any
       analyze: any
+      coldWater: any
       customProps?: Array<any>
       timeLastChecking?: Number | null
       timeNextChecking?: Number | null
       equipTypeModificationId?: number | null
     }
-    
+
     const props: Props = {
       id: this.id,
       parentId: this.parentId,
@@ -318,7 +347,8 @@ export class Equip extends BaseObject {
       password: this.password,
       protocol: this.protocol,
       groupType: this.groupType,
-      analyze: this.analyze
+      analyze: this.analyze,
+      coldWater: this.coldWater,
     }
 
     if (this.isBusAddressVisible(this.equipType)) {
@@ -345,7 +375,10 @@ export class Equip extends BaseObject {
         props.password = this.password
       }
 
-      if (equipTypeInfo.protocols && Object.keys(equipTypeInfo.protocols).length > 0) {
+      if (
+        equipTypeInfo.protocols &&
+        Object.keys(equipTypeInfo.protocols).length > 0
+      ) {
         props.protocol = this.protocol
       }
     }
@@ -361,10 +394,14 @@ export class Equip extends BaseObject {
     }
 
     if (this.connectionTypes.length > 0) {
-      const index = this.connectionTypes.findIndex((r: any) => r.type === this.groupType)
+      const index = this.connectionTypes.findIndex(
+        (r: any) => r.type === this.groupType
+      )
 
       if (index !== -1) {
-        props.group = JSON.parse(JSON.stringify(this.connectionTypes[index].data.group))
+        props.group = JSON.parse(
+          JSON.stringify(this.connectionTypes[index].data.group)
+        )
       }
     }
 
@@ -377,12 +414,23 @@ export class Equip extends BaseObject {
       checked: this.analyze.checked,
       standard: this.analyze.standard.id,
       project: this.analyze.project.id,
-      margin: this.analyze.margin
+      margin: this.analyze.margin,
     }
 
+    try {
+      if (this.coldWater !== null) {
+        props.coldWater = {
+          checkedTemperature: this.coldWater.checkedTemperature,
+          checkedPressure: this.coldWater.checkedPressure,
+          source: this.coldWater.source.id,
+        }
+      }
+    } catch (err) {
+      console.log('$$ err', err)
+    }
 
     if (this.customProps) {
-      props.customProps = this.customProps.map(prop => { 
+      props.customProps = this.customProps.map((prop) => {
         const obj = Object.assign(
           {},
           ...Object.entries(prop).map(([k, v]) => {

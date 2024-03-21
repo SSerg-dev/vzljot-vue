@@ -2,9 +2,31 @@
   <div class="props-grid">
     <template v-for="r in localCustomProps" :key="r.id + 'label'">
       <label>{{ r.name }}:</label>
-      <date-picker v-if="r.type === CustomPropertyTypeEnum.DateTime" v-model="r.value" @update:modelValue="onChange" format="DD.MM.YYYY HH:mm:ss" style="width: 150px" clearable />
-      <input v-else-if="r.type === CustomPropertyTypeEnum.Double || r.type === CustomPropertyTypeEnum.Integer" type="number" @input="onChange" v-model.number="r.value" :step="r.type === CustomPropertyTypeEnum.Double ? 'any' : 1" style="width: 150px" />
-      <select v-else-if="r.type === CustomPropertyTypeEnum.Boolean" v-model="r.value" @change="onChange" style="width: 50px">
+      <date-picker
+        v-if="r.type === CustomPropertyTypeEnum.DateTime"
+        v-model="r.value"
+        @update:modelValue="onChange"
+        format="DD.MM.YYYY HH:mm:ss"
+        style="width: 150px"
+        clearable
+      />
+      <input
+        v-else-if="
+          r.type === CustomPropertyTypeEnum.Double ||
+          r.type === CustomPropertyTypeEnum.Integer
+        "
+        type="number"
+        @input="onChange"
+        v-model.number="r.value"
+        :step="r.type === CustomPropertyTypeEnum.Double ? 'any' : 1"
+        style="width: 150px"
+      />
+      <select
+        v-else-if="r.type === CustomPropertyTypeEnum.Boolean"
+        v-model="r.value"
+        @change="onChange"
+        style="width: 50px"
+      >
         <option :value="null"></option>
         <option :value="true">Да</option>
         <option :value="false">Нет</option>
@@ -21,24 +43,24 @@ import DatePicker from '../Inputs/DatePicker.vue'
 
 export default {
   components: {
-    DatePicker
+    DatePicker,
   },
   props: {
     customProps: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
       localCustomProps: JSON.parse(JSON.stringify(this.customProps)),
-      CustomPropertyTypeEnum
+      CustomPropertyTypeEnum,
     }
   },
   created() {
     this.$watch(
       () => this.customProps,
-      value => (this.localCustomProps = value),
+      (value) =>  (this.localCustomProps = value),
       { deep: true }
     )
   },
@@ -58,8 +80,8 @@ export default {
       }
 
       return value
-    }
-  }
+    },
+  },
 }
 </script>
 

@@ -1,67 +1,64 @@
 <template>
   <div>
-    <expantion-panel caption="Средства измерений" :opened="isOpened">
-      <spinner :show="loading" :text="'Загрузка...'" key="1" />
-      <div class="equip-grid three-container">
-        <div class="three-item-1">
-          <label>Исполнение:</label>
-        </div>
-        <div class="three-item-2">
-          <select
-            style="width: 100%"
-            @change="handleOptionChange"
-            :key="getCard.modifications.length"
-          >
-            <option
-              v-for="(item, index) in getCard.modifications"
-              :key="index"
-              :value="item.description"
-              :data-id="item.id"
-              :selected="item.selected"
-            >
-              {{ item.name }}
-            </option>
-          </select>
-        </div>
-        <div class="three-item-3">
-          <label>Последняя поверка:</label>
-        </div>
-        <div class="three-item-4 date-picker">
-          <date-picker
-            v-model="timeLastChecking"
-            :format="dateFormat"
-            clearable
-            @update:modelValue="handleLastCheckingChange"
-          />
-        </div>
-        <div class="three-item-5">
-          <label>Следующая поверка:</label>
-        </div>
-        <div class="three-item-6 date-picker">
-          <date-picker
-            v-model="timeNextChecking"
-            :format="dateFormat"
-            clearable
-            @update:modelValue="handleNextCheckingChange"
-          />
-        </div>
-        <div class="three-item-7">
-          <button
-            @click="onFillClick"
-            :disabled="!(timeLastChecking && interval)"
-            style="justify-self: right; margin-bottom: 1px"
-          >
-            Заполнить
-          </button>
-        </div>
+    <spinner :show="loading" :text="'Загрузка...'" key="1" />
+    <div class="equip-grid three-container">
+      <div class="three-item-1">
+        <label>Исполнение:</label>
       </div>
-    </expantion-panel>
+      <div class="three-item-2">
+        <select
+          style="width: 100%"
+          @change="handleOptionChange"
+          :key="getCard.modifications.length"
+        >
+          <option
+            v-for="(item, index) in getCard.modifications"
+            :key="index"
+            :value="item.description"
+            :data-id="item.id"
+            :selected="item.selected"
+          >
+            {{ item.name }}
+          </option>
+        </select>
+      </div>
+      <div class="three-item-3">
+        <label>Последняя поверка:</label>
+      </div>
+      <div class="three-item-4 date-picker">
+        <date-picker
+          v-model="timeLastChecking"
+          :format="dateFormat"
+          clearable
+          @update:modelValue="handleLastCheckingChange"
+        />
+      </div>
+      <div class="three-item-5">
+        <label>Следующая поверка:</label>
+      </div>
+      <div class="three-item-6 date-picker">
+        <date-picker
+          v-model="timeNextChecking"
+          :format="dateFormat"
+          clearable
+          @update:modelValue="handleNextCheckingChange"
+        />
+      </div>
+      <div class="three-item-7">
+        <button
+          @click="onFillClick"
+          :disabled="!(timeLastChecking && interval)"
+          style="justify-self: right; margin-bottom: 1px"
+        >
+          Заполнить
+        </button>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import BaseComponent from '@/components/Base/BaseComponent.vue'
-import ExpantionPanel from '@/components/ExpantionPanel.vue'
 import DatePicker from '@/components/Inputs/DatePicker.vue'
 import EquipType from '@/classes/equipType'
 import { mapGetters } from 'vuex'
@@ -69,10 +66,15 @@ import { mapGetters } from 'vuex'
 export default {
   name: 'EquipDetailModifications',
   components: {
-    ExpantionPanel,
     DatePicker,
   },
   extends: BaseComponent,
+  props: {
+    equip: {
+      type: Object,
+      default: () => {},
+    },
+  },
   data() {
     return {
       dateFormat: 'DD.MM.YYYY',
@@ -96,7 +98,6 @@ export default {
       timeout: null,
       delay: 1000,
 
-      isOpened: false,
       isFillClick: true,
       interval: 0,
 
@@ -127,6 +128,7 @@ export default {
     },
   },
   created() {
+    this.loading = false
     this.$emitter.off('equip-detail:create-equip', this.onCreateEquip)
     this.$emitter.off('equip-detail:change-equip-type', this.onChangeEquipType)
 
@@ -138,16 +140,16 @@ export default {
       (value) => (this.interval = value),
       { deep: true }
     )
+    
   },
 
   mounted() {
-    this.isOpened = true
     this.timeout = setTimeout(() => {
       if (
         this.$store.getters.getCard.selectedNodeId &&
         this.$store.getters.getCard.nodeChange
       ) {
-        this.changeNode(this.$store.getters.getCard.selectedNodeId)
+        this.changeNode()
         this.interval = this.equipType.interval
         this.loading = false
       }
@@ -155,7 +157,6 @@ export default {
   },
 
   beforeUnmount() {
-    this.isOpened = false
     clearTimeout(this.timeout)
 
     this.$emitter.off('equip-detail:create-equip', this.onCreateEquip)
@@ -193,7 +194,7 @@ export default {
       if (this.interval === 0) {
         this.interval = -1
       }
-      this.createNode(-1)
+      this.createNode()
       this.$emitter.off('equip-detail:create-equip', this.onCreateEquip)
     },
     onChangeEquipType(id) {
@@ -203,6 +204,7 @@ export default {
         this.onChangeEquipType
       )
     },
+    onChangeNode() {},
     setNextChecking() {
       let nextTime
       if (this.timeLastChecking) {
@@ -246,7 +248,7 @@ export default {
     },
 
     // eslint-disable-next-line no-unused-vars
-    async changeNode(id) {
+    async changeNode() {
       try {
         const equipTypeId = this.$store.getters.getCard.nodeChange.equipType
         if (equipTypeId) {
@@ -276,7 +278,6 @@ export default {
           timeLastChecking: this.timeLastChecking,
           timeNextChecking: this.timeNextChecking,
           equipTypeModificationId: this.equipTypeModificationId,
-          selectedLastNodeId: id,
         }
         this.$store.commit('setCard', options)
       } catch (error) {
@@ -284,7 +285,7 @@ export default {
       }
     },
     // eslint-disable-next-line no-unused-vars
-    async createNode(id) {
+    async createNode() {
       try {
         const equipTypeId = this.$store.getters.getCard.nodeChange.equipType
 
@@ -309,7 +310,6 @@ export default {
           timeLastChecking: this.timeLastChecking,
           timeNextChecking: this.timeNextChecking,
           equipTypeModificationId: this.equipTypeModificationId,
-          selectedLastNodeId: id,
         }
         this.$store.commit('setCard', options)
       } catch (error) {

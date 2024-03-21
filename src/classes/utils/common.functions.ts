@@ -12,7 +12,6 @@ export function log(target: any, key: string, descriptor: PropertyDescriptor) {
 export function debounce(delay: number) {
   return function (target: any, key: string, descriptor: PropertyDescriptor) {
     let timer: ReturnType<typeof setTimeout>;
-    // let timer: ReturnType;
     const fn = descriptor.value;
 
     descriptor.value = function (...args: any[]) {
