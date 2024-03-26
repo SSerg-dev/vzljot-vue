@@ -239,7 +239,7 @@
             <div
               :disabled="!localEquip.analyze.checked"
               class="fas fa-times icon equip-button"
-              @click="clearStandardSet()"
+              @click="clearStandardSet(localEquip.id, 'source')"
               title="Очистить набор"
             />
           </div>
@@ -298,17 +298,80 @@
         </div>
       </div>
     </expantion-panel>
+
     <expantion-panel
       caption="Рассылка параметров холодной воды"
       :opened="false"
     >
-      <equip-detail-cold-water
-        v-bind="{ equip: localEquip, error: localError }"
-        @cold-water-source-select="handleColdWaterSourceSelect"
-        @cold-water-source-clear="handleColdWaterSourceClear"
-        @cold-water-temperature-check="handleColdWaterTemperatureCheck"
-        @cold-water-pressure-check="handleColdWaterPressureCheck"
-      />
+      <div class="connection-type cold-water-container">
+        <div class="container-1">
+          <div class="item-1-1">
+            <check-box
+              v-model="localEquip.coldWater.checkedTemperature"
+              @update:modelValue="handleColdWaterCheck('temperature', $event)"
+              >Выполнять рассылку температуры ХВ</check-box
+            >
+          </div>
+
+          <div class="item-1-2">
+            <check-box
+              v-model="localEquip.coldWater.checkedPressure"
+              @update:modelValue="handleColdWaterCheck('pressure', $event)"
+              >Выполнять рассылку давления ХВ</check-box
+            >
+          </div>
+        </div>
+
+        <div class="container-2">
+          <div class="item-2-1">
+            <label>Источник:</label>
+          </div>
+
+          <div class="item-2-2">
+            <input
+              :disabled="
+                !(
+                  localEquip.coldWater.checkedTemperature ||
+                  localEquip.coldWater.checkedPressure
+                )
+              "
+              type="text"
+              readonly
+              v-model="localEquip.coldWater.source.name"
+              :class="{ 'validation-error': localError.set }"
+              :title="localError.set"
+            />
+          </div>
+
+          <div class="item-2-3">
+            <div
+              :disabled="
+                !(
+                  localEquip.coldWater.checkedTemperature ||
+                  localEquip.coldWater.checkedPressure
+                )
+              "
+              class="fas fa-ellipsis-h icon equip-button"
+              @click="handleColdWaterSourceSelect(localEquip.id, 'source')"
+              title="Выбрать источник..."
+            />
+          </div>
+
+          <div class="item-2-4">
+            <div
+              :disabled="
+                !(
+                  localEquip.coldWater.checkedTemperature ||
+                  localEquip.coldWater.checkedPressure
+                )
+              "
+              class="fas fa-times icon equip-button"
+              @click="handleColdWaterSourceClear"
+              title="Очистить источник"
+            />
+          </div>
+        </div>
+      </div>
     </expantion-panel>
 
     <expantion-panel
@@ -327,6 +390,7 @@
         v-bind="wizard"
         @cancel="cancelWizard"
         @end="onWizardEnd"
+        @change="onColdWaterChanged"
       />
     </transition>
   </div>
@@ -344,73 +408,10 @@ import ExpantionPanel from '../ExpantionPanel.vue'
 import ConnectionType from '../GroupConnection/ConnectionType.vue'
 import ObjectProps from '../CustomProps/ObjectProps.vue'
 import Wizard from '../Wizard.vue'
+
 import EquipDetailModifications from '@/components/Equip/EquipDetailModifications.vue'
-import EquipDetailColdWater from '@/components/Equip/EquipDetailColdWater.vue'
-
-const wizardSelectSet = (http, id, type) => {
-  if (type === 'standard') {
-    return {
-      name: type,
-      component: {
-        text: 'Выбор набора:',
-        component: 'selector',
-        event: 'selectionChanged',
-        data: {
-          loader: async () => {
-            const { data } = await http.get('equip/analyzeSets', {
-              params: { id },
-            })
-
-            return data.sort((a, b) => {
-              if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
-              if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
-            })
-          },
-          searchColumn: 'name',
-          singleMode: true,
-          columns: [
-            {
-              prop: 'name',
-              text: 'Наименование',
-            },
-          ],
-        },
-      },
-    }
-  } else if (type === 'source') {
-    return {
-      name: type,
-      component: {
-        text: 'Выбор источника:',
-        component: 'selector',
-        event: 'selectionChanged',
-        data: {
-          loader: async () => {
-            let { data } = await http.get('equip/coldWaterSource')
-            data = data.map((item) => ({
-              ...item,
-              type: 23,
-              setType: 1,
-            }))
-
-            return data.sort((a, b) => {
-              if (a.name.toLowerCase() < b.name.toLowerCase()) return -1
-              if (a.name.toLowerCase() > b.name.toLowerCase()) return 1
-            })
-          },
-          searchColumn: 'name',
-          singleMode: true,
-          columns: [
-            {
-              prop: 'name',
-              text: 'Наименование',
-            },
-          ],
-        },
-      },
-    }
-  }
-}
+import { wizardSelectSet } from '@/plugins/wizardComponents/wizardSelectSet'
+import { wizardSourceSelectSet } from '@/plugins/wizardComponents/wizardSourceSelectSet'
 
 export default {
   components: {
@@ -422,7 +423,6 @@ export default {
     ObjectProps,
     Wizard,
     EquipDetailModifications,
-    EquipDetailColdWater,
   },
   props: {
     equip: {
@@ -440,6 +440,8 @@ export default {
       localError: JSON.parse(JSON.stringify(this.error)),
       wizard: null,
       action: '',
+      isTemperature: false,
+      isPressure: false,
     }
   },
   created() {
@@ -517,51 +519,54 @@ export default {
       })
     },
     selectColdWaterSource(id, type) {
-      this.wizard =
-        type === 'source'
-          ? wizardSelectSet(this.$http, id, type)
-          : wizardSelectSet(this.$http, id, type)
+      this.wizard = wizardSourceSelectSet(this.$http, id, type)
     },
     clearColdWaterSource() {
-      this.onChange('analyze', {
-        ...this.localEquip.analyze,
-        standard: { id: null, name: null },
+      this.onChange('source', {
+        ...this.localEquip.coldWater,
+        source: { id: null, name: null },
       })
     },
-
     clearProjectSet() {
       this.onChange('analyze', {
         ...this.localEquip.analyze,
         project: { id: null, name: null },
       })
     },
-    onWizardEnd(data, name) { 
+    onWizardEnd(data, name) {
       this.wizard = null
-      
-      // $$
-      console.log('$$ this.localEquip.coldWater ->', JSON.stringify(this.localEquip.coldWater))
 
-      if (name === 'source') {
-        this.onChange('source', {
-
+      const optionsColdWater = {
         ...this.localEquip.coldWater,
         [name]: { id: data[0].id, name: data[0].name },
-      })  
-        
-        return
       }
-      this.onChange('analyze', {
+      const optionsAnalyze = {
         ...this.localEquip.analyze,
         [name]: { id: data[0].id, name: data[0].name },
-      })
+      }
+
+      if (name === 'source') {
+        this.onChange('source', optionsColdWater)
+
+        return
+      } else {
+        this.onChange('analyze', optionsAnalyze)
+      }
     },
     cancelWizard() {
       this.wizard = null
     },
     onChange(prop, value) {
       this.$emit('changed', prop, value)
+
       if (this.action !== 'create') {
         this.action = 'change'
+      }
+    },
+    onColdWaterChanged(selectedItem) {
+      if (selectedItem[0].id > 0) {
+        // eslint-disable-next-line vue/no-mutating-props
+        this.equip.coldWater.source.id = selectedItem[0].id
       }
     },
     onGroupTypeChange(groupType) {
@@ -760,25 +765,31 @@ export default {
           break
       }
     },
-    handleColdWaterSourceSelect(options) {
-      this.selectColdWaterSource(options.id, options.type)
+
+    handleColdWaterSourceSelect(id, type) {
+      this.selectColdWaterSource(id, type)
     },
+
     handleColdWaterSourceClear() {
       this.clearColdWaterSource()
     },
-    handleColdWaterTemperatureCheck(prop, options) {
-      this.onChange(prop, options)
-      delete options['type']
-      delete options['checked']
-      this.localEquip.coldWater = options
-      
-    },
-    handleColdWaterPressureCheck(prop, options) {
-      this.onChange(prop, options)
-      delete options['type']
-      delete options['checked']
-      this.localEquip.coldWater = options 
+    handleColdWaterCheck(type, event) {
+      switch (type) {
+        case 'temperature':
+          this.isTemperature = event
+          this.localEquip.coldWater.checkedTemperature = event
+          break
+        case 'pressure':
+          this.isPressure = event
+          this.localEquip.coldWater.checkedPressure = event
+          break
 
+        default:
+          break
+      }
+      this.onChange('coldWater', {
+        ...this.localEquip.coldWater,
+      })
     },
   }, // end methods
 }
@@ -840,5 +851,48 @@ export default {
 
 .date-picker {
   width: 20%;
+}
+
+/*  */
+.cold-water-container {
+  display: flex;
+  flex-direction: column;
+}
+.container-1 {
+  display: flex;
+  flex-direction: row;
+  column-gap: 3px;
+}
+.container-2 {
+  display: flex;
+  column-gap: 3px;
+  align-items: center;
+}
+.item-1-1 {
+  justify-self: start;
+  align-self: center;
+  margin-right: 10px;
+}
+.item-1-2 {
+  align-self: center;
+  margin-right: 10px;
+}
+.item-2-1 {
+  justify-self: start;
+  align-self: stretch;
+  margin-right: 2px;
+  margin-left: 5px;
+}
+.item-2-2 {
+  width: 100%;
+  align-self: center;
+}
+.item-2-3,
+.item-2-4 {
+  align-self: center;
+}
+
+input {
+  width: 100%;
 }
 </style>

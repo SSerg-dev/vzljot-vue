@@ -118,7 +118,7 @@ export default {
       loading: false
     }
   },
-  emits: ['cancel', 'end'],
+  emits: ['cancel', 'end', 'change'],
   watch: {
     component: {
       handler(value) {
@@ -163,6 +163,7 @@ export default {
     },
     onComponentEvent(data) {
       this.currentValue = data
+      this.$emit('change', this.currentValue)
     },
     async next() {
       if (typeof this.$refs.component.validate === 'function') {

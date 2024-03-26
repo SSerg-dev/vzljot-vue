@@ -108,11 +108,20 @@ interface IEquip {
   connectionTypes?: Array<any>
   pollData?: any
   analyze?: any
-  coldWater?: any
+  coldWater?: ColdWater
   customProps?: Array<any>
   timeLastChecking?: Number | null
   timeNextChecking?: Number | null
   equipTypeModificationId?: number | null
+}
+
+interface ColdWater {
+  checkedTemperature: boolean
+  checkedPressure: boolean
+  source: {
+    id: number | null
+    name: string
+  }
 }
 
 export class Equip extends BaseObject {
@@ -138,7 +147,7 @@ export class Equip extends BaseObject {
   connectionTypes: Array<any>
   pollData: any
   analyze: any
-  coldWater: any
+  coldWater: ColdWater
   customProps: Array<any>
   timeLastChecking?: Number | null
   timeNextChecking?: Number | null
@@ -178,11 +187,11 @@ export class Equip extends BaseObject {
       margin: 0.1,
     },
     coldWater = {
-      checkedTemperature: false,
+      checkedTemperature: false, 
       checkedPressure: false,
       source: {
         id: null,
-        name: null,
+        name: '',
       },
     },
     customProps = [],
@@ -284,6 +293,7 @@ export class Equip extends BaseObject {
 
   async init(id: number): Promise<void> {
     const { data } = await this.http.get('equip/equip', { params: { id } })
+
     this.id = data.id
     this.name = data.name
     this.note = data.note
@@ -329,7 +339,7 @@ export class Equip extends BaseObject {
       group?: object
       pollData?: any
       analyze: any
-      coldWater: any
+      coldWater?: any
       customProps?: Array<any>
       timeLastChecking?: Number | null
       timeNextChecking?: Number | null
@@ -418,12 +428,10 @@ export class Equip extends BaseObject {
     }
 
     try {
-      if (this.coldWater !== null) {
-        props.coldWater = {
-          checkedTemperature: this.coldWater.checkedTemperature,
-          checkedPressure: this.coldWater.checkedPressure,
-          source: this.coldWater.source.id,
-        }
+      props.coldWater = {
+        checkedTemperature: this.coldWater.checkedTemperature || false,
+        checkedPressure: this.coldWater.checkedPressure || false,
+        source: this.coldWater.source.id || null, 
       }
     } catch (err) {
       console.log('$$ err', err)
