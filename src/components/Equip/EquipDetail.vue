@@ -522,6 +522,9 @@ export default {
       this.wizard = wizardSourceSelectSet(this.$http, id, type)
     },
     clearColdWaterSource() {
+      this.equip.coldWater.source.id = null
+      this.localEquip.coldWater.source.name = ''
+
       this.onChange('source', {
         ...this.localEquip.coldWater,
         source: { id: null, name: null },
@@ -565,8 +568,8 @@ export default {
     },
     onColdWaterChanged(selectedItem) {
       if (selectedItem[0].id > 0) {
-        // eslint-disable-next-line vue/no-mutating-props
         this.equip.coldWater.source.id = selectedItem[0].id
+        this.localEquip.coldWater.source.name = selectedItem[0].name
       }
     },
     onGroupTypeChange(groupType) {
@@ -712,7 +715,6 @@ export default {
 
       switch (type) {
         case 'change':
-          //eslint-disable-next-line vue/no-mutating-props
           this.equip.equipTypeModificationId = changedModifications.id
           this.onChange('modifications', changedModifications.id)
           break
@@ -721,7 +723,6 @@ export default {
           this.onChange('modifications', changedModifications.id)
           break
         default:
-          //eslint-disable-next-line vue/no-mutating-props
           this.equip.equipTypeModificationId = changedModifications.id
           this.onChange('modifications', changedModifications.id)
           break
@@ -731,7 +732,6 @@ export default {
       const type = this.action
       switch (type) {
         case 'change':
-          // eslint-disable-next-line vue/no-mutating-props
           this.equip.timeLastChecking = changedLastChecking
           this.onChange('last-checking', changedLastChecking)
           break
@@ -740,7 +740,6 @@ export default {
           this.onChange('last-checking', changedLastChecking)
           break
         default:
-          // eslint-disable-next-line vue/no-mutating-props
           this.equip.timeLastChecking = changedLastChecking
           this.onChange('last-checking', changedLastChecking)
           break
@@ -750,7 +749,6 @@ export default {
       const type = this.action
       switch (type) {
         case 'change':
-          // eslint-disable-next-line vue/no-mutating-props
           this.equip.timeNextChecking = changedNextChecking
           this.onChange('next-checking', changedNextChecking)
           break
@@ -759,7 +757,6 @@ export default {
           this.onChange('next-checking', changedNextChecking)
           break
         default:
-          // eslint-disable-next-line vue/no-mutating-props
           this.equip.timeNextChecking = changedNextChecking
           this.onChange('next-checking', changedNextChecking)
           break

@@ -187,7 +187,7 @@ export class Equip extends BaseObject {
       margin: 0.1,
     },
     coldWater = {
-      checkedTemperature: false, 
+      checkedTemperature: false,
       checkedPressure: false,
       source: {
         id: null,
@@ -431,10 +431,10 @@ export class Equip extends BaseObject {
       props.coldWater = {
         checkedTemperature: this.coldWater.checkedTemperature || false,
         checkedPressure: this.coldWater.checkedPressure || false,
-        source: this.coldWater.source.id || null, 
+        source: this.coldWater.source.id || null,
       }
     } catch (err) {
-      console.log('$$ err', err)
+      console.error(err)
     }
 
     if (this.customProps) {

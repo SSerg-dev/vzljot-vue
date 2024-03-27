@@ -239,7 +239,7 @@
             <div
               :disabled="!localEquip.analyze.checked"
               class="fas fa-times icon equip-button"
-              @click="clearStandardSet()"
+              @click="clearStandardSet(localEquip.id, 'source')"
               title="Очистить набор"
             />
           </div>
@@ -303,7 +303,6 @@
       caption="Рассылка параметров холодной воды"
       :opened="false"
     >
-      <!-- $$ -->
       <div class="connection-type cold-water-container">
         <div class="container-1">
           <div class="item-1-1">
@@ -330,10 +329,15 @@
 
           <div class="item-2-2">
             <input
-              :disabled="!(isTemperature || isPressure)"
+              :disabled="
+                !(
+                  localEquip.coldWater.checkedTemperature ||
+                  localEquip.coldWater.checkedPressure
+                )
+              "
               type="text"
               readonly
-              v-model="localEquip.analyze.standard.name"
+              v-model="localEquip.coldWater.source.name"
               :class="{ 'validation-error': localError.set }"
               :title="localError.set"
             />
@@ -341,7 +345,12 @@
 
           <div class="item-2-3">
             <div
-              :disabled="!(isTemperature || isPressure)"
+              :disabled="
+                !(
+                  localEquip.coldWater.checkedTemperature ||
+                  localEquip.coldWater.checkedPressure
+                )
+              "
               class="fas fa-ellipsis-h icon equip-button"
               @click="handleColdWaterSourceSelect(localEquip.id, 'source')"
               title="Выбрать источник..."
@@ -350,7 +359,12 @@
 
           <div class="item-2-4">
             <div
-              :disabled="!(isTemperature || isPressure)"
+              :disabled="
+                !(
+                  localEquip.coldWater.checkedTemperature ||
+                  localEquip.coldWater.checkedPressure
+                )
+              "
               class="fas fa-times icon equip-button"
               @click="handleColdWaterSourceClear"
               title="Очистить источник"
@@ -358,7 +372,6 @@
           </div>
         </div>
       </div>
-      <!--  -->
     </expantion-panel>
 
     <expantion-panel
@@ -378,7 +391,6 @@
         @cancel="cancelWizard"
         @end="onWizardEnd"
         @change="onColdWaterChanged"
-        
       />
     </transition>
   </div>
@@ -396,6 +408,7 @@ import ExpantionPanel from '../ExpantionPanel.vue'
 import ConnectionType from '../GroupConnection/ConnectionType.vue'
 import ObjectProps from '../CustomProps/ObjectProps.vue'
 import Wizard from '../Wizard.vue'
+
 import EquipDetailModifications from '@/components/Equip/EquipDetailModifications.vue'
 import { wizardSelectSet } from '@/plugins/wizardComponents/wizardSelectSet'
 import { wizardSourceSelectSet } from '@/plugins/wizardComponents/wizardSourceSelectSet'
@@ -509,13 +522,15 @@ export default {
       this.wizard = wizardSourceSelectSet(this.$http, id, type)
     },
     clearColdWaterSource() {
-      // $$ todo
-      this.onChange('analyze', {
-        ...this.localEquip.analyze,
-        standard: { id: null, name: null },
+      // eslint-disable-next-line vue/no-mutating-props
+      this.equip.coldWater.source.id = null
+      this.localEquip.coldWater.source.name = ''
+
+      this.onChange('source', {
+        ...this.localEquip.coldWater,
+        source: { id: null, name: null },
       })
     },
-
     clearProjectSet() {
       this.onChange('analyze', {
         ...this.localEquip.analyze,
@@ -524,32 +539,41 @@ export default {
     },
     onWizardEnd(data, name) {
       this.wizard = null
-      if (name === 'source') {
-        this.onChange('source', {
-          ...this.localEquip.coldWater,
-          [name]: { id: data[0].id, name: data[0].name },
-        })
-        return
+
+      const optionsColdWater = {
+        ...this.localEquip.coldWater,
+        [name]: { id: data[0].id, name: data[0].name },
       }
-      this.onChange('analyze', {
+      const optionsAnalyze = {
         ...this.localEquip.analyze,
         [name]: { id: data[0].id, name: data[0].name },
-      })
+      }
+
+      if (name === 'source') {
+        this.onChange('source', optionsColdWater)
+
+        return
+      } else {
+        this.onChange('analyze', optionsAnalyze)
+      }
     },
     cancelWizard() {
       this.wizard = null
     },
     onChange(prop, value) {
       this.$emit('changed', prop, value)
+
       if (this.action !== 'create') {
         this.action = 'change'
       }
     },
-    // $$
     onColdWaterChanged(selectedItem) {
-      console.log('$$ selectedItem', JSON.stringify(selectedItem))
+      if (selectedItem[0].id > 0) {
+        // eslint-disable-next-line vue/no-mutating-props
+        this.equip.coldWater.source.id = selectedItem[0].id
+        this.localEquip.coldWater.source.name = selectedItem[0].name
+      }
     },
-
     onGroupTypeChange(groupType) {
       this.localEquip.groupType = groupType
       this.onChange('groupType', groupType)
@@ -749,7 +773,6 @@ export default {
 
     handleColdWaterSourceSelect(id, type) {
       this.selectColdWaterSource(id, type)
-      // this.wizard = wizardSourceSelectSet(this.$http, id, type)
     },
 
     handleColdWaterSourceClear() {
@@ -760,12 +783,10 @@ export default {
         case 'temperature':
           this.isTemperature = event
           this.localEquip.coldWater.checkedTemperature = event
-
           break
         case 'pressure':
           this.isPressure = event
-          this.localEquip.coldWater.checkedPressure = event 
-
+          this.localEquip.coldWater.checkedPressure = event
           break
 
         default:
@@ -775,9 +796,7 @@ export default {
         ...this.localEquip.coldWater,
       })
     },
-
   }, // end methods
-  
 }
 </script>
 
