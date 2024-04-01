@@ -18,6 +18,7 @@ export class EquipError {
   periodEquipDatabaseParams?: string
   set?: string
   margin?: string
+  source?: string
   password?: string
   group?: object
 
@@ -36,6 +37,7 @@ export class EquipError {
     periodEquipDatabaseParams = '',
     set = '',
     margin = '',
+    source = '',
     password = '',
     group = undefined,
   }: {
@@ -53,6 +55,7 @@ export class EquipError {
     periodEquipDatabaseParams?: string
     set?: string
     margin?: string
+    source?: string
     password?: string
     group?: object
   }) {
@@ -73,6 +76,7 @@ export class EquipError {
       this.periodEquipDatabaseParams = periodEquipDatabaseParams
     if (set) this.set = set
     if (margin) this.margin = margin
+    if (source) this.source = source
     if (password) this.password = password
     if (group) this.group = group
   }
@@ -293,7 +297,7 @@ export class Equip extends BaseObject {
 
   async init(id: number): Promise<void> {
     const { data } = await this.http.get('equip/equip', { params: { id } })
-
+    
     this.id = data.id
     this.name = data.name
     this.note = data.note

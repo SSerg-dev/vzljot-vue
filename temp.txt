@@ -239,7 +239,7 @@
             <div
               :disabled="!localEquip.analyze.checked"
               class="fas fa-times icon equip-button"
-              @click="clearStandardSet(localEquip.id, 'source')"
+              @click="clearStandardSet()"
               title="Очистить набор"
             />
           </div>
@@ -305,7 +305,7 @@
     >
       <div class="connection-type cold-water-container">
         <div class="container-1">
-          <div class="item-1-1">
+          <div class="cold-water-item-1-1">
             <check-box
               v-model="localEquip.coldWater.checkedTemperature"
               @update:modelValue="handleColdWaterCheck('temperature', $event)"
@@ -313,7 +313,7 @@
             >
           </div>
 
-          <div class="item-1-2">
+          <div class="cold-water-item-1-2">
             <check-box
               v-model="localEquip.coldWater.checkedPressure"
               @update:modelValue="handleColdWaterCheck('pressure', $event)"
@@ -323,11 +323,11 @@
         </div>
 
         <div class="container-2">
-          <div class="item-2-1">
+          <div class="cold-water-item-2-1">
             <label>Источник:</label>
           </div>
 
-          <div class="item-2-2">
+          <div class="cold-water-item-2-2">
             <input
               :disabled="
                 !(
@@ -338,12 +338,12 @@
               type="text"
               readonly
               v-model="localEquip.coldWater.source.name"
-              :class="{ 'validation-error': localError.set }"
-              :title="localError.set"
+              :class="{ 'validation-error': localError.source }"
+              :title="localError.source"
             />
           </div>
 
-          <div class="item-2-3">
+          <div class="cold-water-item-2-3">
             <div
               :disabled="
                 !(
@@ -357,7 +357,7 @@
             />
           </div>
 
-          <div class="item-2-4">
+          <div class="cold-water-item-2-4">
             <div
               :disabled="
                 !(
@@ -384,6 +384,13 @@
         @changed="onChange"
       />
     </expantion-panel>
+
+    <!-- $$ -->
+    <expantion-panel caption="Настройки прибора" :opened="true">
+      <equip-detail-setting />
+    </expantion-panel>
+    <!--    -->
+
     <transition>
       <wizard
         v-if="wizard"
@@ -410,8 +417,11 @@ import ObjectProps from '../CustomProps/ObjectProps.vue'
 import Wizard from '../Wizard.vue'
 
 import EquipDetailModifications from '@/components/Equip/EquipDetailModifications.vue'
+import EquipDetailSetting from '@/components/Equip/EquipDetailSetting.vue'
+
 import { wizardSelectSet } from '@/plugins/wizardComponents/wizardSelectSet'
 import { wizardSourceSelectSet } from '@/plugins/wizardComponents/wizardSourceSelectSet'
+import DatePicker from '@/components/Inputs/DatePicker.vue'
 
 export default {
   components: {
@@ -423,6 +433,8 @@ export default {
     ObjectProps,
     Wizard,
     EquipDetailModifications,
+    EquipDetailSetting,
+    DatePicker,
   },
   props: {
     equip: {
@@ -442,6 +454,9 @@ export default {
       action: '',
       isTemperature: false,
       isPressure: false,
+
+      dateFormat: 'DD.MM.YYYY',
+      currentDate: new Date(),
     }
   },
   created() {
@@ -522,14 +537,14 @@ export default {
       this.wizard = wizardSourceSelectSet(this.$http, id, type)
     },
     clearColdWaterSource() {
-      // eslint-disable-next-line vue/no-mutating-props
       this.equip.coldWater.source.id = null
-      this.localEquip.coldWater.source.name = ''
+      this.equip.coldWater.source.name = ''
 
       this.onChange('source', {
-        ...this.localEquip.coldWater,
-        source: { id: null, name: null },
+        ...this.equip.coldWater,
+        source: { id: null, name: null }, 
       })
+
     },
     clearProjectSet() {
       this.onChange('analyze', {
@@ -549,18 +564,49 @@ export default {
         [name]: { id: data[0].id, name: data[0].name },
       }
 
+       console.log('$$ name', name, JSON.stringify(optionsAnalyze))
+      // --------------------------------
+       
       if (name === 'source') {
         this.onChange('source', optionsColdWater)
 
         return
-      } else {
+      } else if (name === 'analyze' )
+      {
+        this.onChange('analyze', optionsAnalyze)
+      } else if (name === 'standard' )
+      {
         this.onChange('analyze', optionsAnalyze)
       }
+      
+      // --------------------------------
+      /*
+      const type = 'name'
+      switch(type) {
+        case 'source':
+        this.onChange('source', optionsColdWater)
+          break
+        case 'analyze':
+        this.onChange('analyze', optionsAnalyze)
+          break  
+        case 'standard':
+        this.onChange('analyze', optionsAnalyze)
+          break
+          
+        default:
+          break  
+
+      }
+      */
+
+
     },
     cancelWizard() {
       this.wizard = null
     },
     onChange(prop, value) {
+      console.log('$$ prop, value', prop, JSON.stringify(value))
+
       this.$emit('changed', prop, value)
 
       if (this.action !== 'create') {
@@ -569,7 +615,6 @@ export default {
     },
     onColdWaterChanged(selectedItem) {
       if (selectedItem[0].id > 0) {
-        // eslint-disable-next-line vue/no-mutating-props
         this.equip.coldWater.source.id = selectedItem[0].id
         this.localEquip.coldWater.source.name = selectedItem[0].name
       }
@@ -717,7 +762,6 @@ export default {
 
       switch (type) {
         case 'change':
-          //eslint-disable-next-line vue/no-mutating-props
           this.equip.equipTypeModificationId = changedModifications.id
           this.onChange('modifications', changedModifications.id)
           break
@@ -726,7 +770,6 @@ export default {
           this.onChange('modifications', changedModifications.id)
           break
         default:
-          //eslint-disable-next-line vue/no-mutating-props
           this.equip.equipTypeModificationId = changedModifications.id
           this.onChange('modifications', changedModifications.id)
           break
@@ -736,7 +779,6 @@ export default {
       const type = this.action
       switch (type) {
         case 'change':
-          // eslint-disable-next-line vue/no-mutating-props
           this.equip.timeLastChecking = changedLastChecking
           this.onChange('last-checking', changedLastChecking)
           break
@@ -745,7 +787,6 @@ export default {
           this.onChange('last-checking', changedLastChecking)
           break
         default:
-          // eslint-disable-next-line vue/no-mutating-props
           this.equip.timeLastChecking = changedLastChecking
           this.onChange('last-checking', changedLastChecking)
           break
@@ -755,7 +796,6 @@ export default {
       const type = this.action
       switch (type) {
         case 'change':
-          // eslint-disable-next-line vue/no-mutating-props
           this.equip.timeNextChecking = changedNextChecking
           this.onChange('next-checking', changedNextChecking)
           break
@@ -764,7 +804,6 @@ export default {
           this.onChange('next-checking', changedNextChecking)
           break
         default:
-          // eslint-disable-next-line vue/no-mutating-props
           this.equip.timeNextChecking = changedNextChecking
           this.onChange('next-checking', changedNextChecking)
           break
@@ -795,6 +834,14 @@ export default {
       this.onChange('coldWater', {
         ...this.localEquip.coldWater,
       })
+    },
+    handleEquipSettingDate(event) {
+      event
+      // let changedEquipSettingDate = new Date(event)
+      // console.log('$$ changedEquipSettingDate', changedEquipSettingDate)
+    },
+    handlePassSettingCheck(event) {
+      console.log('$$ handlePassSettingCheck', event)
     },
   }, // end methods
 }
@@ -837,28 +884,7 @@ export default {
   justify-content: center;
 }
 
-.equip-grid.three-container {
-  grid-template-columns: auto auto 1fr;
-  grid-template-rows: auto auto 1fr;
-}
-
-.three-item-1,
-.three-item-3,
-.three-item-5 {
-  justify-self: end;
-}
-
-.three-item-2,
-.three-item-4,
-.three-item-6 {
-  grid-column: 2 / span 2;
-}
-
-.date-picker {
-  width: 20%;
-}
-
-/*  */
+/* cold-water */
 .cold-water-container {
   display: flex;
   flex-direction: column;
@@ -873,31 +899,57 @@ export default {
   column-gap: 3px;
   align-items: center;
 }
-.item-1-1 {
+.cold-water-item-1-1 {
   justify-self: start;
   align-self: center;
   margin-right: 10px;
 }
-.item-1-2 {
+.cold-water-item-1-2 {
   align-self: center;
   margin-right: 10px;
 }
-.item-2-1 {
+.cold-water-item-2-1 {
   justify-self: start;
   align-self: stretch;
   margin-right: 2px;
   margin-left: 5px;
 }
-.item-2-2 {
+.cold-water-item-2-2 {
   width: 100%;
   align-self: center;
 }
-.item-2-3,
-.item-2-4 {
+.cold-water-item-2-3,
+.cold-water-item-2-4 {
   align-self: center;
 }
 
 input {
   width: 100%;
+}
+/* equip-setting */
+.equip-setting-container {
+  display: flex;
+  flex-direction: row;
+  margin-bottom: 5px;
+}
+.equip-setting-item-1 {
+  align-self: start;
+  justify-self: center;
+}
+.equip-setting-item-2 {
+  align-self: center;
+  justify-self: center;
+  margin-right: 10px;
+}
+.equip-setting-item-3 {
+  align-self: end;
+  justify-self: center;
+}
+.equip-setting-item-4 {
+  align-self: center;
+  justify-self: center;
+}
+.date-picker {
+  width: 13.2%;
 }
 </style>

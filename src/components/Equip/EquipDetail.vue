@@ -338,8 +338,8 @@
               type="text"
               readonly
               v-model="localEquip.coldWater.source.name"
-              :class="{ 'validation-error': localError.set }"
-              :title="localError.set"
+              :class="{ 'validation-error': localError.source }"
+              :title="localError.source"
             />
           </div>
 
@@ -547,10 +547,8 @@ export default {
         ...this.localEquip.analyze,
         [name]: { id: data[0].id, name: data[0].name },
       }
-
       if (name === 'source') {
         this.onChange('source', optionsColdWater)
-
         return
       } else {
         this.onChange('analyze', optionsAnalyze)
