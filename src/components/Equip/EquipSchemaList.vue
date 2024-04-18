@@ -266,6 +266,7 @@ export default {
     viewClick(r) {
       const type = this.$store.state.env.itemTypes[r.type]
       const obj = type.type === 'symbolSchema' ? new Schema(r) : new Set(r)
+
       this.componentData = {
         component: type.type === 'symbolSchema' ? 'schema' : 'set-component',
         uuid: obj.uuid,
@@ -279,7 +280,6 @@ export default {
           equipTypeId: this.equipTypeId,
         },
       }
-
       this.edit = true
     },
     close() {

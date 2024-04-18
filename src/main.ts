@@ -1,6 +1,7 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import { axios } from './plugins/axios'
+
 import { store } from './plugins/store'
 import mitt, { Emitter } from 'mitt'
 

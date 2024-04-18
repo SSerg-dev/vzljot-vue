@@ -398,7 +398,7 @@ export default defineComponent({
       wizard.value = {
         name: 'settings',
         component: {
-          text: 'Настройки сбора данных:',
+          text: 'Настройки сбора и рассылки данных:',
           component: 'pollDataSettings',
           event: 'changed',
           data: {

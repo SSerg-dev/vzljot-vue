@@ -296,7 +296,6 @@ export default {
       () => this.set.params.length,
       () => (this.pageInfo.Items = this.set.params.length)
     )
-
     this.pageInfo.Items = this.set.params.length
   },
   computed: {

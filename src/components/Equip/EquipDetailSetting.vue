@@ -1,36 +1,72 @@
 <template>
-  <div>
-    <EquipDetailSettingList />
+  <div v-if="isVisible">
+    <set-params-equip-detail-setting />
   </div>
 </template>
 
 <script>
+import { mapGetters } from 'vuex'
 import BaseComponent from '@/components/Base/BaseComponent.vue'
-import EquipDetailSettingList from '@/components/Equip/EquipDetailSettingList.vue'
+import { Equip } from '@/classes/equip'
+import SetParamsEquipDetailSetting from '@/components/Set/SetParamsEquipDetailSetting.vue'
 
 export default {
   name: 'EquipDetailSetting',
   components: {
-    EquipDetailSettingList,
+    SetParamsEquipDetailSetting,
   },
   extends: BaseComponent,
   props: {
     equip: {
-      type: Object,
-      default: () => {},
+      type: Equip,
+      default: () => new Equip({}),
     },
   },
   data() {
-    return {}
+    return {
+      localEquip: new Equip(this.equip),
+      isVisible: false,
+    }
   },
-  computed: {},
-  watch: {},
-  created() {},
+
+  computed: {
+    ...mapGetters({
+      getEquip: 'getEquip',
+    }),
+  },
+
+  watch: {
+    equip(newValue) {
+      const options = {
+        equipId: null,
+        equipTypeId: newValue.equipType,
+        id: newValue.id,
+        uuid: newValue.uuid,
+        name: newValue.name,
+        serialNumber: newValue.serialNumber,
+        equipTypeName: newValue.equipTypes[0].name,
+      }
+      this.$store.commit('setEquip', options)
+      this.isVisible = true
+    },
+  },
+  created() {
+    this.$watch(
+      () => this.equip,
+      (value) => (this.localEquip = new Equip(value)),
+      { deep: true }
+    )
+  },
   mounted() {},
   beforeUnmount() {
     clearTimeout(this.timeout)
+    this.isVisible = false
   },
-  methods: {}, // end methods
+  methods: {
+    onSaved(data) {
+      this.component.text = `Набор: ${data.name}`
+    },
+  }, // end methods
 }
 </script>
 

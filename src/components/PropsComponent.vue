@@ -1,6 +1,11 @@
 <template>
   <div class="props-background">
-    <div class="props-header" :style="`grid-template-columns: ${image1 ? 'min-content ' : ''}1fr min-content;`">
+    <div
+      class="props-header"
+      :style="`grid-template-columns: ${
+        image1 ? 'min-content ' : ''
+      }1fr min-content;`"
+    >
       <span v-if="image1" class="icon-wrapper">
         <div :class="`heading-icon ${image1}`" />
       </span>
@@ -24,11 +29,11 @@ export default {
   props: {
     uuid: String,
     image: String,
-    text: String
+    text: String,
   },
   data() {
     return {
-      key: uuidv4()
+      key: uuidv4(),
     }
   },
   computed: {
@@ -39,13 +44,25 @@ export default {
 
       const images = this.$slots
         .default()
-        .filter(r => r.props && r.props.hasOwnProperty('type') && itemTypes.includes(this.$store.state.env.itemTypes[r.props.type].type))
-        .map(r => {
+        .filter(
+          (r) =>
+            r.props &&
+            r.props.hasOwnProperty('type') &&
+            itemTypes.includes(
+              this.$store.state.env.itemTypes[r.props.type].type
+            )
+        )
+        .map((r) => {
           const type = { type: r.props.type }
 
-          if (r.props.type === matchType(this.$store.state.env.itemTypes).symbolSchema) {
+          if (
+            r.props.type ===
+            matchType(this.$store.state.env.itemTypes).symbolSchema
+          ) {
             return `fas fa-project-diagram icon`
-          } else if (r.props.type === matchType(this.$store.state.env.itemTypes).set) {
+          } else if (
+            r.props.type === matchType(this.$store.state.env.itemTypes).set
+          ) {
             return `fas fa-tasks-alt icon`
           }
 
@@ -57,7 +74,7 @@ export default {
       }
 
       return null
-    }
+    },
   },
   created() {
     this.$emitter.on('close', this.onCloseEvent)
@@ -75,18 +92,24 @@ export default {
         const slots = this.$slots.default()
 
         if (slots) {
-          slots.forEach(r => {
+          slots.forEach((r) => {
             if (
               r.props &&
               r.props.hasOwnProperty('id') &&
               r.props.hasOwnProperty('type') &&
-              itemTypes.includes(this.$store.state.env.itemTypes[r.props.type].type)
+              itemTypes.includes(
+                this.$store.state.env.itemTypes[r.props.type].type
+              )
             ) {
               console.log('beforeClose', r.props.id, r.props.type, this.key)
-              this.$emitter.emit('beforeClose', { id: r.props.id, type: r.props.type, key: this.key })
+              this.$emitter.emit('beforeClose', {
+                id: r.props.id,
+                type: r.props.type,
+                key: this.key,
+              })
             } else {
               if (this.uuid) {
-                this.$emitter.emit('beforeClose', { uuid: this.uuid })                
+                this.$emitter.emit('beforeClose', { uuid: this.uuid })
               } else {
                 this.$emit('close')
               }
@@ -99,8 +122,8 @@ export default {
       if (this.uuid === event.uuid) {
         this.$emit('close')
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

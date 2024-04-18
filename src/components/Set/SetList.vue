@@ -98,7 +98,6 @@ export default {
     },
     viewClick(r) {
       const set = new Set(r)
-
       this.component = {
         image: set.image,
         text: `Набор: ${r.text}`,

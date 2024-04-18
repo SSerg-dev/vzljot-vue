@@ -384,6 +384,11 @@
         @changed="onChange"
       />
     </expantion-panel>
+    <!-- $$ -->
+    <expantion-panel caption="Настройки прибора (просмотр)" :opened="true">
+      <equip-detail-setting v-bind="{ equip: localEquip }"/>
+    </expantion-panel>
+
     <transition>
       <wizard
         v-if="wizard"
@@ -409,9 +414,11 @@ import ConnectionType from '../GroupConnection/ConnectionType.vue'
 import ObjectProps from '../CustomProps/ObjectProps.vue'
 import Wizard from '../Wizard.vue'
 
-import EquipDetailModifications from '@/components/Equip/EquipDetailModifications.vue'
 import { wizardSelectSet } from '@/plugins/wizardComponents/wizardSelectSet'
 import { wizardSourceSelectSet } from '@/plugins/wizardComponents/wizardSourceSelectSet'
+
+import EquipDetailModifications from '@/components/Equip/EquipDetailModifications.vue'
+import EquipDetailSetting from '@/components/Equip/EquipDetailSetting.vue'
 
 export default {
   components: {
@@ -423,6 +430,7 @@ export default {
     ObjectProps,
     Wizard,
     EquipDetailModifications,
+    EquipDetailSetting
   },
   props: {
     equip: {

@@ -75,7 +75,6 @@ interface Card {
   timeNextChecking: number | null
   nodeChange: any | null
   nodeCreate: any | null
-
 }
 const card: Card = {
   isCardSelected: false,
@@ -89,7 +88,33 @@ const card: Card = {
   timeLastChecking: null,
   timeNextChecking: null,
   nodeChange: null,
-  nodeCreate: null
+  nodeCreate: null,
+}
+
+interface Equip {
+  equipId: number | null
+  equipTypeId: number | null
+  id: number | null
+  uuid: string | null
+  name: string | null
+  serialNumber: string | null
+  equipTypeName: string | null
+  equipSetting: [] | null
+  equipSettingIndex: number | null
+  equipSettingHeight: number | null
+
+}
+const equip: Equip = {
+  equipId: null,
+  equipTypeId: null,
+  id: null,
+  uuid: null,
+  name: null,
+  serialNumber: null,
+  equipTypeName: null,
+  equipSetting: null,
+  equipSettingIndex: -1,
+  equipSettingHeight: 0
 }
 
 interface State {
@@ -105,6 +130,7 @@ interface State {
   vsp: any
   weather: any | null
   card: Card
+  equip: Equip
 }
 
 export const store = createStore<State>({
@@ -143,6 +169,7 @@ export const store = createStore<State>({
     },
     weather: null,
     card,
+    equip,
   },
   mutations: {
     notification(state, payload) {
@@ -181,15 +208,45 @@ export const store = createStore<State>({
       if (typeof payload.isInfoChanged === 'boolean')
         state.card.isInfoChanged = payload.isInfoChanged
       if (payload.viewData) state.card.viewData = payload.viewData
-      if (payload.selectedNodeId) state.card.selectedNodeId = payload.selectedNodeId
-      if (payload.selectedLastNodeId) state.card.selectedLastNodeId = payload.selectedLastNodeId
-      if (payload.modifications) state.card.modifications = payload.modifications
+      if (payload.selectedNodeId)
+        state.card.selectedNodeId = payload.selectedNodeId
+      if (payload.selectedLastNodeId)
+        state.card.selectedLastNodeId = payload.selectedLastNodeId
+      if (payload.modifications)
+        state.card.modifications = payload.modifications
       if (payload.interval) state.card.interval = payload.interval
-      if (payload.equipTypeModificationId) state.card.equipTypeModificationId = payload.equipTypeModificationId
-      if (payload.timeLastChecking) state.card.timeLastChecking = payload.timeLastChecking
-      if (payload.timeNextChecking) state.card.timeNextChecking = payload.timeNextChecking
+      if (payload.equipTypeModificationId)
+        state.card.equipTypeModificationId = payload.equipTypeModificationId
+      if (payload.timeLastChecking)
+        state.card.timeLastChecking = payload.timeLastChecking
+      if (payload.timeNextChecking)
+        state.card.timeNextChecking = payload.timeNextChecking
       if (payload.nodeChange) state.card.nodeChange = payload.nodeChange
       if (payload.nodeCreate) state.card.nodeCreate = payload.nodeCreate
+    },
+    
+    setEquip: (state, payload) => {
+      if (payload.equipId)
+        state.equip.equipId = payload.equipId
+      if (payload.equipTypeId)  
+        state.equip.equipTypeId = payload.equipTypeId
+      if (payload.id)  
+        state.equip.id = payload.id
+      if (payload.uuid)  
+        state.equip.uuid = payload.uuid
+      if (payload.name)  
+        state.equip.name = payload.name
+      if (payload.serialNumber)
+        state.equip.serialNumber = payload.serialNumber
+      if (payload.equipTypeName)
+        state.equip.equipTypeName = payload.equipTypeName
+      if (payload.equipSetting)
+        state.equip.equipSetting = payload.equipSetting
+      if (payload.equipSettingIndex > -1)
+        state.equip.equipSettingIndex = payload.equipSettingIndex
+      if (payload.equipSettingHeight > 0)
+        state.equip.equipSettingHeight = payload.equipSettingHeight
+      
     },
   },
   getters: {
@@ -212,7 +269,21 @@ export const store = createStore<State>({
         timeLastChecking: state.card.timeLastChecking,
         timeNextChecking: state.card.timeNextChecking,
         nodeChange: state.card.nodeChange,
-        nodeCreate: state.card.nodeCreate
+        nodeCreate: state.card.nodeCreate,
+      }
+    },
+    getEquip: (state) => {
+      return {
+        equipId: state.equip.equipId,
+        equipTypeId: state.equip.equipTypeId,
+        id: state.equip.id,
+        uuid: state.equip.uuid,
+        name: state.equip.name,
+        serialNumber: state.equip.serialNumber,
+        equipTypeName: state.equip.equipTypeName,
+        equipSetting: state.equip.equipSetting,
+        equipSettingIndex: state.equip.equipSettingIndex,
+        equipSettingHeight: state.equip.equipSettingHeight
       }
     },
 

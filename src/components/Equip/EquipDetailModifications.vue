@@ -376,6 +376,6 @@ export default {
 }
 
 .date-picker {
-  width: 20%;
+  width: 90px;
 }
 </style>
