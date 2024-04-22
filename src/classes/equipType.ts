@@ -1,7 +1,6 @@
 import BaseObject from './base/baseObject'
 import Modification from './modification'
-import { store } from '@/plugins/store'
-// import { debounce } from './utils/common.functions'
+import { store } from '@/store/store'
 
 type EquipTypeType = {
   uuid?: string

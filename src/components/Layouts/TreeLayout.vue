@@ -28,7 +28,7 @@
 </template>
 
 <script>
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 import { asyncImport, matchType, getImage } from '../../plugins/api.js'
 
 import { Equip } from '@/classes/equip'

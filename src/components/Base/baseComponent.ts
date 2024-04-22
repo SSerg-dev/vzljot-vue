@@ -1,6 +1,6 @@
 import axios, { AxiosError } from 'axios'
 import { Emitter } from 'mitt'
-import { store } from '@/plugins/store'
+import { store } from '@/store/store'
 import { inject, onBeforeUnmount, onMounted, ref, unref, watch } from 'vue'
 
 type ValueOf<T> = T[keyof T]

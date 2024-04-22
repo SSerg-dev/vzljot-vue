@@ -1,5 +1,5 @@
 import { axios } from '@/plugins/axios'
-import { store } from '@/plugins/store'
+import { store } from '@/store/store'
 import { v4 as uuidv4 } from 'uuid'
 
 export default class BaseObject {

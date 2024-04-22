@@ -69,7 +69,7 @@
 <script>
 import axios from 'axios'
 import { axios as http } from '../../plugins/axios'
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 
 const CancelToken = axios.CancelToken
 let cancel = null

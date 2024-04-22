@@ -61,7 +61,7 @@
       <header class="header" v-for="r in customColumns" :key="r">{{ r }}</header>
       <div v-for="(r, index) in localItems" :key="index" class="table-row">
         <span class="cell sticky-first column" :style="`grid-template-columns: repeat(${firstColumnsCount}, min-content)`">
-          <span v-if="$store.state.user?.userRights.pollData" :class="r.task.class" :style="{ color: r.task.style.color }" :title="r.task.text" />
+          <span v-if="$store.state.user?.userRights.pollData" :class="r.task?.class" :style="{ color: r.task?.style.color }" :title="r.task?.text" />
           <input
             v-if="$store.state.user?.userRights.equipList || $store.state.user?.userRights.pollData"
             type="checkbox"
@@ -86,12 +86,12 @@
         <span class="cell">{{
           r.archiveMonthTime ? `${(r.archiveMonthTime.getMonth() + 1).toString().padStart(2, '0')}.${r.archiveMonthTime.getFullYear()}` : ''
         }}</span>
-        <span class="cell">{{ r.pollCurrentTime === null ? '' : r.pollCurrentTime.toLocaleString() }}</span>
+        <span class="cell">{{ r.pollCurrentTime === null ? '' : r.pollCurrentTime?.toLocaleString() }}</span>
         <span class="cell">{{ r.timeOffset }}</span>
         <span class="cell">{{ r.pollSource & 512 ? 'Да' : r.pollSource & 256 ? 'Нет' : '' }}</span>
         <span class="cell">{{ r.note }}</span>
-        <span class="cell">{{ r.timeCreate === null ? '' : r.timeCreate.toLocaleString() }}</span>
-        <span class="cell">{{ r.timeLastEdit === null ? '' : r.timeLastEdit.toLocaleString() }}</span>
+        <span class="cell">{{ r.timeCreate === null ? '' : r.timeCreate?.toLocaleString() }}</span>
+        <span class="cell">{{ r.timeLastEdit === null ? '' : r.timeLastEdit?.toLocaleString() }}</span>
         <span class="cell" v-for="(prop, indexProp) in customColumns" :key="indexProp">{{ r.custom[indexProp].value }}</span>
       </div>
     </div>
@@ -103,7 +103,7 @@
 </template>
 
 <script lang="ts">
-let abortController = new AbortController()
+let abortController = new AbortController() 
 
 const collator = new Intl.Collator(['en-US', 'ru-RU'])
 
@@ -112,7 +112,7 @@ function sort(a: { name: string }, b: { name: string }) {
 }
 
 import { axios } from '@/plugins/axios'
-import { store } from '@/plugins/store'
+import { store } from '@/store/store'
 import { computed, defineComponent, inject, onBeforeUnmount, PropType, ref, watch } from 'vue'
 
 import { ColumnTypeEnum, Equip, Filter, PollMessage, SiMessage } from '@/classes/equipList'
@@ -442,7 +442,7 @@ export default defineComponent({
         const settings = JSON.parse(JSON.stringify(localSettings.value))
 
         settings.timeFrom = new Date(settings.timeFrom).getTime()
-        settings.timeTo = new Date(settings.timeFrom).getTime()
+        settings.timeTo = new Date(settings.timeTo).getTime()
 
         await axios.post(
           'equipList/poll',

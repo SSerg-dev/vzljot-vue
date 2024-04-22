@@ -1,5 +1,6 @@
 ﻿import { v4 as uuidv4 } from 'uuid'
-import { store } from './store'
+import { store } from '@/store/store'
+
 import { getImage } from './api.js'
 
 export class Node {

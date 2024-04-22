@@ -91,7 +91,7 @@
 </template>
 
 <script>
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 
 import { getImage } from '../../plugins/api.js'
 

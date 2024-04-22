@@ -652,7 +652,7 @@ const wizardSubscriptionRemove = () => {
   }
 }
 
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 
 const abortController = new AbortController()
 

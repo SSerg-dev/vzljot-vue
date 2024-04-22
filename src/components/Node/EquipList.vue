@@ -30,7 +30,7 @@
 <script lang="ts">
 import { axios } from '@/plugins/axios'
 import { Equip } from '@/classes/node'
-import { store } from '@/plugins/store'
+import { store } from '@/store/store'
 import { defineComponent, computed, PropType, ref, watch } from 'vue'
 
 import Pager from '../PagerComponent.vue'

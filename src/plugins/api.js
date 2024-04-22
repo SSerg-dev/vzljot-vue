@@ -1,5 +1,5 @@
 import { defineAsyncComponent, h } from 'vue'
-import { store } from './store'
+import { store } from '@/store/store'
 
 export const asyncImport = importPromise => {
   return defineAsyncComponent({

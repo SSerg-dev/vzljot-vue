@@ -114,7 +114,7 @@ import Tabx from '../Tabs/Tabx.vue'
 import Tabs from '../Tabs/Tabs.vue'
 import Wizard from '../Wizard.vue'
 import { setupTreeComponent } from '../Base/baseComponent'
-import { store } from '@/plugins/store'
+import { store } from '@/store/store'
 
 export default defineComponent({
   components: {

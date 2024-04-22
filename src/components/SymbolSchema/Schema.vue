@@ -30,7 +30,7 @@
 
 <script lang="ts">
 import { axios as http } from '../../plugins/axios'
-import { store } from '@/plugins/store'
+import { store } from '@/store/store'
 import { Schema, SchemaError } from '@/classes/schema'
 
 import PreserverComponent from '../PreserverComponent.vue'

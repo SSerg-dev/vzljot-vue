@@ -1,7 +1,7 @@
 import { createApp } from 'vue'
 import App from './AppSymbolSchema.vue'
 import { axios } from './plugins/axios'
-import { store } from './plugins/store'
+import { store } from '@/store/store'
 import mitt from 'mitt'
 
 // __webpack_public_path__ = window.props.baseUrl + 'js/sp/dist/'

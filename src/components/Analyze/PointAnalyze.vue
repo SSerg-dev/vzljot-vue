@@ -14,7 +14,7 @@
 </template>
 
 <script>
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 
 import Analyze from './AnalyzeComponent.vue'
 import Temperature from './TemperatureComponent.vue'

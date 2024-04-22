@@ -191,8 +191,7 @@ const sortByName = (a: { name: string }, b: { name: string }) => {
   return 0
 }
 
-import { store } from '../../plugins/store'
-
+import { store } from '@/store/store'
 import { getImage, matchType } from '../../plugins/api.js'
 
 import { ReportTask, ReportTaskError } from '../../classes/reportTask'

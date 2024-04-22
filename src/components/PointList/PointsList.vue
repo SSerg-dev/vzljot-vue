@@ -65,7 +65,7 @@
 
 <script>
 import { matchType } from '../../plugins/api.js'
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 
 let abortController = new AbortController()
 

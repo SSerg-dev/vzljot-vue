@@ -99,7 +99,7 @@
 <script>
 import CardItem from './CardItem.vue'
 import PieChart from './PieChart.vue'
-import { sortByName } from '@/plugins/utils/common.functions.js'
+import { sortByName } from '@/utils/common.functions.js'
 
 export default {
   components: { CardItem, PieChart },

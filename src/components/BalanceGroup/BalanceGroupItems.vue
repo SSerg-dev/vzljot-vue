@@ -40,7 +40,7 @@
 </template>
 
 <script lang="ts">
-import { store } from '@/plugins/store'
+import { store } from '@/store/store'
 import { computed, defineComponent, PropType, ref, watch } from 'vue'
 
 import { Filter, Point } from '@/classes/balanceGroup'

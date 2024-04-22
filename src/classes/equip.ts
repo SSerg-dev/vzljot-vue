@@ -1,6 +1,6 @@
 import BaseObject from './base/baseObject'
 import { CustomPropertyTypeEnum } from './enum/CustomPropertyTypeEnum'
-import { store } from '@/plugins/store'
+import { store } from '@/store/store'
 
 export class EquipError {
   name?: string

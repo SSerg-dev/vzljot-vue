@@ -11,7 +11,7 @@
 
 <script lang="ts">
 import axios, { AxiosError } from 'axios'
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 import { defineComponent, PropType, ref, watch } from 'vue'
 
 import { EquipList, EquipListError } from '../../classes/equipList'

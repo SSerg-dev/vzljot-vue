@@ -33,7 +33,7 @@
 
 <script lang="ts">
 import { setupTreeComponent } from '../Base/baseComponent'
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 import { computed, defineComponent, PropType } from 'vue'
 
 import { matchType } from '../../plugins/api'

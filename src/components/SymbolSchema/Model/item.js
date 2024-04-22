@@ -1,4 +1,4 @@
-import { store } from '../../../plugins/store'
+import { store } from '@/store/store'
 
 import Factory from './factory'
 

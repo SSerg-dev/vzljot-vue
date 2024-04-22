@@ -40,7 +40,7 @@
 import { CommonStatusEnum } from '@/classes/enum/CommonStatusEnum'
 import { Point } from '@/classes/pointGroup'
 import { axios } from '@/plugins/axios'
-import { store } from '@/plugins/store'
+import { store } from '@/store/store'
 import { defineComponent, computed, PropType, ref, watch } from 'vue'
 
 import PagerComponent from '../PagerComponent.vue'

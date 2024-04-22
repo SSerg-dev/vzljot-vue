@@ -43,7 +43,7 @@ import { computed, defineComponent, inject, onBeforeUnmount, PropType, provide, 
 import { Modem, ModemError } from '../../classes/modem'
 import { ModemPool, ModemPoolError } from '../../classes/modemPool'
 
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 
 import ModemComponent from './Modem.vue'
 import ModemPoolComponent from './ModemPool.vue'

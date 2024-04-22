@@ -1,4 +1,4 @@
-import { store } from '@/plugins/store'
+import { store } from '@/store/store'
 import { Emitter } from 'mitt'
 import { computed, inject, onBeforeUnmount, ref, watch } from 'vue'
 import { SaveEvent } from './baseComponent'

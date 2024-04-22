@@ -45,7 +45,7 @@
 </template>
 
 <script lang="ts">
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 import { computed, defineComponent, PropType } from 'vue'
 
 import { matchType } from '../../plugins/api'

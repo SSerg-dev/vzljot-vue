@@ -22,7 +22,7 @@ import '@devexpress/analytics-core/dist/css/dx-analytics.light.css'
 import 'devexpress-reporting/dist/css/dx-webdocumentviewer.css'
 
 import axios from 'axios'
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 import { wizardCertificates, wizardPassword } from '../../plugins/wizardComponents/wizardCertificate'
 import { sign } from '../../plugins/crypto/crypto'
 

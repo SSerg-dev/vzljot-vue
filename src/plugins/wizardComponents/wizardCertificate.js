@@ -1,4 +1,4 @@
-﻿import { store } from '../../plugins/store'
+﻿import { store } from '@/store/store'
 import { getUserCertificates } from '../crypto/crypto'
 import Certificate from '../crypto/certificate'
 

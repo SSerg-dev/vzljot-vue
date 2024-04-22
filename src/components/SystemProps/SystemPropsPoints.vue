@@ -32,7 +32,7 @@
 <script>
 import { getImage } from '@/plugins/api.js'
 import User from '@/classes/user'
-import { sortByName } from '@/plugins/utils/common.functions.js'
+import { sortByName } from '@/utils/common.functions.js'
 
 export default {
   components: {},

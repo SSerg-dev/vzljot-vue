@@ -2,7 +2,8 @@ import { createApp } from 'vue'
 import App from './App.vue'
 import { axios } from './plugins/axios'
 
-import { store } from './plugins/store'
+import { store } from '@/store/store'
+
 import mitt, { Emitter } from 'mitt'
 
 // __webpack_public_path__ = window.props.baseUrl + 'js/sp/dist/'

@@ -73,7 +73,7 @@
 import { setupTreeComponent } from '../Base/baseComponent'
 
 import { axios as http } from '../../plugins/axios'
-import { store } from '../../plugins/store'
+import { store } from '@/store/store'
 import { computed, defineComponent, PropType, ref } from 'vue'
 
 import { matchType } from '../../plugins/api'

@@ -31,7 +31,8 @@
     </div>
     <check-box v-model="value.forcePollEquipSettings" @update:modelValue="onChange()" :disabled="forcePollEquipSettingsDisabled">Выполнить сбор приборных настроек</check-box>
     <check-box v-model="value.allowOutOfRange" @update:modelValue="onChange()" :disabled="allowOutOfRangeDisabled">Разрешить сбор отсутствующих данных вне диапазона</check-box>
-    <check-box v-model="value.rewrite" @update:modelValue="onChange()" :disabled="rewriteDisabled">Перезаписать ранее полученные архивные данные</check-box>
+    <check-box v-model="value.rewrite" @update:modelValue="onRewriteChange()" :disabled="rewriteDisabled">Перезаписать ранее полученные архивные данные</check-box>
+    <check-box v-model="value.rewriteMissing" @update:modelValue="onRewriteMissingChange()" :disabled="rewriteDisabled">Перезаписать данные, которые отсутствовали у прибора во время сбора</check-box>
   </div>
 </template>
 
@@ -104,8 +105,22 @@ export default {
     }
   },
   methods: {
-    onChange() {      
+    onChange() {
       this.$emit('changed', this.value)
+    },
+    onRewriteChange() {
+      if (this.value.rewrite && this.value.rewriteMissing) {
+        this.value.rewriteMissing = false;
+      }
+
+      this.$emit('changed', this.value);
+    },
+    onRewriteMissingChange() {
+      if (this.value.rewriteMissing && this.value.rewrite) {
+        this.value.rewrite = false;
+      }
+
+      this.$emit('changed', this.value);
     },
     validate() {
       Object.keys(this.error).forEach(r => (this.error[r] = { value: false, title: '' }))
