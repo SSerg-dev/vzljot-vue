@@ -119,6 +119,8 @@ import { ColumnTypeEnum, Equip, Filter, PollMessage, SiMessage } from '@/classes
 import PagerComponent from '../PagerComponent.vue'
 import ToolBar from '../ToolBar.vue'
 import Wizard from '../Wizard.vue'
+import { wizardSettings } from '@/plugins/wizardComponents/wizardSettings'
+
 import { SchemeSystemTypeEnum } from '@/classes/enum/SchemeSystemTypeEnum'
 import { Emitter } from 'mitt'
 
@@ -393,19 +395,9 @@ export default defineComponent({
         }
       }
     }
-
+    
     function onSettingsClick() {
-      wizard.value = {
-        name: 'settings',
-        component: {
-          text: 'Настройки сбора и рассылки данных:',
-          component: 'pollDataSettings',
-          event: 'changed',
-          data: {
-            settings: localSettings.value
-          }
-        }
-      }
+      wizard.value = wizardSettings(localSettings.value)
     }
 
     function processMessage(message: PollMessage) {

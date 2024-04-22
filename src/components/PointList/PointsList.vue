@@ -74,6 +74,7 @@ import PagerComponent from '../PagerComponent.vue'
 import ToolBar from '../ToolBar.vue'
 import ReportComponent from '../Report/ReportComponent.vue'
 import Wizard from '../Wizard.vue'
+import { wizardSettings } from '@/plugins/wizardComponents/wizardSettings'
 
 const reportTypes = matchType(store.state.env.reportTypes)
 
@@ -129,20 +130,6 @@ const wizardFilter = (filter, types) => {
       data: {
         filter,
         types
-      }
-    }
-  }
-}
-
-const wizardSettings = settings => {
-  return {
-    name: 'settings',
-    component: {
-      text: 'Настройки сбора данных:',
-      component: 'pollDataSettings',
-      event: 'changed',
-      data: {
-        settings
       }
     }
   }

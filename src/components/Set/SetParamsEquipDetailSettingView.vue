@@ -25,7 +25,7 @@
       <wizard
         v-if="wizard"
         v-bind="wizard"
-        @cancel="cancelWizard"
+        @cancel="cancelWizard" 
         @end="onWizardEnd"
       />
       <props-component v-if="edit" v-bind="componentData" @close="close">

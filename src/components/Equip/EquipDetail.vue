@@ -384,8 +384,8 @@
         @changed="onChange"
       />
     </expantion-panel>
-    <!-- $$ -->
-    <expantion-panel caption="Настройки прибора (просмотр)" :opened="true">
+    
+    <expantion-panel caption="Настройки прибора (просмотр)" :opened="false">
       <equip-detail-setting v-bind="{ equip: localEquip }"/>
     </expantion-panel>
 

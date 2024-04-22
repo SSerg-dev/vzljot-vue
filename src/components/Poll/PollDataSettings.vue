@@ -29,9 +29,9 @@
         </div>
       </div>
     </div>
-    <check-box v-model="value.forcePollEquipSettings" @update:modelValue="onChange()" :disabled="disabled">Выполнить сбор приборных настроек</check-box>
-    <check-box v-model="value.allowOutOfRange" @update:modelValue="onChange()" :disabled="disabled">Разрешить сбор отсутствующих данных вне диапазона</check-box>
-    <check-box v-model="value.rewrite" @update:modelValue="onChange()" :disabled="disabled">Перезаписать ранее полученные архивные данные</check-box>
+    <check-box v-model="value.forcePollEquipSettings" @update:modelValue="onChange()" :disabled="forcePollEquipSettingsDisabled">Выполнить сбор приборных настроек</check-box>
+    <check-box v-model="value.allowOutOfRange" @update:modelValue="onChange()" :disabled="allowOutOfRangeDisabled">Разрешить сбор отсутствующих данных вне диапазона</check-box>
+    <check-box v-model="value.rewrite" @update:modelValue="onChange()" :disabled="rewriteDisabled">Перезаписать ранее полученные архивные данные</check-box>
   </div>
 </template>
 
@@ -71,6 +71,26 @@ export default {
     disabled() {
       return this.value.useSystem
     },
+    archiveOptionSelected() {
+      return this.value.archiveHour || this.value.archiveDay || this.value.archiveMonth;
+    },
+    otherOptionSelected() {
+      return this.value.setParams
+        || this.value.equipEvents
+        || this.value.equipCustomizing
+        || this.value.setDataColdWater
+        || this.value.coldWater
+        || this.value.equipDatabaseParams;
+    },
+    forcePollEquipSettingsDisabled() {
+      return this.disabled || !(this.archiveOptionSelected || this.otherOptionSelected);
+    },
+    allowOutOfRangeDisabled() {
+      return this.disabled || !this.archiveOptionSelected;
+    },
+    rewriteDisabled() {
+      return this.disabled || !this.archiveOptionSelected;
+    },
     pollDataTimeTypes() {
       return matchType(this.$store.state.env.pollDataTimeTypes)
     }
@@ -84,21 +104,13 @@ export default {
     }
   },
   methods: {
-    onChange() {
+    onChange() {      
       this.$emit('changed', this.value)
     },
     validate() {
       Object.keys(this.error).forEach(r => (this.error[r] = { value: false, title: '' }))
 
-      if (!(this.value.archiveHour
-        || this.value.archiveDay
-        || this.value.archiveMonth
-        || this.value.setParams
-        || this.value.equipEvents
-        || this.value.equipCustomizing
-        || this.value.setDataColdWater
-        || this.value.coldWater
-        || this.value.equipDatabaseParams) && !this.disabled) {
+      if (!(this.archiveOptionSelected || this.otherOptionSelected) && !this.disabled) {
         this.error.data.value = true
         this.error.data.title = 'Необходимо выбрать хотя бы один тип данных.'
       }

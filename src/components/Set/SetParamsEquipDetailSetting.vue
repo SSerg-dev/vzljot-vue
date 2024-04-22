@@ -144,7 +144,7 @@ export default {
       const minHeight = 88
       const itemHeight = 34
       const itemCount = this.localItems.length
-      const coeff = 22
+      const coeff = 24
 
       return `calc(${minHeight}px + ${
         itemCount * itemHeight + this.getEquip.equipSettingHeight * coeff

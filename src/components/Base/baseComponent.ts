@@ -69,7 +69,7 @@ export function setupComponent<TObject extends { id?: number; uuid?: string, edi
 
   onMounted(async () => {
     try {
-      await localItem.value.init(item.id)
+      await (localItem.value as any).init(item.id)
       watch(
         () => localItem.value,
         value => {
@@ -102,10 +102,10 @@ export function setupComponent<TObject extends { id?: number; uuid?: string, edi
   function onChanged(key: keyof TObject, value: TObject[keyof TObject]) {
     if (localItem.value.hasOwnProperty('editable')) {
       if (localItem.value.editable) {
-        localItem.value[key] = value
+        (localItem.value as any)[key] = value
       }
     } else {
-      localItem.value[key] = value
+      (localItem.value as any)[key] = value
     }
   }
 
@@ -113,9 +113,9 @@ export function setupComponent<TObject extends { id?: number; uuid?: string, edi
     try {
       saving.value = true
 
-      localError.value = new localError.value.constructor({})
+      localError.value = new (localError.value as any).constructor({})
 
-      await localItem.value.save()
+      await (localItem.value as any).save()
 
       hasChanges.value = false
 
@@ -171,7 +171,7 @@ export function setupTreeComponent<TObject extends object, TError extends object
 
   onMounted(async () => { 
     try {
-      await localItem.value.init(id)
+      await (localItem.value as any).init(id)
 
       const options = {
         nodeChange: localItem.value
@@ -181,8 +181,8 @@ export function setupTreeComponent<TObject extends object, TError extends object
       watch(
         () => localItem.value,
         value => {
-          if (value.hasOwnProperty('editable')) {
-            if (value.editable) {
+          if ((value as any).hasOwnProperty('editable')) {
+            if ((value as any).editable) {
               hasChanges.value = true
             }
           } else {
@@ -247,9 +247,9 @@ export function setupTreeComponent<TObject extends object, TError extends object
     try {
       saving.value = true
 
-      localError.value = new localError.value.constructor({})
+      localError.value = new (localError.value as any).constructor({})
       
-      await localItem.value.save()
+      await (localItem.value as any).save()
 
       hasChanges.value = false
     } catch (err) {
@@ -269,12 +269,12 @@ export function setupTreeComponent<TObject extends object, TError extends object
   }
 
   function onChanged<Key extends keyof TObject>(key: Key, value: ValueOf<TObject>) {
-    if (localItem.value.hasOwnProperty('editable')) {
-      if (localItem.value.editable) {
-        localItem.value[key] = value
+    if ((localItem.value as any).hasOwnProperty('editable')) {
+      if ((localItem.value as any).editable) {
+        (localItem.value as any)[key] = value
       }
     } else {
-      localItem.value[key] = value
+      (localItem.value as any)[key] = value
     }
   }
 

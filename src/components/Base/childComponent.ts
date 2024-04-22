@@ -32,17 +32,17 @@ export function setup<TObject extends { id?: number; uuid?: string; editable: bo
 
   function onChanged(key: keyof TObject, value: TObject[keyof TObject]) {
     if (localItem.value.editable) {
-      localItem.value[key] = value
+      (localItem.value as any)[key] = value
     }
   }
 
   function save({ uuid, close }: SaveEvent) {
     if (localItem.value.uuid === uuid) {
-      saving.value = true
+      saving.value = true;
 
-      localError.value = localItem.value.validate(items)
+     (localError as any).value = localItem.value.validate(items)
 
-      if (Object.values(localError.value).filter(r => r).length === 0) {
+      if (Object.values((localError as any).value).filter(r => r).length === 0) {
         hasChanges.value = false
         emit('saved', localItem.value, close)
       }
