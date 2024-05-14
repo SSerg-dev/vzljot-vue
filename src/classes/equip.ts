@@ -1,6 +1,7 @@
 import BaseObject from './base/baseObject'
 import { CustomPropertyTypeEnum } from './enum/CustomPropertyTypeEnum'
 import { store } from '@/store/store'
+import { EquipSettingTable } from '@/store/equip'
 
 export class EquipError {
   name?: string
@@ -117,6 +118,9 @@ interface IEquip {
   timeLastChecking?: Number | null
   timeNextChecking?: Number | null
   equipTypeModificationId?: number | null
+  equipSettings?: Array<EquipSetting> | null
+  equipSettingTable?: EquipSettingTable | null
+
 }
 
 interface ColdWater {
@@ -128,8 +132,15 @@ interface ColdWater {
   }
 }
 
+interface EquipSetting {
+  id: number
+  caption: string | null
+  name: string | null
+  value: string | null
+}
+
 export class Equip extends BaseObject {
-  editable = Equip.store.state.user?.userRights.equipEdit
+  editable = Equip.store.state.user?.userRights.equipEdit 
 
   id?: number
   parentId?: number
@@ -156,6 +167,8 @@ export class Equip extends BaseObject {
   timeLastChecking?: Number | null
   timeNextChecking?: Number | null
   equipTypeModificationId?: number | null
+  equipSettings?: Array<EquipSetting> | null
+  equipSettingTable?: EquipSettingTable | null 
 
   constructor({
     uuid = undefined,
@@ -202,6 +215,8 @@ export class Equip extends BaseObject {
     timeLastChecking = null,
     timeNextChecking = null,
     equipTypeModificationId = null,
+    equipSettings = [],
+    equipSettingTable = null
   }: IEquip) {
     super(uuid)
 
@@ -230,6 +245,8 @@ export class Equip extends BaseObject {
     this.timeLastChecking = timeLastChecking
     this.timeNextChecking = timeNextChecking
     this.equipTypeModificationId = equipTypeModificationId
+    this.equipSettings = equipSettings
+    this.equipSettingTable = equipSettingTable
   }
 
   isBusAddressVisible(type: number) {
@@ -348,6 +365,8 @@ export class Equip extends BaseObject {
       timeLastChecking?: Number | null
       timeNextChecking?: Number | null
       equipTypeModificationId?: number | null
+      equipSettings?: Array<EquipSetting> | null
+      equipSettingTable?: EquipSettingTable | null
     }
 
     const props: Props = {
@@ -363,6 +382,8 @@ export class Equip extends BaseObject {
       groupType: this.groupType,
       analyze: this.analyze,
       coldWater: this.coldWater,
+      equipSettings: this.equipSettings,
+      equipSettingTable: this.equipSettingTable 
     }
 
     if (this.isBusAddressVisible(this.equipType)) {
@@ -459,6 +480,17 @@ export class Equip extends BaseObject {
 
         return obj
       })
+    }
+
+    this.equipSettings = Equip.store.state.equip.equipSettingSave
+    if (this.equipSettings) {
+      props.equipSettings = this.equipSettings 
+    }
+
+    this.equipSettingTable = Equip.store.state.equip.equipSettingTable
+    if (this.equipSettingTable) {
+      console.log('$$ save this.equipSettingTable', JSON.stringify(this.equipSettingTable))
+      props.equipSettingTable = this.equipSettingTable
     }
 
     await this.http.post('equip/equip', props)

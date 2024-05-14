@@ -32,9 +32,6 @@
 import { Set, SetError, Equip } from '../../classes/set'
 
 import PreserverComponent from '../PreserverComponent.vue'
-//import SetDetail from './SetDetail.vue'
-//import SetEquips from './SetEquips.vue'
-
 import SetParamsEquipDetailSetting from '@/components/Set/SetParamsEquipDetailSetting.vue'
 
 import Wizard from '../Wizard.vue'
@@ -47,8 +44,6 @@ import { SetParam } from '@/classes/setParam'
 export default defineComponent({
   components: {
     PreserverComponent,
-    //SetDetail,
-    //SetEquips,
     SetParamsEquipDetailSetting,
     Wizard,
   },

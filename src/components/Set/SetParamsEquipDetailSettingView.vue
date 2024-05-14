@@ -12,12 +12,18 @@
         class="table-row"
         :ref="(el) => (rowsElement[r.id] = el)"
       >
-        <span class="cell icon">
+        <span
+          class="cell icon clickable-icon"
+          @click="onEdit(r)"
+          title="Редактирование..."
+        >
           <div :class="['fas', 'fa-cog', 'cog']" />
         </span>
 
-        <span class="cell" style="justify-content: start">{{ r.name }}</span>
-        <span class="cell" style="justify-content: start">{{ r.value }}</span>
+        <span class="cell" style="justify-content: start">{{ r.caption }}</span>
+        <span class="cell" style="justify-content: end"
+          ><EquipSettingValue :param="r" :editName="editName" />
+        </span>
       </div>
     </div>
 
@@ -25,7 +31,7 @@
       <wizard
         v-if="wizard"
         v-bind="wizard"
-        @cancel="cancelWizard" 
+        @cancel="cancelWizard"
         @end="onWizardEnd"
       />
       <props-component v-if="edit" v-bind="componentData" @close="close">
@@ -47,6 +53,8 @@ import PropsComponent from '@/components/PropsComponent.vue'
 import ToolBar from '@/components/ToolBar.vue'
 import Wizard from '@/components/Wizard.vue'
 
+import EquipSettingValue from '@/components/Inputs/EquipSettingValue.vue'
+
 import { mapGetters } from 'vuex'
 
 export default {
@@ -55,6 +63,7 @@ export default {
     PropsComponent,
     ToolBar,
     Wizard,
+    EquipSettingValue,
   },
   extends: ListComponent,
 
@@ -74,6 +83,7 @@ export default {
       pageInfo: JSON.parse(JSON.stringify(this.$store.getters.pageInfo)),
       busy: false,
       rowsElement: {},
+      localEditName: '',
     }
   },
   created() {
@@ -91,6 +101,9 @@ export default {
     ...mapGetters({
       getEquip: 'getEquip',
     }),
+    editName() {
+      return this.localEditName
+    },
   },
   beforeUnmount() {
     if (cancel) this.cancel()
@@ -100,20 +113,20 @@ export default {
       this.pageInfo.Size = size
       this.pageInfo.Page = page
     },
-    handleEquipSettingDate(event) {
-      event
-      // let changedEquipSettingDate = new Date(event)
-    },
-    handlePassSettingCheck(event) {
-      event
-      // console.log('$$ event', event)
-    },
+    // handleEquipSettingDate(event) {
+    //   const changedEquipSettingDate = new Date(event) 
+    // },
+    // handlePassSettingCheck(event) {
+    // },
     onSaved(data) {
       this.componentData.text = `${'Настройка прибора'}: ${data.name}`
     },
 
     close() {
       this.edit = false
+    },
+    onEdit(r) {
+      this.localEditName = r.name
     },
   }, // end methods
 }

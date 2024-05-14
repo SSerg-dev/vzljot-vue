@@ -177,7 +177,7 @@
         />
       </div>
     </expantion-panel>
-    <expantion-panel caption="Средства измерений" :opened="false">
+    <expantion-panel caption="Средство измерения" :opened="false">
       <equip-detail-modifications
         v-bind="{ equip: localEquip }"
         @modifications-updated="handleModificationsUpdated"
@@ -384,9 +384,12 @@
         @changed="onChange"
       />
     </expantion-panel>
-    
+
     <expantion-panel caption="Настройки прибора (просмотр)" :opened="false">
-      <equip-detail-setting v-bind="{ equip: localEquip }"/>
+      <equip-detail-setting
+        v-bind="{ equip: localEquip }"
+        @equip-setting-update="updatedEquipSetting"
+      />
     </expantion-panel>
 
     <transition>
@@ -430,7 +433,7 @@ export default {
     ObjectProps,
     Wizard,
     EquipDetailModifications,
-    EquipDetailSetting
+    EquipDetailSetting,
   },
   props: {
     equip: {
@@ -458,7 +461,6 @@ export default {
       (value) => (this.localEquip = new Equip(value)),
       { deep: true }
     )
-
     this.$watch(
       () => this.error,
       (value) => (this.localError = JSON.parse(JSON.stringify(value))),
@@ -567,7 +569,6 @@ export default {
     },
     onChange(prop, value) {
       this.$emit('changed', prop, value)
-
       if (this.action !== 'create') {
         this.action = 'change'
       }
@@ -793,6 +794,9 @@ export default {
       this.onChange('coldWater', {
         ...this.localEquip.coldWater,
       })
+    },
+    updatedEquipSetting(changedValues) {
+      this.onChange('equipSetting', changedValues)
     },
   }, // end methods
 }

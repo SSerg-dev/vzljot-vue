@@ -3,6 +3,11 @@ import { createStore } from 'vuex'
 import Mu from '@/plugins/model/mu.js'
 import { matchType } from '@/plugins/api'
 
+import { Card, card } from '@/store/card'
+import { Equip, equip } from '@/store/equip'
+
+// import { moduleCard } from '@/store/card'
+
 type EnumType = {
   [key: string]: any
 }
@@ -62,61 +67,6 @@ const env: Env = {
   setTypes: {},
 }
 
-interface Card {
-  isCardSelected: boolean | null
-  isInfoChanged: boolean | null
-  viewData: Object | null
-  selectedNodeId: number | null
-  selectedLastNodeId: number | null
-  modifications: [] | null
-  interval: 0 | null
-  equipTypeModificationId: number | null
-  timeLastChecking: number | null
-  timeNextChecking: number | null
-  nodeChange: any | null
-  nodeCreate: any | null
-}
-const card: Card = {
-  isCardSelected: false,
-  isInfoChanged: false,
-  viewData: {},
-  selectedNodeId: null,
-  selectedLastNodeId: null,
-  modifications: [],
-  interval: 0,
-  equipTypeModificationId: null,
-  timeLastChecking: null,
-  timeNextChecking: null,
-  nodeChange: null,
-  nodeCreate: null,
-}
-
-interface Equip {
-  equipId: number | null
-  equipTypeId: number | null
-  id: number | null
-  uuid: string | null
-  name: string | null
-  serialNumber: string | null
-  equipTypeName: string | null
-  equipSetting: [] | null
-  equipSettingIndex: number | null
-  equipSettingHeight: number | null
-
-}
-const equip: Equip = {
-  equipId: null,
-  equipTypeId: null,
-  id: null,
-  uuid: null,
-  name: null,
-  serialNumber: null,
-  equipTypeName: null,
-  equipSetting: null,
-  equipSettingIndex: -1,
-  equipSettingHeight: 0
-}
-
 interface State {
   collator: any
   colors: any | null
@@ -134,6 +84,9 @@ interface State {
 }
 
 export const store = createStore<State>({
+  // modules: {
+  //   card: moduleCard
+  // },
   state: {
     collator: new Intl.Collator(['en-US', 'ru-RU']),
     colors: null,
@@ -202,6 +155,7 @@ export const store = createStore<State>({
     weather(state, payload) {
       state.weather = payload
     },
+
     setCard(state, payload) {
       if (typeof payload.isCardSelected === 'boolean')
         state.card.isCardSelected = payload.isCardSelected
@@ -224,29 +178,44 @@ export const store = createStore<State>({
       if (payload.nodeChange) state.card.nodeChange = payload.nodeChange
       if (payload.nodeCreate) state.card.nodeCreate = payload.nodeCreate
     },
-    
+
     setEquip: (state, payload) => {
-      if (payload.equipId)
-        state.equip.equipId = payload.equipId
-      if (payload.equipTypeId)  
-        state.equip.equipTypeId = payload.equipTypeId
-      if (payload.id)  
-        state.equip.id = payload.id
-      if (payload.uuid)  
-        state.equip.uuid = payload.uuid
-      if (payload.name)  
-        state.equip.name = payload.name
-      if (payload.serialNumber)
-        state.equip.serialNumber = payload.serialNumber
+      if (payload.equipId) state.equip.equipId = payload.equipId
+      if (payload.equipTypeId) state.equip.equipTypeId = payload.equipTypeId
+      if (payload.id) state.equip.id = payload.id
+      if (payload.uuid) state.equip.uuid = payload.uuid
+      if (payload.name) state.equip.name = payload.name
+      if (payload.serialNumber) state.equip.serialNumber = payload.serialNumber
       if (payload.equipTypeName)
         state.equip.equipTypeName = payload.equipTypeName
-      if (payload.equipSetting)
-        state.equip.equipSetting = payload.equipSetting
+      if (payload.equipSetting) state.equip.equipSetting = payload.equipSetting
+
+      if (payload.equipSettingSave) {
+        if (state.equip.equipSettingSave !== null) {
+          const index = state.equip.equipSettingSave.findIndex(
+            (item) => item.name === payload.equipSettingSave.name
+          )
+          if (index !== -1) {
+            state.equip.equipSettingSave.splice(
+              index,
+              1,
+              payload.equipSettingSave
+            )
+          } else {
+            state.equip.equipSettingSave.push(payload.equipSettingSave)
+          }
+        } else {
+          state.equip.equipSettingSave = [payload.equipSettingSave]
+        }
+      }
+
+      if (payload.equipSettingTable)
+        state.equip.equipSettingTable = payload.equipSettingTable
+
       if (payload.equipSettingIndex > -1)
         state.equip.equipSettingIndex = payload.equipSettingIndex
       if (payload.equipSettingHeight > 0)
         state.equip.equipSettingHeight = payload.equipSettingHeight
-      
     },
   },
   getters: {
@@ -282,8 +251,9 @@ export const store = createStore<State>({
         serialNumber: state.equip.serialNumber,
         equipTypeName: state.equip.equipTypeName,
         equipSetting: state.equip.equipSetting,
+        equipSettingSave: state.equip.equipSettingSave,
         equipSettingIndex: state.equip.equipSettingIndex,
-        equipSettingHeight: state.equip.equipSettingHeight
+        equipSettingHeight: state.equip.equipSettingHeight,
       }
     },
 

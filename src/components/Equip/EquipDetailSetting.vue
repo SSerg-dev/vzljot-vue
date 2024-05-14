@@ -51,6 +51,9 @@ export default {
     },
   },
   created() {
+    this.$emitter.on('equip-setting-value:update', this.update)
+    this.$emitter.on('set-params-equip-setting:update', this.change)
+
     this.$watch(
       () => this.equip,
       (value) => (this.localEquip = new Equip(value)),
@@ -63,8 +66,15 @@ export default {
     this.isVisible = false
   },
   methods: {
-    onSaved(data) {
-      this.component.text = `Набор: ${data.name}`
+    update(changedValues) {
+      const options = {
+        equipSettingSave: changedValues,
+      }
+      this.$store.commit('setEquip', options)
+      this.$emit('equip-setting-update', changedValues)
+    },
+    change(changedValues) {
+      this.$emit('equip-setting-update', changedValues)
     },
   }, // end methods
 }

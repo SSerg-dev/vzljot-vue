@@ -140,7 +140,6 @@ export default {
       (value) => (this.interval = value),
       { deep: true }
     )
-    
   },
 
   mounted() {

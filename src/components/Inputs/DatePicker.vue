@@ -1,11 +1,42 @@
 <template>
-  <div :class="['datepicker', { 'datepicker-clearable': clearable && text && !disabled }]">
-    <input ref="input" type="text" @keydown="keydown" :value="text" :class="[show ? 'focus' : '', inputClass]" :disabled="disabled" :placeholder="placeholder" :name="name" />
-    <span class="datepicker-icon fas fa-calendar-alt" @click="onIconClick" :disabled="disabled" />
-    <span class="datepicker-close fas fa-times" @click.stop="cls" :disabled="disabled" />
+  <div
+    :class="[
+      'datepicker',
+      { 'datepicker-clearable': clearable && text && !disabled },
+    ]"
+  >
+    <input
+      ref="input"
+      type="text"
+      @keydown="keydown"
+      :value="text"
+      :class="[show ? 'focus' : '', inputClass]"
+      :disabled="disabled"
+      :placeholder="placeholder"
+      :name="name"
+    />
+    <span
+      class="datepicker-icon fas fa-calendar-alt"
+      @click="onIconClick"
+      :disabled="disabled"
+    />
+    <span
+      class="datepicker-close fas fa-times"
+      @click.stop="cls"
+      :disabled="disabled"
+    />
     <transition name="datepicker-anim">
-      <div class="datepicker-popup" :class="[popupClass]" tabindex="-1" v-if="show">
-        <date-picker-calendar v-model:value="date" v-bind="{ disabledDate, format, local }" @input="ok" />
+      <div
+        class="datepicker-popup"
+        :class="[popupClass]"
+        tabindex="-1"
+        v-if="show"
+      >
+        <date-picker-calendar
+          v-model:value="date"
+          v-bind="{ disabledDate, format, local }"
+          @input="ok"
+        />
       </div>
     </transition>
   </div>
@@ -22,23 +53,23 @@ export default {
     popupClass: [String],
     modelValue: {
       type: [Date, Array, String, Number],
-      default: () => new Date()
+      default: () => new Date(),
     },
     disabled: [Boolean],
     clearable: {
       type: Boolean,
-      default: false
+      default: false,
     },
     placeholder: [String],
     disabledDate: {
       type: Function,
       default: () => {
         return false
-      }
+      },
     },
     format: {
       type: String,
-      default: 'DD.MM.YYYY'
+      default: 'DD.MM.YYYY',
     },
     local: {
       type: Object,
@@ -49,35 +80,38 @@ export default {
           minuteTip: 'Выберите минуту', // tip of select minute
           secondTip: 'Выберите секунду', // tip of select second
           yearSuffix: '',
-          monthsHead: 'Январь_Февраль_Март_Апрель_Май_Июнь_Июль_Август_Сентябрь_Октябрь_Ноябрь_Декабрь'.split('_'), // months of head
+          monthsHead:
+            'Январь_Февраль_Март_Апрель_Май_Июнь_Июль_Август_Сентябрь_Октябрь_Ноябрь_Декабрь'.split(
+              '_'
+            ), // months of head
           months: 'Янв_Фев_Мар_Апр_Май_Июн_Июл_Авг_Сен_Окт_Ноя_Дек'.split('_'), // months of panel
-          weeks: 'Пн_Вт_Ср_Чт_Пт_Сб_Вс'.split('_') // weeks
+          weeks: 'Пн_Вт_Ср_Чт_Пт_Сб_Вс'.split('_'), // weeks
         }
-      }
-    }
+      },
+    },
   },
   data() {
     return {
       show: false,
-      date: this.vi(this.modelValue)
+      date: this.vi(this.modelValue),
     }
   },
   emits: ['update:modelValue', 'input'],
   provide() {
     return {
       toFormat: this.toFormat,
-      disabledDate: this.disabledDate
+      disabledDate: this.disabledDate,
     }
   },
   computed: {
     text() {
       return this.modelValue ? this.toFormat(this.date) : ''
-    }
+    },
   },
   watch: {
     modelValue() {
       this.date = this.vi(this.modelValue)
-    }
+    },
   },
   methods: {
     keydown(event) {
@@ -93,11 +127,19 @@ export default {
           break
         case 'Left':
         case 'ArrowLeft':
-          this.setSelection(new Date(this.modelValue), this.getCursorPosition(this.$refs.input), -1)
+          this.setSelection(
+            new Date(this.modelValue),
+            this.getCursorPosition(this.$refs.input),
+            -1
+          )
           break
         case 'Right':
         case 'ArrowRight':
-          this.setSelection(new Date(this.modelValue), this.getCursorPosition(this.$refs.input), 1)
+          this.setSelection(
+            new Date(this.modelValue),
+            this.getCursorPosition(this.$refs.input),
+            1
+          )
           break
       }
     },
@@ -108,7 +150,7 @@ export default {
       const positions = {}
       const mask = this.getMask(value, this.format)
 
-      symbols.forEach(symbol => {
+      symbols.forEach((symbol) => {
         let pos = mask.indexOf(symbol)
         if (pos > -1) {
           positions[symbol] = { start: pos, end: mask.lastIndexOf(symbol) + 1 }
@@ -117,7 +159,7 @@ export default {
 
       const reduced = {}
 
-      this.format.split('').forEach(symbol => {
+      this.format.split('').forEach((symbol) => {
         let pos = symbols.indexOf(symbol)
         if (pos > -1) {
           reduced[symbol] = true
@@ -132,7 +174,9 @@ export default {
       }
 
       let maskLength = mask.length
-      let char = mask.charAt(maskLength === position ? (maskLength += -1) : position)
+      let char = mask.charAt(
+        maskLength === position ? (maskLength += -1) : position
+      )
       let groupPosition = reduced[char] + direction
 
       switch (groupPosition) {
@@ -147,7 +191,10 @@ export default {
           break
       }
       if (char !== '') {
-        if (this.$refs.input.selectionStart || this.$refs.input.selectionStart === 0) {
+        if (
+          this.$refs.input.selectionStart ||
+          this.$refs.input.selectionStart === 0
+        ) {
           this.$refs.input.selectionStart = positions[char].start
           this.$refs.input.selectionEnd = positions[char].end
         }
@@ -168,9 +215,24 @@ export default {
       let seconds = value.getSeconds()
       let milliseconds = value.getMilliseconds()
 
-      const dayInMonth = [31, (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
+      const dayInMonth = [
+        31,
+        (year % 4 === 0 && year % 100 !== 0) || year % 400 === 0 ? 29 : 28,
+        31,
+        30,
+        31,
+        30,
+        31,
+        31,
+        30,
+        31,
+        30,
+        31,
+      ]
 
-      switch (mask.charAt(maskLength === position ? (maskLength += -1) : position)) {
+      switch (
+        mask.charAt(maskLength === position ? (maskLength += -1) : position)
+      ) {
         case 'Y':
           year += diff
           break
@@ -208,7 +270,15 @@ export default {
           break
       }
 
-      const date = new Date(year, month, day, hour, minutes, seconds, milliseconds)
+      const date = new Date(
+        year,
+        month,
+        day,
+        hour,
+        minutes,
+        seconds,
+        milliseconds
+      )
 
       this.$emit('update:modelValue', date)
       this.$emit('input', date)
@@ -248,7 +318,7 @@ export default {
       const minutes = time.getMinutes()
       const seconds = time.getSeconds()
       const milliseconds = time.getMilliseconds()
-      const dd = t => ('0' + t).slice(-2)
+      const dd = (t) => ('0' + t).slice(-2)
       return {
         YYYY: year,
         MM: dd(month + 1),
@@ -265,7 +335,7 @@ export default {
         m: minutes,
         ss: dd(seconds),
         s: seconds,
-        S: ('000' + milliseconds).slice(-3)
+        S: ('000' + milliseconds).slice(-3),
       }
     },
     getMask(time, format) {
@@ -278,11 +348,17 @@ export default {
       }
       const map = this.getMap(time)
 
-      return (format || this.format).replace(/Y+|M+|D+|H+|h+|m+|s+|S+/g, str => mask(map[str], str.toString()[0]))
+      return (format || this.format).replace(
+        /Y+|M+|D+|H+|h+|m+|s+|S+/g,
+        (str) => mask(map[str], str.toString()[0])
+      )
     },
     toFormat(time, format) {
       const map = this.getMap(time)
-      return (format || this.format).replace(/Y+|M+|D+|H+|h+|m+|s+|S+/g, str => map[str])
+      return (format || this.format).replace(
+        /Y+|M+|D+|H+|h+|m+|s+|S+/g,
+        (str) => map[str]
+      )
     },
     hide(e) {
       if (!this.$el.contains(e.target)) {
@@ -291,14 +367,14 @@ export default {
     },
     async onIconClick() {
       this.show = !this.show && !this.disabled
-    }
+    },
   },
   mounted() {
     document.addEventListener('click', this.hide)
   },
   beforeUnmount() {
     document.removeEventListener('click', this.hide)
-  }
+  },
 }
 </script>
 

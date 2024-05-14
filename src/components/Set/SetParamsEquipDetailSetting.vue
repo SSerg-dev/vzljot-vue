@@ -19,7 +19,6 @@
       <header class="header header-pass-check">
         Разрешить пропускать проверку настроек
       </header>
-
       <div
         v-for="(r, i) in localItemsSorted"
         :key="i"
@@ -41,14 +40,14 @@
             v-model="r.timeStart"
             :format="dateFormat"
             clearable
-            @update:modelValue="handleEquipSettingDate($event)"
+            @update:modelValue="handleEquipSettingDate($event, i)"
           />
         </span>
 
         <span class="cell check-box">
           <check-box
             v-model="r.checked"
-            @update:modelValue="handlePassSettingCheck($event)"
+            @update:modelValue="handlePassSettingCheck($event, i)"
           ></check-box>
         </span>
       </div>
@@ -127,7 +126,13 @@ export default {
       rowsElement: {},
 
       dateFormat: 'DD.MM.YYYY',
-      currentDate: new Date()
+      currentDate: new Date(),
+
+      coeff: 24,
+      localItemsSorted: [],
+
+      localTimeStart: null,
+      localProperties: null,
     }
   },
   created() {
@@ -135,6 +140,9 @@ export default {
   },
   async mounted() {
     await this.load()
+    this.localItemsSorted = this.localItems
+      .slice()
+      .sort((a, b) => new Date(a.timeStart) - new Date(b.timeStart))
   },
   computed: {
     ...mapGetters({
@@ -144,16 +152,10 @@ export default {
       const minHeight = 88
       const itemHeight = 34
       const itemCount = this.localItems.length
-      const coeff = 24
 
       return `calc(${minHeight}px + ${
-        itemCount * itemHeight + this.getEquip.equipSettingHeight * coeff
+        itemCount * itemHeight + this.getEquip.equipSettingHeight * this.coeff
       }px)`
-    },
-    localItemsSorted() {
-      return this.localItems.slice().sort((a, b) => {
-        return new Date(a.timeStart) - new Date(b.timeStart)
-      })
     },
   },
   beforeUnmount() {
@@ -164,19 +166,50 @@ export default {
       this.pageInfo.Size = size
       this.pageInfo.Page = page
     },
-    handleEquipSettingDate(event) {
-      event
-      // let changedEquipSettingDate = new Date(event)
+    handleEquipSettingDate(event, i) {
+      this.localTimeStart = new Date(event)
+      this.localProperties = this.dataItems[i].properties
+  
+      this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
+
+      const changedValues = this.localTimeStart
+      this.$emitter.emit('set-params-equip-setting:update', changedValues)
     },
-    handlePassSettingCheck(event) {
-      event
-      // console.log('$$ event', event)
+    handlePassSettingCheck(event, i) {
+      this.localTimeStart = this.dataItems[i].timeStart
+      this.localProperties = event ? 1 : 0
+
+      this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
+
+      const changedValues = this.localProperties
+      this.$emitter.emit('set-params-equip-setting:update', changedValues)
     },
-    viewClick(r, i) {
+    setEquipSettingTable(i, timeStart, properties) {
+      const equipSettingTable = {
+        id: this.dataItems[i].id,
+        equipId: this.$store.state.equip.id,
+        timeStart,
+        properties,
+      }
+      console.log(
+        '$$ detail setting equipSettingTable',
+        JSON.stringify(equipSettingTable)
+      )
+
       const options = {
         equipSettingIndex: i,
+        equipSetting: this.dataItems,
+        equipSettingTable,
       }
+
       this.$store.commit('setEquip', options)
+    },
+
+    viewClick(r, i) { 
+      this.localTimeStart = this.dataItems[i].timeStart
+      this.localProperties = this.dataItems[i].properties
+
+      this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
 
       const obj = new Set(r)
       this.componentData = {
@@ -214,11 +247,6 @@ export default {
             checked: r.properties === 1 ? true : false,
           })
         })
-
-        const options = {
-          equipSetting: this.dataItems,
-        }
-        this.$store.commit('setEquip', options)
       } catch (error) {
         this.$store.commit('error', error)
       } finally {
