@@ -1,76 +1,78 @@
 import BaseObject from '@/classes/base/baseObject'
 import { store } from '@/store/store'
 import { EquipSettingTable } from '@/store/equip'
+import { log } from './utils/common.functions'
 
 interface IEquipSetting {
   uuid?: string
-  // id?: number
-  // name?: string
-  equipSettings?: Array<IEquipSettingItem> | null
+  id?: number
+  name?: string
   equipSettingTable?: EquipSettingTable | null
+  equipSettings?: Array<IEquipSettingItem> | null
 }
 
 interface IEquipSettingItem {
-  id: number
+  id: number | null
   caption: string | null
   name: string | null
   value: string | null
 }
 
 interface IProps {
-  equipSettings?: Array<IEquipSettingItem> | null
   equipSettingTable?: EquipSettingTable | null
+  equipSettings?: Array<IEquipSettingItem> | null
 }
 
-export class EquipSetting extends BaseObject {
-  equipSettings?: Array<IEquipSettingItem> | null
+export default class EquipSetting extends BaseObject {
+  id?: number | undefined
+  name?: string
+
   equipSettingTable?: EquipSettingTable | null
+  equipSettings?: Array<IEquipSettingItem> | null
 
   constructor({
     uuid = undefined,
 
-    // id = undefined,
-    // name = '',
-    equipSettings = [],
+    id = undefined,
+    name = '',
+
     equipSettingTable = null,
+    equipSettings = [],
   }: IEquipSetting) {
     super(uuid)
 
-    // this.id = id
-    // this.name = name
+    this.id = id
+    this.name = name
 
-    this.equipSettings = equipSettings
     this.equipSettingTable = equipSettingTable
+    this.equipSettings = equipSettings
   }
 
-  async init(id: number) {
-    if (!Number.isNaN(id)) {
-      // const { data } = await this.http.get<Set>('set/edit', { params: { id } })
-      // this.id = data.id
-      // this.name = data.name
-    }
-  }
+  async init(id: number) {}
 
   async save() {
-    // const obj = {
-    //   id: this.id,
-    //   name: this.name,
-    // } 
-
     const props: IProps = {
-      equipSettings: this.equipSettings,
       equipSettingTable: this.equipSettingTable,
-    }
-
-    this.equipSettings = EquipSetting.store.state.equip.equipSettingSave
-    if (this.equipSettings) {
-      props.equipSettings = this.equipSettings 
+      equipSettings: this.equipSettings,
     }
 
     this.equipSettingTable = EquipSetting.store.state.equip.equipSettingTable
     if (this.equipSettingTable) {
       props.equipSettingTable = this.equipSettingTable
     }
-    // const { data } = await this.http.post('set/save', obj)
+
+    this.equipSettings = EquipSetting.store.state.equip.equipSettingSave
+    if (this.equipSettings) {
+      props.equipSettings = this.equipSettings
+    }
+
+    const { data } = await this.http.post('equip/updateEquipSettings', props, {
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
   }
+
+  addEquipSetting() {}
+  removeEquipSetting() {}
 }

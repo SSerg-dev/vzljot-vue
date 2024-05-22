@@ -34,7 +34,7 @@ export default {
     },
     editName: {
       type: String,
-      default: () => '', 
+      default: () => '',
     },
   },
   data: () => ({
@@ -69,8 +69,9 @@ export default {
         id: selectedId,
         caption: selectedValue,
         name: this.param.name,
-        value: selectedId
+        value: selectedId,
       }
+
       this.$emitter.emit('equip-setting-value:update', changedValues)
     },
 

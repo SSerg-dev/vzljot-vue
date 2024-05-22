@@ -71,7 +71,7 @@ export default {
       this.$emitter.emit('endComponentWizard', { id: this.id, type: this.type, key: this.key, ...data })
     },
     onSaveClick() {
-      this.save()
+      this.save() 
     }
   }
 }

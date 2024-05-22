@@ -1,5 +1,5 @@
 <template>
-  <div v-if="isVisible">
+  <div>
     <set-params-equip-detail-setting />
   </div>
 </template>
@@ -52,7 +52,9 @@ export default {
   },
   created() {
     this.$emitter.on('equip-setting-value:update', this.update)
-    this.$emitter.on('set-params-equip-setting:update', this.change)
+    this.$emitter.on('set-params-equip-setting:update', this.change) 
+
+    this.$emitter.on('equip-setting-value:update', this.change)
 
     this.$watch(
       () => this.equip,

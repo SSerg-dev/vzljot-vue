@@ -385,10 +385,14 @@
       />
     </expantion-panel>
 
-    <expantion-panel caption="Настройки прибора (просмотр)" :opened="false">
+    <expantion-panel
+      caption="Настройки прибора"
+      :opened="false"
+      style="display: none"
+    >
       <equip-detail-setting
         v-bind="{ equip: localEquip }"
-        @equip-setting-update="updatedEquipSetting"
+        @equip-setting-update="updatedEquipSetting" 
       />
     </expantion-panel>
 
@@ -509,7 +513,10 @@ export default {
       return false
     },
   },
+
   async mounted() {
+    this.$emitter.emit('equip-detail:equip', this.localEquip)
+
     this.$emit('mounted')
     if (!this.localEquip.id) {
       this.create(this.localEquip.parentId, this.localEquip.type)

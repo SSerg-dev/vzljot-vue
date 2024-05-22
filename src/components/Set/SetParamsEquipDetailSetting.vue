@@ -15,10 +15,6 @@
     <div class="table-grid" style="width: 100%">
       <header class="header"></header>
       <header class="header header-date">Наименование</header>
-      <header class="header header-date">Дата ввода</header>
-      <header class="header header-pass-check">
-        Разрешить пропускать проверку настроек
-      </header>
       <div
         v-for="(r, i) in localItemsSorted"
         :key="i"
@@ -33,28 +29,13 @@
           />
         </span>
 
-        <span class="cell" style="justify-content: center">{{ r.name }}</span>
-
-        <span class="cell date-picker">
-          <date-picker
-            v-model="r.timeStart"
-            :format="dateFormat"
-            clearable
-            @update:modelValue="handleEquipSettingDate($event, i)"
-          />
-        </span>
-
-        <span class="cell check-box">
-          <check-box
-            v-model="r.checked"
-            @update:modelValue="handlePassSettingCheck($event, i)"
-          ></check-box>
-        </span>
+        <span class="cell caption">{{
+          `${r.name.replace(' 12', ' 12')}`
+        }}</span>
       </div>
     </div>
 
     <pager-component v-bind="pageInfo" @go="onChangePage" />
-    <spinner :show="wait" :text="'Загрузка настроек...'" />
 
     <transition-group>
       <wizard
@@ -128,7 +109,7 @@ export default {
       dateFormat: 'DD.MM.YYYY',
       currentDate: new Date(),
 
-      coeff: 24,
+      coeff: 32,
       localItemsSorted: [],
 
       localTimeStart: null,
@@ -166,24 +147,6 @@ export default {
       this.pageInfo.Size = size
       this.pageInfo.Page = page
     },
-    handleEquipSettingDate(event, i) {
-      this.localTimeStart = new Date(event)
-      this.localProperties = this.dataItems[i].properties
-  
-      this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
-
-      const changedValues = this.localTimeStart
-      this.$emitter.emit('set-params-equip-setting:update', changedValues)
-    },
-    handlePassSettingCheck(event, i) {
-      this.localTimeStart = this.dataItems[i].timeStart
-      this.localProperties = event ? 1 : 0
-
-      this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
-
-      const changedValues = this.localProperties
-      this.$emitter.emit('set-params-equip-setting:update', changedValues)
-    },
     setEquipSettingTable(i, timeStart, properties) {
       const equipSettingTable = {
         id: this.dataItems[i].id,
@@ -191,10 +154,6 @@ export default {
         timeStart,
         properties,
       }
-      console.log(
-        '$$ detail setting equipSettingTable',
-        JSON.stringify(equipSettingTable)
-      )
 
       const options = {
         equipSettingIndex: i,
@@ -204,8 +163,7 @@ export default {
 
       this.$store.commit('setEquip', options)
     },
-
-    viewClick(r, i) { 
+    viewClick(r, i) {
       this.localTimeStart = this.dataItems[i].timeStart
       this.localProperties = this.dataItems[i].properties
 
@@ -216,7 +174,7 @@ export default {
         component: 'set-component',
         uuid: null, //obj.uuid,
         image: obj.image,
-        text: `Настройка прибора: ${r.name}`,
+        text: `Настройка прибора: ${r.name.replace(' 12', ' 12')}`,
         data: {
           uuid: obj.uuid,
           id: r.id,
@@ -259,7 +217,8 @@ export default {
 
 <style scoped>
 .table-grid {
-  grid-template-columns: 38px repeat(2, max-content) minmax(max-content, 1fr);
+  /* grid-template-columns: 38px repeat(2, max-content) minmax(max-content, 1fr); */
+  grid-template-columns: 38px 240px;
 }
 .header-date,
 .header-name,
@@ -268,18 +227,6 @@ export default {
   justify-content: center;
 }
 .caption {
-  width: 640px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1rem;
-}
-.date-picker {
-  width: 100px;
-}
-.check-box {
-  display: flex;
-  align-items: center;
   justify-content: end;
 }
 </style>

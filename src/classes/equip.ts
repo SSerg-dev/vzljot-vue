@@ -120,7 +120,6 @@ interface IEquip {
   equipTypeModificationId?: number | null
   equipSettings?: Array<EquipSetting> | null
   equipSettingTable?: EquipSettingTable | null
-
 }
 
 interface ColdWater {
@@ -140,7 +139,7 @@ interface EquipSetting {
 }
 
 export class Equip extends BaseObject {
-  editable = Equip.store.state.user?.userRights.equipEdit 
+  editable = Equip.store.state.user?.userRights.equipEdit
 
   id?: number
   parentId?: number
@@ -168,7 +167,7 @@ export class Equip extends BaseObject {
   timeNextChecking?: Number | null
   equipTypeModificationId?: number | null
   equipSettings?: Array<EquipSetting> | null
-  equipSettingTable?: EquipSettingTable | null 
+  equipSettingTable?: EquipSettingTable | null
 
   constructor({
     uuid = undefined,
@@ -216,7 +215,7 @@ export class Equip extends BaseObject {
     timeNextChecking = null,
     equipTypeModificationId = null,
     equipSettings = [],
-    equipSettingTable = null
+    equipSettingTable = null,
   }: IEquip) {
     super(uuid)
 
@@ -314,7 +313,7 @@ export class Equip extends BaseObject {
 
   async init(id: number): Promise<void> {
     const { data } = await this.http.get('equip/equip', { params: { id } })
-    
+
     this.id = data.id
     this.name = data.name
     this.note = data.note
@@ -383,7 +382,7 @@ export class Equip extends BaseObject {
       analyze: this.analyze,
       coldWater: this.coldWater,
       equipSettings: this.equipSettings,
-      equipSettingTable: this.equipSettingTable 
+      equipSettingTable: this.equipSettingTable,
     }
 
     if (this.isBusAddressVisible(this.equipType)) {
@@ -484,12 +483,11 @@ export class Equip extends BaseObject {
 
     this.equipSettings = Equip.store.state.equip.equipSettingSave
     if (this.equipSettings) {
-      props.equipSettings = this.equipSettings 
+      props.equipSettings = this.equipSettings
     }
 
     this.equipSettingTable = Equip.store.state.equip.equipSettingTable
     if (this.equipSettingTable) {
-      console.log('$$ save this.equipSettingTable', JSON.stringify(this.equipSettingTable))
       props.equipSettingTable = this.equipSettingTable
     }
 

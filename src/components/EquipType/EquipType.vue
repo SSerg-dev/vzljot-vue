@@ -1,17 +1,45 @@
 <template>
   <div class="component-detail">
-    <preserver-component v-bind="{ readOnly: !$store.state.user?.userRights.equipTypeEdit, saving, disabled: !hasChanges || loading || modificationEdit, loading }" @saveClick="onSaveClick()">
+    <preserver-component
+      v-bind="{
+        readOnly: !$store.state.user?.userRights.equipTypeEdit,
+        saving,
+        disabled: !hasChanges || loading || modificationEdit,
+        loading,
+      }"
+      @saveClick="onSaveClick()"
+    >
       <tabs>
         <tab text="Параметры">
-          <equip-type-props v-bind="Object.assign(equipType, { error })" @change="onChangeProps" />
+          <equip-type-props
+            v-bind="Object.assign(equipType, { error })"
+            @change="onChangeProps"
+          />
         </tab>
         <tab text="Исполнения">
-          <modifications-list v-bind="{ items: equipType.modifications, isPressure: equipType.isPressure, isTemperature: equipType.isTemperature, isVolume: equipType.isVolume, isWeight: equipType.isWeight }" @edit="onEditModification" @add="onAddModification" @remove="onRemoveModification" />
+          <modifications-list
+            v-bind="{
+              items: equipType.modifications,
+              isPressure: equipType.isPressure,
+              isTemperature: equipType.isTemperature,
+              isVolume: equipType.isVolume,
+              isWeight: equipType.isWeight,
+            }"
+            @edit="onEditModification"
+            @add="onAddModification"
+            @remove="onRemoveModification"
+          />
         </tab>
       </tabs>
     </preserver-component>
     <transition-group>
-      <wizard v-if="wizard" v-bind="wizard" @cancel="cancelWizard" @end="onWizardEnd" key="0" />
+      <wizard
+        v-if="wizard"
+        v-bind="wizard"
+        @cancel="cancelWizard"
+        @end="onWizardEnd"
+        key="0"
+      />
       <spinner :show="loading" :text="'Загрузка...'" key="1" />
     </transition-group>
   </div>
@@ -33,13 +61,13 @@ export default {
     ModificationsList,
     PreserverComponent,
     Tab,
-    Tabs
+    Tabs,
   },
   extends: BaseComponent,
   data() {
     return {
       modificationEdit: false,
-      equipType: new EquipType({})
+      equipType: new EquipType({}),
     }
   },
   async mounted() {
@@ -55,8 +83,10 @@ export default {
     onChangeProps(prop, value) {
       this.equipType[prop] = value
 
-      if (['isTemperature', 'isPressure', 'isVolume', 'isWeight'].includes(prop)) {
-        this.equipType.modifications.forEach(r => (r[prop] = value))
+      if (
+        ['isTemperature', 'isPressure', 'isVolume', 'isWeight'].includes(prop)
+      ) {
+        this.equipType.modifications.forEach((r) => (r[prop] = value))
       }
 
       this.hasChanges = true
@@ -91,8 +121,8 @@ export default {
       } finally {
         this.saving = false
       }
-    }
-  }
+    },
+  },
 }
 </script>
 
