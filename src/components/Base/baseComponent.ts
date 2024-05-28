@@ -10,7 +10,10 @@ export type SaveEvent = {
   close: boolean
 }
 
-export function setupComponent<TObject extends { id?: number; uuid?: string, editable?: boolean }, TError extends object>(
+export function setupComponent<
+  TObject extends { id?: number; uuid?: string; editable?: boolean },
+  TError extends object
+>(
   item: TObject,
   error: TError,
   emit?: (event: string, ...args: any[]) => void
@@ -41,9 +44,9 @@ export function setupComponent<TObject extends { id?: number; uuid?: string, edi
             text: 'Сохранение:',
             component: 'message',
             data: {
-              text: 'Данные были изменены. Сохранить изменения?'
-            }
-          }
+              text: 'Данные были изменены. Сохранить изменения?',
+            },
+          },
         }
       } else {
         emitter?.emit('close', { uuid: event.uuid })
@@ -72,7 +75,7 @@ export function setupComponent<TObject extends { id?: number; uuid?: string, edi
       await (localItem.value as any).init(item.id)
       watch(
         () => localItem.value,
-        value => {
+        (value) => {
           if (value.hasOwnProperty('editable')) {
             if (value.editable) {
               hasChanges.value = true
@@ -148,11 +151,14 @@ export function setupComponent<TObject extends { id?: number; uuid?: string, edi
     onWizardEnd,
     save,
     saving,
-    wizard
+    wizard,
   }
 }
 
-export function setupTreeComponent<TObject extends object, TError extends object>(uuid: string, id: number, item: TObject, error: TError) {
+export function setupTreeComponent<
+  TObject extends object,
+  TError extends object
+>(uuid: string, id: number, item: TObject, error: TError) {
   const emitter = inject<
     Emitter<{
       beforeNodeChange: { uuid: string; node: any; target: any }
@@ -169,18 +175,18 @@ export function setupTreeComponent<TObject extends object, TError extends object
   const saving = ref(false)
   const wizard = ref<any>()
 
-  onMounted(async () => { 
+  onMounted(async () => {
     try {
       await (localItem.value as any).init(id)
 
       const options = {
-        nodeChange: localItem.value
+        nodeChange: localItem.value,
       }
       store.commit('setCard', options)
 
       watch(
         () => localItem.value,
-        value => {
+        (value) => {
           if ((value as any).hasOwnProperty('editable')) {
             if ((value as any).editable) {
               hasChanges.value = true
@@ -209,7 +215,7 @@ export function setupTreeComponent<TObject extends object, TError extends object
 
   function onBeforeChange(event: { uuid: string; node: any; target: any }) {
     if (event.uuid === uuid) {
-      if (hasChanges.value) {
+      if (hasChanges.value && !store.state.equip.hasNotSave) {
         wizard.value = {
           event,
           name: 'save',
@@ -217,13 +223,17 @@ export function setupTreeComponent<TObject extends object, TError extends object
             text: 'Сохранение:',
             component: 'message',
             data: {
-              text: 'Данные были изменены. Сохранить изменения?'
-            }
-          }
+              text: 'Данные были изменены. Сохранить изменения?',
+            },
+          },
         }
       } else {
-        emitter?.emit('afterNodeChange', { node: event.node, target: event.target })
+        emitter?.emit('afterNodeChange', {
+          node: event.node,
+          target: event.target,
+        })
       }
+      store.state.equip.hasNotSave = false
     }
   }
 
@@ -233,7 +243,10 @@ export function setupTreeComponent<TObject extends object, TError extends object
 
     if (name === 'save') {
       save()
-      emitter?.emit('afterNodeChange', { node: event.node, target: event.target })
+      emitter?.emit('afterNodeChange', {
+        node: event.node,
+        target: event.target, 
+      })
     }
   }
 
@@ -248,7 +261,7 @@ export function setupTreeComponent<TObject extends object, TError extends object
       saving.value = true
 
       localError.value = new (localError.value as any).constructor({})
-      
+
       await (localItem.value as any).save()
 
       hasChanges.value = false
@@ -264,11 +277,14 @@ export function setupTreeComponent<TObject extends object, TError extends object
         }
       }
     } finally {
-      saving.value = false 
+      saving.value = false
     }
   }
 
-  function onChanged<Key extends keyof TObject>(key: Key, value: ValueOf<TObject>) {
+  function onChanged<Key extends keyof TObject>(
+    key: Key,
+    value: ValueOf<TObject>
+  ) {
     if ((localItem.value as any).hasOwnProperty('editable')) {
       if ((localItem.value as any).editable) {
         (localItem.value as any)[key] = value
@@ -288,6 +304,6 @@ export function setupTreeComponent<TObject extends object, TError extends object
     onWizardEnd,
     save,
     saving,
-    wizard
+    wizard,
   }
 }

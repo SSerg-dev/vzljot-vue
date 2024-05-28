@@ -216,6 +216,7 @@ export const store = createStore<State>({
         state.equip.equipSettingIndex = payload.equipSettingIndex
       if (payload.equipSettingHeight > 0)
         state.equip.equipSettingHeight = payload.equipSettingHeight
+      if (payload.hasNotSave) state.equip.hasNotSave = payload.hasNotSave
     },
   },
   getters: {
@@ -254,6 +255,7 @@ export const store = createStore<State>({
         equipSettingSave: state.equip.equipSettingSave,
         equipSettingIndex: state.equip.equipSettingIndex,
         equipSettingHeight: state.equip.equipSettingHeight,
+        hasNotSave: state.equip.hasNotSave,
       }
     },
 

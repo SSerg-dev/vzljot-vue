@@ -71,6 +71,13 @@ import Wizard from '@/components/Wizard.vue'
 import DatePicker from '@/components/Inputs/DatePicker.vue'
 import CheckBox from '@/components/Inputs/CheckBox.vue'
 
+import {
+  // wizardAdd,
+  // wizardRemove,
+  // cancelWizard,
+  // onWizardEnd
+} from '@/plugins/wizardComponents/wizardEquipSetting'
+
 import { mapGetters } from 'vuex'
 
 export default {
@@ -79,6 +86,9 @@ export default {
     PagerComponent,
     SetComponent: asyncImport(() =>
       import('@/components/Set/SetParamsEquipDetailSettingView.vue')
+    ),
+    SetComponentNew: asyncImport(() =>
+      import('@/components/Set/SetParamsEquipDetailSettingNew.vue')
     ),
 
     PropsComponent,
@@ -114,10 +124,13 @@ export default {
 
       localTimeStart: null,
       localProperties: null,
+
+      wizardEquipSetting: null,
     }
   },
   created() {
     this.$emitter.on('message', this.processMessage)
+    this.currentDate = this.getCurrentDate()
   },
   async mounted() {
     await this.load()
@@ -164,8 +177,8 @@ export default {
       this.$store.commit('setEquip', options)
     },
     viewClick(r, i) {
-      this.localTimeStart = this.dataItems[i].timeStart
-      this.localProperties = this.dataItems[i].properties
+      this.localTimeStart = this.localItemsSorted[i].timeStart
+      this.localProperties = this.localItemsSorted[i].properties
 
       this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
 
@@ -183,7 +196,6 @@ export default {
           equipTypeId: this.equipTypeId,
         },
       }
-
       this.edit = true
     },
     onSaved(data) {
@@ -210,6 +222,42 @@ export default {
       } finally {
         this.wait = false
       }
+    },
+    async onAddClick() {
+      // this.wizardEquipSetting = wizardAdd('AAAAAA')
+      /*
+      this.setEquipSettingTable(0, (new Date()), 0) 
+      
+      const r = this.localItemsSorted[0]
+
+      const obj = new Set(r)
+      this.componentData = {
+        component: 'set-component-new', 
+        uuid: null,
+        image: obj.image,
+        text: `Создать: ${this.currentDate}`,
+        data: {
+          uuid: obj.uuid,
+          id: r.id,
+          purposeGroup: r.setType,
+          equipId: this.id,
+          equipTypeId: this.equipTypeId,
+        },
+      }
+      this.edit = true
+      */
+    },
+    onRemoveClick() {
+      // this.wizardEquipSetting = wizardRemove('BBBBBB')
+    },
+    getCurrentDate() {
+      const now = new Date()
+      const day = String(now.getDate()).padStart(2, '0')
+      const month = String(now.getMonth() + 1).padStart(2, '0')
+      const year = now.getFullYear()
+      const hours = String(now.getHours()).padStart(2, '0')
+
+      return `${day}-${month}-${year} ${hours}`
     },
   }, // end methods
 }

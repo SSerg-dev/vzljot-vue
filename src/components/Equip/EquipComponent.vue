@@ -19,7 +19,7 @@
         </preserver-component>
       </tabx>
 
-      <tab text="Настройки прибора (просмотр)">
+      <tab text="Настройки прибора">
         <equip-detail-setting />
       </tab>
 

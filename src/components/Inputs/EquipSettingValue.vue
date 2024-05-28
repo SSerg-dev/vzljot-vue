@@ -1,11 +1,10 @@
 <template>
-  <div>
+  <div> 
     <select
       ref="selectElement"
       @change="handleOptionChange"
       @mousedown="enableSelect"
     >
-      <!-- :disabled="hasDisabled(item)" -->
       <option
         v-for="(item, index) in items"
         :key="index"
@@ -36,6 +35,10 @@ export default {
       type: String,
       default: () => '',
     },
+    mode: {
+      type: String,
+      default: () => ''
+    }
   },
   data: () => ({
     items: {},

@@ -42,7 +42,7 @@
         <header class="header header-date">Значение</header>
 
         <div
-          v-for="(r, i) in localEquipSettingSorted[getEquip.equipSettingIndex]
+          v-for="(r, i) in getEquip.equipSetting[getEquip.equipSettingIndex]
             .detailArray"
           :key="i"
           class="table-row"
@@ -56,7 +56,7 @@
             r.caption
           }}</span>
           <span class="cell" style="justify-content: end"
-            ><EquipSettingValue :param="r" :editName="editName" :mode="mode" />
+            ><EquipSettingValue :param="r" :editName="editName" :mode="mode"/>
           </span>
         </div>
       </div>
@@ -99,7 +99,7 @@ import EquipSettingValue from '@/components/Inputs/EquipSettingValue.vue'
 import { mapGetters } from 'vuex'
 
 export default {
-  name: 'SetComponentEquipDetailSettingView',
+  name: 'SetComponentEquipDetailSettingNew',
   components: {
     PropsComponent,
     ToolBar,
@@ -139,10 +139,9 @@ export default {
       localTimeStart: null,
       localProperties: null,
       localEquipSettingId: null,
-      localEquipSettingSorted: [],
 
       equipSetting: new EquipSetting({}),
-      mode: 'change',
+      mode: 'create'
     }
   },
 
@@ -156,12 +155,23 @@ export default {
       ].detailArray.length
 
     this.$store.getters.pageInfo.Items = this.pageInfo.Items
-
-    this.init()
   },
 
   async mounted() {
+    const options = {
+      equipSettingHeight:
+        this.getEquip.equipSetting[this.getEquip.equipSettingIndex].detailArray
+          .length,
+    }
+
+    this.$store.commit('setEquip', options)
     this.hasChanges = false
+
+    this.localSettingEquipId =
+      this.getEquip.equipSetting[this.getEquip.equipSettingIndex].id
+
+    this.localTimeStart = new Date()
+    this.localProperties = false
   },
 
   computed: {
@@ -173,40 +183,9 @@ export default {
     },
   },
 
-  beforeUnmount() {
-  },
+  beforeUnmount() {},
 
   methods: {
-    init() {
-      this.localEquipSettingSorted = this.getEquip.equipSetting
-        .slice()
-        .sort((a, b) => new Date(a.timeStart) - new Date(b.timeStart))
-
-      this.localEquipSettingId =
-        this.localEquipSettingSorted[this.getEquip.equipSettingIndex].id
-
-      this.localTimeStart =
-        this.localEquipSettingSorted[this.getEquip.equipSettingIndex].timeStart
-
-      this.localProperties = this.localEquipSettingSorted[
-        this.getEquip.equipSettingIndex
-      ].properties
-        ? true
-        : false
-
-      const options = {
-        equipSettingTable: {
-          id: this.localEquipSettingId,
-          timeStart: this.localTimeStart,
-          properties: this.localProperties,
-        },
-        equipSettingHeight:
-          this.localEquipSettingSorted[this.getEquip.equipSettingIndex]
-            .detailArray.length,
-      }
-      this.$store.commit('setEquip', options)
-    },
-
     onChangePage(page, size) {
       this.pageInfo.Size = size
       this.pageInfo.Page = page
@@ -236,6 +215,7 @@ export default {
         equipSettingIndex: i,
         equipSettingTable,
       }
+
       this.$store.commit('setEquip', options)
       this.hasChanges = true
     },
@@ -256,11 +236,6 @@ export default {
         }
       } finally {
         this.saving = false
-
-        const options = {
-          hasNotSave: true,
-        }
-        this.$store.commit('setEquip', options)
       }
     },
     change(changedValues) {

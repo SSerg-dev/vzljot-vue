@@ -195,8 +195,8 @@ export default {
           this.$refs.input.selectionStart ||
           this.$refs.input.selectionStart === 0
         ) {
-          this.$refs.input.selectionStart = positions[char].start
-          this.$refs.input.selectionEnd = positions[char].end
+          this.$refs.input.selectionStart = positions[char]?.start
+          this.$refs.input.selectionEnd = positions[char]?.end
         }
       }
     },

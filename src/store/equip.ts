@@ -13,11 +13,13 @@ export interface Equip {
   equipSettingHeight: number | null
   equipSettingTable: EquipSettingTable | null
   equipSettingTableArray: EquipSettingTable[] | null
+  hasNotSave: boolean | null
 }
 
 export interface EquipSettingTable {
   id: number | null
   equipId: number | null
+  equipSettingId?: number | null
   timeStart?: Date | null
   properties: number | null
   index: number | null
@@ -26,6 +28,7 @@ export interface EquipSettingTable {
 const equipSettingTable: EquipSettingTable = {
   id: null,
   equipId: null,
+  equipSettingId: null,
   timeStart: null,
   properties: null,
   index: -1
@@ -45,5 +48,6 @@ export const equip: Equip = {
   equipSettingIndex: -1,
   equipSettingHeight: 0,
   equipSettingTable: null,
-  equipSettingTableArray: null
+  equipSettingTableArray: null,
+  hasNotSave: false
 }

@@ -58,7 +58,11 @@ export default class EquipSetting extends BaseObject {
 
     this.equipSettingTable = EquipSetting.store.state.equip.equipSettingTable
     if (this.equipSettingTable) {
+      this.equipSettingTable.equipId = this.equipSettingTable.id
       props.equipSettingTable = this.equipSettingTable
+
+      if (!props.equipSettingTable.equipSettingId)
+        props.equipSettingTable.equipSettingId = this.equipSettingTable.id
     }
 
     this.equipSettings = EquipSetting.store.state.equip.equipSettingSave
