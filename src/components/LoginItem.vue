@@ -2,12 +2,26 @@
   <div class="login-background">
     <div class="login-wrapper" @keydown.enter.prevent="login">
       <expansion-item :resizable="false" caption="Вход в систему">
-        <div class="login-grid">
-          <label>Пользователь:</label>
-          <input v-model="user" type="text" maxlength="50" style="width: 160px" autocomplete="username" />
-          <label>Пароль:</label>
-          <input v-model="password" type="password" maxlength="32" style="width: 160px" autocomplete="current-password" />
-        </div>
+        <form @submit.prevent="login">
+          <div class="login-grid">
+            <label>Пользователь:</label>
+            <input
+              v-model="user"
+              type="text"
+              maxlength="50"
+              style="width: 160px"
+              autocomplete="username"
+            />
+            <label>Пароль:</label>
+            <input
+              v-model="password"
+              type="password"
+              maxlength="32"
+              style="width: 160px"
+              autocomplete="current-password"
+            />
+          </div>
+        </form>
       </expansion-item>
       <v-button caption="Вход" :f="login" :disabled="disabled" autofocus />
     </div>
@@ -19,26 +33,31 @@ import ExpansionItem from './ExpantionPanel.vue'
 export default {
   components: { ExpansionItem },
   props: {
-    connection: Object
+    connection: Object,
   },
   data() {
     return {
       user: null,
-      password: null
+      password: null,
     }
   },
   computed: {
     disabled() {
       return !this.user
-    }
+    },
   },
   methods: {
     async login() {
       if (this.user) {
         try {
-          await this.$http.post('account/login', { user: this.user, password: this.password })
+          await this.$http.post('account/login', {
+            user: this.user,
+            password: this.password,
+          })
 
-          const data = JSON.parse(await this.connection.invoke('connect', this.user, this.password))
+          const data = JSON.parse(
+            await this.connection.invoke('connect', this.user, this.password)
+          )
 
           for (let prop in data.data) {
             this.$store.commit(prop, data.data[prop])
@@ -50,11 +69,14 @@ export default {
 
           this.$emit('login')
         } catch (err) {
-          this.$store.commit('notification', { type: 1, text: err.response.data })
+          this.$store.commit('notification', {
+            type: 1,
+            text: err.response.data,
+          })
         }
       }
-    }
-  }
+    },
+  },
 }
 </script>
 <style scoped>

@@ -310,6 +310,9 @@ export default {
       this.show = false
     },
     getMap(time) {
+      if (typeof time === 'number') {
+        time = new Date(time)
+      }
       const year = time.getFullYear()
       const month = time.getMonth()
       const day = time.getDate()

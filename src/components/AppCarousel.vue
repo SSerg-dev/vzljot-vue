@@ -1,6 +1,9 @@
 <template>
   <div class="carousel-container">
-    <transition-group name="carousel-fade" mode="out-in">
+    <!-- <transition-group name="carousel-fade" mode="out-in">
+      <div v-for="(slide, index) in slides" :key="index" class="slide" :style="[slide.image ? { background: 'url(' + slide.image + ')  no-repeat fixed center' } : '']">{{ slide.image ? '' : 'Слайд ' + (index + 1) }}</div>
+    </transition-group> -->
+    <transition-group name="carousel-fade">
       <div v-for="(slide, index) in slides" :key="index" class="slide" :style="[slide.image ? { background: 'url(' + slide.image + ')  no-repeat fixed center' } : '']">{{ slide.image ? '' : 'Слайд ' + (index + 1) }}</div>
     </transition-group>
     <div class="button-left">

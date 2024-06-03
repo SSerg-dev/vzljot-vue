@@ -60,21 +60,25 @@ export default {
   justify-content: space-between;
   align-items: center;
 
-  width: 500px;
-  height: 52px;
+  width: 470px;
+  height: max-content * 2;
 
   padding: 10px 10px 10px 20px;
 
-  background-color: #666b7f;
-  color: #fff;
-  font-size: 1em;
-  border-radius: 4px;
+  background: #fff;
+  box-shadow: 0 3px 6px rgba(0, 0, 0, 0.16), 0 3px 6px rgba(0, 0, 0, 0.23);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  border: 1px #ccc solid;
+
+  font-size: larger;
+  border-radius: 5px;
 
   margin-bottom: 10px;
   opacity: 1;
 
   transform: translateY(-20px);
-  transition: opacity 0.3s ease, transform 0.3s ease;
+  transition: opacity .3s ease, transform .3s ease;
+
   pointer-events: auto;
   position: relative;
 }
@@ -89,12 +93,13 @@ export default {
   display: flex;
   align-items: stretch;
   justify-content: center;
+  padding-bottom: 10px;
 }
 
 .toast-close {
   background: none;
   border: none;
-  color: #f00;
+  color: #abacb1;
   font-size: 20px;
   cursor: pointer;
 }
@@ -105,8 +110,6 @@ export default {
 
 button {
   min-width: 42px;
-
-  background: #bacbdb;
-  border: 1px solid #bacbdb;
 }
+
 </style>

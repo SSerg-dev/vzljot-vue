@@ -134,6 +134,8 @@ import Tabs from '../Tabs/Tabs.vue'
 import Wizard from '../Wizard.vue'
 import { setupTreeComponent } from '../Base/baseComponent'
 import EquipDetailSetting from '@/components/Equip/EquipDetailSetting.vue'
+import { Events } from '@/events'
+import { Emitter } from 'mitt'
 
 export default defineComponent({
   components: {
@@ -209,12 +211,12 @@ export default defineComponent({
 
     onBeforeMount(() => {
       if (instance) {
-        instance.appContext.config.globalProperties.$emitter.on(
-          'equip-detail:equip',
-          (equip: Equip) => {
-            Object.assign(localEquip, equip)
-          }
-        )
+        const emitter: Emitter<Events> =
+          instance.appContext.config.globalProperties.$emitter
+
+        emitter.on('equip-detail:equip', (equip: Equip) => {
+          Object.assign(localEquip, equip)
+        })
       }
     })
 

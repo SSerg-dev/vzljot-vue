@@ -4,39 +4,80 @@
       <slot></slot>
     </div>
     <div v-if="!readOnly" class="footer">
-      <v-button caption="Сохранить" @click="onSaveClick" :disabled="saving || disabled" />
+      <v-button
+        caption="Сохранить"
+        @click="onSaveClick"
+        :disabled="saving || disabled"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import VButton from './Inputs/VButton.vue'
+import { store } from '@/store/store'
 
 export default {
   components: {
-    VButton
+    VButton,
   },
   props: {
     saving: {
       type: Boolean,
-      default: false
+      default: false,
     },
     disabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     readOnly: {
       type: Boolean,
-      default: false
+      default: false,
+    },
+  },
+  data() {
+    return {
+      delay: 3000,
     }
   },
   methods: {
     onSaveClick() {
-      if (!this.readOnly) {
+      const type = 'date'
+      const isValid = this.validate(type)
+
+      if (!this.readOnly && isValid) {
         this.$emit('saveClick')
       }
-    }
-  }
+    },
+    validate(type) {
+      switch (type) {
+        case 'date':
+          {
+            if (
+              typeof store.state.card.timeLastChecking.getTime() === 'number' &&
+              typeof store.state.card.timeNextChecking.getTime() === 'number'
+            ) {
+              if (
+                store.state.card.timeLastChecking.getTime() <=
+                store.state.card.timeNextChecking.getTime()
+              ) {
+                return true
+              } else {
+                this.$toast.show(
+                  `⚠️ Дата следующей поверки должна быть больше даты предыдущей поверки.`,
+                  this.delay
+                )
+                return false
+              }
+            }
+          }
+          break
+
+        default:
+          return true
+      }
+    },
+  },
 }
 </script>
 

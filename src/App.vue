@@ -45,6 +45,7 @@
           </v-menus>
         </nav>
       </header>
+
       <main class="content-wrapper">
         <transition mode="out-in">
           <keep-alive v-if="$store.state.user">
@@ -83,6 +84,8 @@
   </div>
 </template>
 <script>
+// import { inject } from 'vue'
+
 import './assets/font.css'
 import './assets/main.css'
 import './assets/table.css'
@@ -426,7 +429,7 @@ export default {
     onUserEvent(value) {
       this.popupData.text = `Пользователь: ${value}`
     },
-    menuClicked(name) { 
+    menuClicked(name) {
       switch (name) {
         case 'info':
           this.onInfo(true)
@@ -519,16 +522,17 @@ export default {
     },
     onInfo(flag) {
       let options = {
-        isInfoChanged: flag, 
+        isInfoChanged: flag,
       }
       this.$emitter.emit('info:open', options)
     },
     onEquip(flag) {
       let options = {
-        isEquipChanged: flag, 
+        isEquipChanged: flag,
       }
       this.$emitter.emit('equip:open', options)
     },
+
   }, // end methods
 }
 </script>

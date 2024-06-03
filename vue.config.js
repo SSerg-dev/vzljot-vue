@@ -1,4 +1,5 @@
 const { defineConfig } = require('@vue/cli-service')
+const webpack = require('webpack')
 
 module.exports = defineConfig({
   transpileDependencies: true,
@@ -19,18 +20,27 @@ module.exports = defineConfig({
     app: {
       entry: './src/main.ts',
       title: 'Взлет СП4 Web',
-    }
+    },
   },
-  //publicPath: process.env.NODE_ENV === 'production' ? '/sp/js/sp/dist/' : '/js/sp/dist/',
+
   publicPath: '/js/sp/dist/',
   outputDir: 'dist',
-  configureWebpack: config => {
+  configureWebpack: (config) => {
     if (process.env.NODE_ENV === 'production') {
       config.output.chunkFilename = './chunks/[name].[chunkhash].js'
     }
-  }
+    if (process.env.NODE_ENV === 'development') {
+      config.plugins.push(
+        new webpack.DefinePlugin({
+          __VUE_PROD_HYDRATION_MISMATCH_DETAILS__: JSON.stringify(false),
+        })
+      )
+    }
+  },
   // devServer: {
-  //   proxy: 'http://localhost:16385'
+  //   overlay: {
+  //     warnings: false,
+  //     errors: false
+  //   }
   // }
-
 })

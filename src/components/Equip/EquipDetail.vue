@@ -392,7 +392,7 @@
     >
       <equip-detail-setting
         v-bind="{ equip: localEquip }"
-        @equip-setting-update="updatedEquipSetting" 
+        @equip-setting-update="updatedEquipSetting"
       />
     </expantion-panel>
 
@@ -710,6 +710,7 @@ export default {
       try {
         this.localError = {}
         this.action = ''
+
         await this.localEquip.save()
 
         return true
@@ -724,7 +725,7 @@ export default {
       }
     },
 
-    handleModificationsUpdated(changedModifications) {
+    handleModificationsUpdated(changedModifications) { 
       const type = this.action
 
       switch (type) {

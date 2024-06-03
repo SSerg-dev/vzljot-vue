@@ -3,13 +3,7 @@ import App from './AppPoint.vue'
 import { axios } from './plugins/axios'
 import { store } from '@/store/store'
 import mitt, { Emitter } from 'mitt'
-
-// __webpack_public_path__ = window.props.baseUrl + 'js/sp/dist/'
-
-type Events = {
-  updateObject: void
-  deleteObject: void
-}
+import { Events } from '@/events'
 
 declare module '@vue/runtime-core' {
   export interface ComponentCustomProperties {
@@ -38,8 +32,6 @@ app.directive('focus', Focus)
 import SpinnerComponent from './components/SpinnerComponent.vue'
 import VButton from './components/Inputs/VButton.vue'
 
-app
-  .component('VButton', VButton)
-  .component('Spinner', SpinnerComponent)
+app.component('VButton', VButton).component('Spinner', SpinnerComponent)
 
 app.mount('#app')

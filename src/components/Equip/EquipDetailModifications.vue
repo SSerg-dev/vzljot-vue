@@ -219,7 +219,6 @@ export default {
     },
     // eslint-disable-next-line no-unused-vars
     onFillClick(event) {
-      // this.isFillClick = !!event.isTrusted
       const result = this.setNextChecking()
       if (result) {
         this.handleNextCheckingChange(result.getTime())
@@ -236,14 +235,24 @@ export default {
 
       this.$emit('modifications-updated', changedModifications)
     },
+
     handleLastCheckingChange(event) {
       let changedLastChecking = new Date(event).getTime()
       this.$emit('last-checking-updated', changedLastChecking)
-      // this.timeLastChecking = changedLastChecking
+
+      const options = {
+        timeLastChecking: event,
+      }
+      this.$store.commit('setCard', options)
     },
     handleNextCheckingChange(event) {
       let changedNextChecking = new Date(event).getTime()
       this.$emit('next-checking-updated', changedNextChecking)
+
+      const options = {
+        timeNextChecking: event,
+      }
+      this.$store.commit('setCard', options)
     },
 
     // eslint-disable-next-line no-unused-vars
