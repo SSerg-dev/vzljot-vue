@@ -14,6 +14,8 @@ export interface Equip {
   equipSettingTable: EquipSettingTable | null
   equipSettingTableArray: EquipSettingTable[] | null
   hasNotSave: boolean | null
+  validateTypes: ValidateTypes | null 
+
 }
 
 export interface EquipSettingTable {
@@ -34,6 +36,13 @@ const equipSettingTable: EquipSettingTable = {
   index: -1
 }
 
+interface ValidateTypes {
+  date: string | null
+}
+
+const validateTypes: ValidateTypes = { 
+  date: 'nodate'
+}
 
 export const equip: Equip = {
   equipId: null,
@@ -49,5 +58,6 @@ export const equip: Equip = {
   equipSettingHeight: 0,
   equipSettingTable: null,
   equipSettingTableArray: null,
-  hasNotSave: false
+  hasNotSave: false,
+  validateTypes: validateTypes || null 
 }

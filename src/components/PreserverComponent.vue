@@ -42,7 +42,7 @@ export default {
   },
   methods: {
     onSaveClick() {
-      const type = 'date'
+      const type = this.$store.state.equip.validateTypes.date
       const isValid = this.validate(type)
 
       if (!this.readOnly && isValid) {
@@ -54,22 +54,31 @@ export default {
         case 'date':
           {
             if (
-              typeof store.state.card.timeLastChecking.getTime() === 'number' &&
-              typeof store.state.card.timeNextChecking.getTime() === 'number'
+              store.state.card.timeLastChecking?.getTime &&
+              store.state.card.timeNextChecking?.getTime
             ) {
               if (
-                store.state.card.timeLastChecking.getTime() <=
-                store.state.card.timeNextChecking.getTime()
+                typeof store.state.card.timeLastChecking.getTime() ===
+                  'number' &&
+                typeof store.state.card.timeNextChecking.getTime() === 'number'
               ) {
-                return true
-              } else {
-                this.$toast.show(
-                  `⚠️ Дата следующей поверки должна быть больше даты предыдущей поверки.`,
-                  this.delay
-                )
-                return false
+                if (
+                  store.state.card.timeLastChecking.getTime() <=
+                  store.state.card.timeNextChecking.getTime()
+                ) {
+                  return true
+                } else {
+                  this.$emitter.emit('preserver-component:display', 'block')
+
+                  this.$toast.show(
+                    `⚠️ Дата следующей поверки должна быть больше даты предыдущей поверки.`,
+                    this.delay
+                  )
+
+                  return false
+                }
               }
-            }
+            } else return true
           }
           break
 

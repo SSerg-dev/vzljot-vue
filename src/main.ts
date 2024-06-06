@@ -40,7 +40,7 @@ app.use(store)
 
 import Focus from './directives/focus'
 
-app.directive('focus', Focus)
+app.directive('focus', Focus) 
 
 import PropsComponent from './components/PropsComponent.vue'
 import RecursiveNode from './components/Tree/RecursiveNode.vue'

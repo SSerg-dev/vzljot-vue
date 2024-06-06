@@ -532,7 +532,6 @@ export default {
       }
       this.$emitter.emit('equip:open', options)
     },
-
   }, // end methods
 }
 </script>

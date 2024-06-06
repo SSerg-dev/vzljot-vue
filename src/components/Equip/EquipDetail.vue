@@ -457,7 +457,7 @@ export default {
       action: '',
       isTemperature: false,
       isPressure: false,
-      oldColdWaterSource: null
+      oldColdWaterSource: null,
     }
   },
   created() {
@@ -537,10 +537,10 @@ export default {
       })
     },
     selectColdWaterSource(id, type) {
-      this.wizard = wizardSourceSelectSet(this.$http, id, type) 
-      if ( !this.oldColdWaterSource ) { 
+      this.wizard = wizardSourceSelectSet(this.$http, id, type)
+      if (!this.oldColdWaterSource) {
         // assign clone
-        this.oldColdWaterSource = {...this.localEquip.coldWater.source} 
+        this.oldColdWaterSource = { ...this.localEquip.coldWater.source }
       }
     },
     clearColdWaterSource() {
@@ -588,6 +588,11 @@ export default {
       this.$emit('changed', prop, value)
       if (this.action !== 'create') {
         this.action = 'change'
+      }
+      if (prop === 'last-checking' || prop === 'next-checking') {
+        this.$store.state.equip.validateTypes.date = 'date'
+      } else {
+        this.$store.state.equip.validateTypes.date = 'nodate'
       }
     },
     onColdWaterChanged(selectedItem) {

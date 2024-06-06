@@ -3,7 +3,9 @@ import ToastContainer from '@/plugins/toast/ToastContainer.vue'
 
 export const ToastPlugin = {
   install(app, options = {}) {
-    const container = document.createElement('div')
+    const container = document.createElement('date-toast')
+    container.style.display = 'none'
+
     document.body.appendChild(container)
 
     const vnode = h(ToastContainer, options)
@@ -19,6 +21,17 @@ export const ToastPlugin = {
       }
     } else {
       console.error('addToast method is not available')
+    }
+
+    if (app.config.globalProperties.$emitter) {
+      app.config.globalProperties.$emitter.on(
+        'preserver-component:display',
+        (display) => {
+          container.style.display = display
+        }
+      )
+    } else {
+      console.error('$emitter is not available')
     }
   },
 }
