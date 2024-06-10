@@ -87,6 +87,7 @@ export default {
   display: grid;
   gap: 5px 3px;
   min-width: 450px;
+
 }
 
 /* equip-setting */

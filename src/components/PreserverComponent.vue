@@ -63,7 +63,7 @@ export default {
                 typeof store.state.card.timeNextChecking.getTime() === 'number'
               ) {
                 if (
-                  store.state.card.timeLastChecking.getTime() <=
+                  store.state.card.timeLastChecking.getTime() <
                   store.state.card.timeNextChecking.getTime()
                 ) {
                   return true

@@ -111,6 +111,8 @@ export default {
               if (this.uuid) {
                 this.$emitter.emit('beforeClose', { uuid: this.uuid })
               } else {
+                // console.log('$$ ++++ close', this.$store.state.equip.equipSettingHeight)
+                this.$store.state.equip.equipSettingHeight = 0 
                 this.$emit('close')
               }
             }

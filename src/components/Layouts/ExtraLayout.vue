@@ -64,12 +64,12 @@ export default {
       return getImage.call(this, item)
     },
     onComponentCreated({ type, key, creator, component }) {
-      if (this.itemTypes.includes(this.$store.state.env.itemTypes[type].type) && (creator ? this.creators.includes(creator) : true)) {
+      if (this.itemTypes.includes(this.$store.state.env.itemTypes[type]?.type) && (creator ? this.creators.includes(creator) : true)) {
         this.components.push({ key, component })
       }
     },
     onComponentBeforeUnmount({ type, key, creator }) {
-      if (this.itemTypes.includes(this.$store.state.env.itemTypes[type].type) && (creator ? this.creators.includes(creator) : true)) {
+      if (this.itemTypes.includes(this.$store.state.env.itemTypes[type]?.type) && (creator ? this.creators.includes(creator) : true)) {
         const index = this.components.findIndex(r => r.key === key)
 
         if (index > -1) {

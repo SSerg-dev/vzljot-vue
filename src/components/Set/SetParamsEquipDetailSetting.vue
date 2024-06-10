@@ -35,7 +35,9 @@
       </div>
     </div>
 
-    <pager-component v-bind="pageInfo" @go="onChangePage" />
+    <div class="pager-component-position">
+      <pager-component v-bind="pageInfo" @go="onChangePage" />
+    </div>
 
     <transition-group>
       <wizard
@@ -71,12 +73,11 @@ import Wizard from '@/components/Wizard.vue'
 import DatePicker from '@/components/Inputs/DatePicker.vue'
 import CheckBox from '@/components/Inputs/CheckBox.vue'
 
-import {
-  // wizardAdd,
-  // wizardRemove,
-  // cancelWizard,
-  // onWizardEnd
-} from '@/plugins/wizardComponents/wizardEquipSetting'
+import // wizardAdd,
+// wizardRemove,
+// cancelWizard,
+// onWizardEnd
+'@/plugins/wizardComponents/wizardEquipSetting'
 
 import { mapGetters } from 'vuex'
 
@@ -277,4 +278,9 @@ export default {
 .caption {
   justify-content: end;
 }
+/* .pager-component-position {
+  position: fixed;
+  bottom: 2.8rem;
+  
+} */
 </style>
