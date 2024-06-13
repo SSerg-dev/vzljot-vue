@@ -19,7 +19,7 @@
         </preserver-component>
       </tabx>
 
-      <tab text="Настройки прибора">
+      <tab v-if="$store.state.user?.userRights.equip" text="Настройки прибора">
         <equip-detail-setting />
       </tab>
 
@@ -110,7 +110,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType, reactive } from 'vue'
-import { onBeforeMount, getCurrentInstance } from 'vue'
+import { onBeforeMount, getCurrentInstance, onMounted } from 'vue'
 
 import { ReportObjectTypeEnum } from '@/classes/enum/ReportObjectTypeEnum'
 
@@ -218,6 +218,8 @@ export default defineComponent({
           Object.assign(localEquip, equip)
         })
       }
+    })
+    onMounted(() => {
     })
 
     function onGroupChange() {

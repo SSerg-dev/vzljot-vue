@@ -74,6 +74,9 @@ export default {
                     `⚠️ Дата следующей поверки должна быть больше даты предыдущей поверки.`,
                     this.delay
                   )
+                  setTimeout(() => {
+                    this.$emitter.emit('preserver-component:display', 'none')
+                  }, this.delay) 
 
                   return false
                 }

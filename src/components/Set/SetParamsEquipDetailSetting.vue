@@ -1,5 +1,5 @@
 <template>
-  <div class="component-detail" :style="{ height: computedHeight }">
+  <div class="content" :style="{ height: computedHeight }">
     <tool-bar v-if="$store.state.user?.userRights.setEdit">
       <div
         :class="['button', 'fas', 'fa-plus-circle', { disabled: true }]"
@@ -7,36 +7,43 @@
         @click="onAddClick()"
       />
       <div
-        :class="['button', 'fas', 'fa-times-circle', { disabled: true }]"
+        :class="['button', 'fas', 'fa-times-circle', { disabled: true }]" 
         title="Удалить"
         @click="onRemoveClick()"
       />
     </tool-bar>
-    <div class="table-grid" style="width: 100%">
-      <header class="header"></header>
-      <header class="header header-date">Наименование</header>
-      <div
-        v-for="(r, i) in localItemsSorted"
-        :key="i"
-        class="table-row"
-        :ref="(el) => (rowsElement[r.id] = el)"
-      >
-        <span class="cell icon">
+
+    <div class="container">
+      <div class="item-1">
+        <div class="table-grid">
+          <header class="header"></header>
+          <header class="header header-date">Наименование</header>
           <div
-            :class="`fas fa-tasks-alt clickable-icon`"
-            @click="viewClick(r, i)"
-            title="Просмотр..."
-          />
-        </span>
+            v-for="(r, i) in localItemsSorted"
+            :key="i"
+            class="table-row"
+            :ref="(el) => (rowsElement[r.id] = el)"
+          >
+            <span class="cell icon">
+              <div
+                :class="`fas fa-tasks-alt clickable-icon`"
+                @click="viewClick(r, i)"
+                title="Просмотр..."
+              />
+            </span>
 
-        <span class="cell caption">{{
-          `${r.name.replace(' 12', ' 12')}`
-        }}</span>
+            <span class="cell caption">{{
+              `${r.name.replace(' 12', ' 12')}`
+            }}</span>
+          </div>
+        </div>
       </div>
-    </div>
 
-    <div class="pager-component-position">
-      <pager-component v-bind="pageInfo" @go="onChangePage" />
+      <div class="item-2">
+        <div class="pager-component-position">
+          <pager-component v-bind="pageInfo" @go="onChangePage" />
+        </div>
+      </div>
     </div>
 
     <transition-group>
@@ -144,13 +151,16 @@ export default {
       getEquip: 'getEquip',
     }),
     computedHeight() {
+      /*
       const minHeight = 88
       const itemHeight = 34
-      const itemCount = this.localItems.length
-
+      const itemCount = this.localItems.length 
+      
       return `calc(${minHeight}px + ${
         itemCount * itemHeight + this.getEquip.equipSettingHeight * this.coeff
       }px)`
+      */
+      return `calc(389%)`
     },
   },
   beforeUnmount() {
@@ -278,9 +288,26 @@ export default {
 .caption {
   justify-content: end;
 }
-/* .pager-component-position {
-  position: fixed;
-  bottom: 2.8rem;
-  
-} */
+
+.pager-component-position {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  background-color: #ecf0f6;
+
+  width: 100%;
+}
+.container,
+.item-1,
+.item-2 {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+.container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
 </style>

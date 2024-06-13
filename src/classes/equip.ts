@@ -115,8 +115,8 @@ interface IEquip {
   analyze?: any
   coldWater?: ColdWater
   customProps?: Array<any>
-  timeLastChecking?: Number | null
-  timeNextChecking?: Number | null
+  timeLastChecking?: number | null
+  timeNextChecking?: number | null
   equipTypeModificationId?: number | null
   equipSettings?: Array<EquipSetting> | null
   equipSettingTable?: EquipSettingTable | null
@@ -163,8 +163,8 @@ export class Equip extends BaseObject {
   analyze: any
   coldWater: ColdWater
   customProps: Array<any>
-  timeLastChecking?: Number | null
-  timeNextChecking?: Number | null
+  timeLastChecking?: number | null
+  timeNextChecking?: number | null
   equipTypeModificationId?: number | null
   equipSettings?: Array<EquipSetting> | null
   equipSettingTable?: EquipSettingTable | null
@@ -241,8 +241,9 @@ export class Equip extends BaseObject {
     this.analyze = analyze
     this.coldWater = coldWater
     this.customProps = customProps
-    this.timeLastChecking = timeLastChecking
-    this.timeNextChecking = timeNextChecking
+    // $$  
+    this.timeLastChecking = this.getDateOnlyTimestamp(timeLastChecking)
+    this.timeNextChecking = this.getDateOnlyTimestamp(timeNextChecking)
     this.equipTypeModificationId = equipTypeModificationId
     this.equipSettings = equipSettings
     this.equipSettingTable = equipSettingTable
@@ -311,6 +312,21 @@ export class Equip extends BaseObject {
     }
   }
 
+  getDateOnlyTimestamp(timestamp: number | null): number {
+    if (timestamp) {
+      const originalDate = new Date(timestamp)
+
+      const year = originalDate.getUTCFullYear()
+      const month = originalDate.getUTCMonth()
+      const date = originalDate.getUTCDate()
+
+      const dateOnly = new Date(Date.UTC(year, month, date))
+
+      return dateOnly.getTime()
+    }
+    return 0
+  }
+
   async init(id: number): Promise<void> {
     const { data } = await this.http.get('equip/equip', { params: { id } })
 
@@ -361,8 +377,8 @@ export class Equip extends BaseObject {
       analyze: any
       coldWater?: any
       customProps?: Array<any>
-      timeLastChecking?: Number | null
-      timeNextChecking?: Number | null
+      timeLastChecking?: number | null
+      timeNextChecking?: number | null
       equipTypeModificationId?: number | null
       equipSettings?: Array<EquipSetting> | null
       equipSettingTable?: EquipSettingTable | null

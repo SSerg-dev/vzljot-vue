@@ -445,6 +445,7 @@ export default {
           this.onInfo(false)
           this.onEquip(false)
           this.currentMenu = name
+          this.$emitter.emit('preserver-component:display', 'none')
           break
         case 'notifications':
           this.popupData = {

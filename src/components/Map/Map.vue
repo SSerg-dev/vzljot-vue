@@ -150,7 +150,7 @@ export default {
       checkboxesPanel.addTo(this.map)
 
       const map = this.$store.state.env.maps[this.userMap.id]
-      const mapOptions = map.connections.find(r => r.name === this.userMap.connection)
+      const mapOptions = map.connections.find(r => r?.name === this.userMap.connection)
       let tileLayer = null
 
       switch (map.type) {
