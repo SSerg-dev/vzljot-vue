@@ -300,6 +300,7 @@
     </expantion-panel>
 
     <expantion-panel
+      v-if="hasSetDataColdWater"
       caption="Рассылка параметров холодной воды"
       :opened="false"
     >
@@ -473,6 +474,9 @@ export default {
     )
   },
   computed: {
+    hasSetDataColdWater() {
+      return this.$store.state.equip.hasSetDataColdWater
+    },
     equipTypeInfo() {
       return this.localEquip.equipTypes && this.localEquip.equipTypes.length > 0
         ? this.localEquip.getEquipTypeInfo(this.localEquip.equipType)

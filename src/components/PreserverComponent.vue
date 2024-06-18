@@ -68,6 +68,7 @@ export default {
                 ) {
                   return true
                 } else {
+                  /*
                   this.$emitter.emit('preserver-component:display', 'block')
 
                   this.$toast.show(
@@ -76,8 +77,9 @@ export default {
                   )
                   setTimeout(() => {
                     this.$emitter.emit('preserver-component:display', 'none')
-                  }, this.delay) 
-
+                  }, this.delay)
+                  */
+                  
                   return false
                 }
               }

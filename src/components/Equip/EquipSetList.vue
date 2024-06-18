@@ -17,6 +17,7 @@
           <option :value="parseInt($store.getters.pollDataTypes.equipCustomizing)">{{ $store.state.env.pollDataTypes[$store.getters.pollDataTypes.equipCustomizing].text }}</option>
           <option v-if="hasSetDataColdWater" :value="parseInt($store.getters.pollDataTypes.setDataColdWater)">{{ $store.state.env.pollDataTypes[$store.getters.pollDataTypes.setDataColdWater].text }}</option>
           <option v-if="hasColdWater" :value="parseInt($store.getters.pollDataTypes.coldWater)">{{ $store.state.env.pollDataTypes[$store.getters.pollDataTypes.coldWater].text }}</option>
+          <option v-if="hasTimeSync" :value="parseInt($store.getters.pollDataTypes.timeSync)">{{ $store.state.env.pollDataTypes[$store.getters.pollDataTypes.timeSync].text }}</option>
         </select>
       </label>
       <label

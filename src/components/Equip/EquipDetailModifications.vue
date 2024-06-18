@@ -63,6 +63,8 @@ import DatePicker from '@/components/Inputs/DatePicker.vue'
 import EquipType from '@/classes/equipType'
 import { mapGetters } from 'vuex'
 
+import { store } from '@/store/store'
+
 export default {
   name: 'EquipDetailModifications',
   components: {
@@ -85,6 +87,9 @@ export default {
       timeLastChecking: null,
       timeNextChecking: null,
       equipTypeModificationId: null,
+      startTimeLastChecking: null,
+      startTimeNextChecking: null,
+      isStartTime: false,
 
       localData: null,
       equipTypeId: null,
@@ -110,11 +115,44 @@ export default {
     }),
   },
   watch: {
-    getCard(newVal) {
+    getCard(newVal, oldVal) {
+      oldVal
+      setTimeout(() => {
+        if (newVal) {
+          this.isStartTime = true
+        }
+      }, 1000)
+
       if (newVal.nodeChange) {
         this.equipTypeId = newVal.nodeChange.equipType
+
+        // init
         this.timeLastChecking = newVal.nodeChange.timeLastChecking ?? null
         this.timeNextChecking = newVal.nodeChange.timeNextChecking ?? null
+
+        if (!this.startTimeLastChecking) {
+          this.startTimeLastChecking = newVal.nodeChange.timeLastChecking
+        }
+        if (!this.startTimeNextChecking) {
+          this.startTimeNextChecking = newVal.nodeChange.timeNextChecking
+        }
+
+        if (this.timeLastChecking < newVal.nodeChange.timeNextChecking) {
+          this.timeLastChecking = newVal.nodeChange.timeLastChecking ?? null
+          this.timeNextChecking = newVal.nodeChange.timeNextChecking ?? null
+
+          store.state.equip.hasNotSave = false
+        } else {
+          this.timeLastChecking = oldVal.nodeChange?.timeLastChecking
+          this.timeNextChecking = oldVal.nodeChange?.timeNextChecking
+          
+          store.state.equip.hasNotSave = true
+
+          if (this.isStartTime) {
+            this.message()
+          }
+        }
+
         this.equipTypeModificationId = newVal.nodeChange.equipTypeModificationId
       }
     },
@@ -163,6 +201,18 @@ export default {
   },
 
   methods: {
+    message() {
+      this.$emitter.emit('preserver-component:display', 'block')
+
+      this.$toast.show(
+        `⚠️ Дата следующей поверки должна быть больше даты предыдущей поверки.`,
+        this.delay
+      )
+      setTimeout(() => {
+        this.$emitter.emit('preserver-component:display', 'none')
+      }, this.delay)
+    },
+
     // eslint-disable-next-line no-unused-vars
     async changeTypeEquip(id) {
       try {

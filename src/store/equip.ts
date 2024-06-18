@@ -15,6 +15,7 @@ export interface Equip {
   equipSettingTableArray: EquipSettingTable[] | null
   hasNotSave: boolean | null
   validateTypes: ValidateTypes | null 
+  hasSetDataColdWater: boolean | null
 
 }
 
@@ -59,5 +60,6 @@ export const equip: Equip = {
   equipSettingTable: null,
   equipSettingTableArray: null,
   hasNotSave: false,
-  validateTypes: validateTypes || null 
+  validateTypes: validateTypes || null,
+  hasSetDataColdWater: null 
 }

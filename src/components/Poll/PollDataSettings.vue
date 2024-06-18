@@ -81,6 +81,7 @@ export default {
         || this.value.equipCustomizing
         || this.value.setDataColdWater
         || this.value.coldWater
+        || this.value.timeSync
         || this.value.equipDatabaseParams;
     },
     forcePollEquipSettingsDisabled() {

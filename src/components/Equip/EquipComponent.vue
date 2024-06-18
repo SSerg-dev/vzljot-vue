@@ -48,6 +48,7 @@
             hasEquipEvents: hasEquipEvents,
             hasSetDataColdWater: hasSetDataColdWater,
             hasColdWater: hasColdWater,
+            hasTimeSync: hasTimeSync
           }"
         />
       </tab>
@@ -137,6 +138,8 @@ import EquipDetailSetting from '@/components/Equip/EquipDetailSetting.vue'
 import { Events } from '@/events'
 import { Emitter } from 'mitt'
 
+import { store } from '@/store/store'
+
 export default defineComponent({
   components: {
     ArchiveComponent,
@@ -186,6 +189,10 @@ export default defineComponent({
       type: Array,
       default: () => [],
     },
+    hasTimeSync: {
+      type: Boolean as PropType<boolean>,
+      required: true,
+    }
   },
   setup(props) {
     const {
@@ -220,6 +227,7 @@ export default defineComponent({
       }
     })
     onMounted(() => {
+      store.state.equip.hasSetDataColdWater = props.hasSetDataColdWater
     })
 
     function onGroupChange() {

@@ -7,15 +7,15 @@ import Wizard from '../Wizard.vue'
 
 export default {
   components: {
-    Wizard
+    Wizard,
   },
   props: {
     creator: String,
     id: {
       type: Number,
-      default: null
+      default: null,
     },
-    type: Number
+    type: Number,
   },
   data() {
     return {
@@ -24,7 +24,7 @@ export default {
       loading: true,
       saving: false,
       error: {},
-      wizard: null
+      wizard: null,
     }
   },
   created() {
@@ -33,9 +33,16 @@ export default {
   beforeUnmount() {
     this.$emitter.off('beforeClose', this.onBeforeClose)
 
-    this.$emitter.emit('componentBeforeUnmount', { id: this.id, type: this.type, key: this.key, creator: this.creator, component: this })
+    this.$emitter.emit('componentBeforeUnmount', {
+      id: this.id,
+      type: this.type,
+      key: this.key,
+      creator: this.creator,
+      component: this,
+    })
   },
   methods: {
+    
     matchType(types) {
       return matchType(types)
     },
@@ -49,9 +56,9 @@ export default {
               text: 'Сохранение:',
               component: 'message',
               data: {
-                text: 'Данные были изменены. Сохранить изменения?'
-              }
-            }
+                text: 'Данные были изменены. Сохранить изменения?',
+              },
+            },
           }
         } else {
           this.$emitter.emit('close', { id: this.id, type: this.type, key })
@@ -59,7 +66,12 @@ export default {
       }
     },
     cancelWizard() {
-      this.$emitter.emit('cancelComponentWizard',  { id: this.id, type: this.type, key: this.key, ...this.wizard.data })
+      this.$emitter.emit('cancelComponentWizard', {
+        id: this.id,
+        type: this.type,
+        key: this.key,
+        ...this.wizard.data,
+      })
       this.wizard = null
     },
     onWizardEnd() {
@@ -68,11 +80,16 @@ export default {
 
       this.save()
 
-      this.$emitter.emit('endComponentWizard', { id: this.id, type: this.type, key: this.key, ...data })
+      this.$emitter.emit('endComponentWizard', {
+        id: this.id,
+        type: this.type,
+        key: this.key,
+        ...data,
+      })
     },
     onSaveClick() {
-      this.save() 
-    }
-  }
+      this.save()
+    },
+  },
 }
 </script>

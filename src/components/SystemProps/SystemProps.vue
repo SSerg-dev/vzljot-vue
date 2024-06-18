@@ -338,6 +338,15 @@
                       v-bind="periodEquipDatabaseParamsData"
                     />
                   </tabx>
+                  <tabx
+                    text="Синхронизация времени"
+                    v-if="pollData.timeSync"
+                  >
+                    <poll-period-props
+                      @change="onPeriodTimeSyncChange"
+                      v-bind="periodTimeSyncData"
+                    />
+                  </tabx>
                 </tabs>
                 <div
                   style="
@@ -1069,6 +1078,7 @@ export default {
         periodSetDataColdWater: null,
         periodColdWater: null,
         periodEquipDatabaseParams: null,
+        periodTimeSync: null,
       },
       months:
         'Январь_Февраль_Март_Апрель_Май_Июнь_Июль_Август_Сентябрь_Октябрь_Ноябрь_Декабрь'.split(
@@ -1092,6 +1102,7 @@ export default {
         setDataColdWater: true,
         coldWater: true,
         equipDatabaseParams: true,
+        timeSync: true,
         depth: 0,
         dateStart: null,
         allowStartHour: 0,
@@ -1163,6 +1174,16 @@ export default {
           retryMin: 0,
         },
         periodEquipDatabaseParams: {
+          periodNum: 0,
+          periodHour: 0,
+          periodMin: 0,
+          periodSec: 0,
+          periodType: matchType(this.$store.state.env.pollDataPeriodTypes)
+            .everyHour,
+          retryHour: 0,
+          retryMin: 0,
+        },
+        periodTimeSync: {
           periodNum: 0,
           periodHour: 0,
           periodMin: 0,
@@ -1413,6 +1434,18 @@ export default {
         this.pollData.periodEquipDatabaseParams
       )
     },
+    periodTimeSyncData() {
+      return Object.assign(
+        {
+          enabled: this.pollData.enabled && this.pollData.control,
+          error: Object.assign(
+            { pollDataPeriod: this.error.periodTimeSync },
+            this.error
+          ),
+        },
+        this.pollData.periodTimeSync
+      )
+    },
   },
   methods: {
     handlePointsUpdated(changedPoints) {
@@ -1579,6 +1612,9 @@ export default {
     },
     onPeriodEquipDatabaseParamsChange(value, prop) {
       this.pollData.periodEquipDatabaseParams[prop] = value
+    },
+    onPeriodTimeSyncChange(value, prop) {
+      this.pollData.periodTimeSync[prop] = value
     },
   },
 }

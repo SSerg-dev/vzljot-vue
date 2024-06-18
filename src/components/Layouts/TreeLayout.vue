@@ -335,7 +335,7 @@ export default {
         } else if (type === 'groupConnection') {
           component = { name: 'group', data: { uuid: node.uuid, id: node.id } }
         } else if (type === 'equip') {
-          component = { name: 'equip-component', data: { uuid: node.uuid, id: node.id, hasSet: node.hasSet, hasEquipEvents: node.hasEquipEvents, hasSetDataColdWater: node.hasSetDataColdWater, hasColdWater: node.hasColdWater ,reportTypes: node.reportTypes } }
+          component = { name: 'equip-component', data: { uuid: node.uuid, id: node.id, hasSet: node.hasSet, hasEquipEvents: node.hasEquipEvents, hasSetDataColdWater: node.hasSetDataColdWater, hasColdWater: node.hasColdWater, hasTimeSync: node.hasTimeSync, reportTypes: node.reportTypes } }
         } else if (type === 'equips') {
           component = { name: 'equips-component' }
         } else {

@@ -1,5 +1,5 @@
 <template>
-  <div> 
+  <div>
     <select
       ref="selectElement"
       @change="handleOptionChange"
@@ -14,6 +14,7 @@
       >
         <div>
           {{ item }}
+          <!-- <p>Enum Value: {{ enumValue }}</p> -->
         </div>
       </option>
     </select>
@@ -22,6 +23,13 @@
 
 <script>
 import { mapGetters } from 'vuex'
+
+// $$
+const EquipSettingParamValueTypeEnum = Object.freeze({
+  none: 'none',
+  string: 'string',
+  list: 'list',
+})
 
 export default {
   name: 'EquipSettingValue',
@@ -37,8 +45,8 @@ export default {
     },
     mode: {
       type: String,
-      default: () => ''
-    }
+      default: () => '',
+    },
   },
   data: () => ({
     items: {},
@@ -48,6 +56,33 @@ export default {
     ...mapGetters({
       getEquip: 'getEquip',
     }),
+    // $$
+    enumValue() {
+      const { valueType, readOnly } = this.param
+      let result 
+      // console.log('$$ this.param', JSON.stringify(this.param))
+      // console.log('$$ valueType', JSON.stringify(valueType))
+      
+      //console.log('$$ readOnly', JSON.stringify(readOnly))
+
+      switch (valueType) {
+        case 'List':
+          result = readOnly
+            ? EquipSettingParamValueTypeEnum.none
+            : EquipSettingParamValueTypeEnum.list
+          break
+        case 'None':
+          result = readOnly
+            ? EquipSettingParamValueTypeEnum.none
+            : EquipSettingParamValueTypeEnum.string
+          break
+        default:
+          result = EquipSettingParamValueTypeEnum.none
+          break
+      }
+
+      return result
+    },
   },
   watch: {
     editName(newVal) {
@@ -58,6 +93,7 @@ export default {
   mounted() {
     this.items = this.param.paramValues
     this.values = this.param.value
+    // console.log('$$ this.param', JSON.stringify(this.param))
   },
   beforeUnmount() {},
 

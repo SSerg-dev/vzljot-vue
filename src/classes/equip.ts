@@ -17,6 +17,7 @@ export class EquipError {
   periodSetDataColdWater?: string
   periodColdWater?: string
   periodEquipDatabaseParams?: string
+  periodTimeSync?: string
   set?: string
   margin?: string
   source?: string
@@ -36,6 +37,7 @@ export class EquipError {
     periodSetDataColdWater = '',
     periodColdWater = '',
     periodEquipDatabaseParams = '',
+    periodTimeSync = '',
     set = '',
     margin = '',
     source = '',
@@ -54,6 +56,7 @@ export class EquipError {
     periodSetDataColdWater?: string
     periodColdWater?: string
     periodEquipDatabaseParams?: string
+    periodTimeSync?: string
     set?: string
     margin?: string
     source?: string
@@ -75,6 +78,7 @@ export class EquipError {
     if (periodColdWater) this.periodColdWater = periodColdWater
     if (periodEquipDatabaseParams)
       this.periodEquipDatabaseParams = periodEquipDatabaseParams
+    if (periodTimeSync) this.periodTimeSync = periodTimeSync
     if (set) this.set = set
     if (margin) this.margin = margin
     if (source) this.source = source
@@ -241,7 +245,6 @@ export class Equip extends BaseObject {
     this.analyze = analyze
     this.coldWater = coldWater
     this.customProps = customProps
-    // $$  
     this.timeLastChecking = this.getDateOnlyTimestamp(timeLastChecking)
     this.timeNextChecking = this.getDateOnlyTimestamp(timeNextChecking)
     this.equipTypeModificationId = equipTypeModificationId
@@ -439,6 +442,7 @@ export class Equip extends BaseObject {
     if (this.timeNextChecking !== null) {
       props.timeNextChecking = this.timeNextChecking
     }
+
     if (this.equipTypeModificationId !== null) {
       props.equipTypeModificationId = this.equipTypeModificationId
     }

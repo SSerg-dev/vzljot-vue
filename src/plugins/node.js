@@ -283,6 +283,7 @@ function updateNodeProps(node, obj) {
   if (Object.prototype.hasOwnProperty.call(obj, 'hasEquipEvents')) node.hasEquipEvents = obj.hasEquipEvents
   if (Object.prototype.hasOwnProperty.call(obj, 'hasSetDataColdWater')) node.hasSetDataColdWater = obj.hasSetDataColdWater
   if (Object.prototype.hasOwnProperty.call(obj, 'hasColdWater')) node.hasColdWater = obj.hasColdWater
+  if (Object.prototype.hasOwnProperty.call(obj, 'hasTimeSync')) node.hasTimeSync = obj.hasTimeSync
   if (Object.prototype.hasOwnProperty.call(obj, 'connectionGroupType')) node.connectionGroupType = obj.connectionGroupType
   if (Object.prototype.hasOwnProperty.call(obj, 'reportTypes')) node.reportTypes = obj.reportTypes
 }
