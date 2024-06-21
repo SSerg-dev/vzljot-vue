@@ -3,12 +3,28 @@
     <div class="group-connection-type-grid two">
       <label>Тип подключения:</label>
       <select v-model="localGroupType" @change="onChanged(localGroupType)">
-        <option v-for="r in connectionTypes" :key="r.type" :value="r.type">{{ r.name }}</option>
+        <option 
+          v-for="r in connectionTypes" 
+          :key="r.type" 
+          :value="r.type"
+          >
+          {{ r.name }}
+        </option>
       </select>
     </div>
-    <expantion-panel v-show="component != 'None'" caption="Параметры подключения" :staticHeight="false" :resizable="false">
+    <expantion-panel
+      v-show="component != 'None'"
+      caption="Параметры подключения"
+      :staticHeight="false"
+      :resizable="false"
+    >
       <transition name="group-connection-fade" mode="out-in">
-        <component :is="component" v-bind="Object.assign({}, componentData, { error })" @changed="onGroupChanged" @changeConnectionType="onChangeConnectionType" />
+        <component
+          :is="component"
+          v-bind="Object.assign({}, componentData, { error })"
+          @changed="onGroupChanged"
+          @changeConnectionType="onChangeConnectionType"
+        />
       </transition>
     </expantion-panel>
   </div>
@@ -27,11 +43,15 @@ export default {
     ASSV: asyncImport(() => import('./Connections/ASSV.vue')),
     ComPort: asyncImport(() => import('./Connections/ComPort.vue')),
     GPRS: asyncImport(() => import('./Connections/GPRS.vue')),
-    Bars02Multiport_GPRS: asyncImport(() => import('./Connections/BarsGPRS.vue')),
+    Bars02Multiport_GPRS: asyncImport(() =>
+      import('./Connections/BarsGPRS.vue')
+    ),
     Ebyte: asyncImport(() => import('./Connections/Ebyte.vue')),
     Esco_GPRS: asyncImport(() => import('./Connections/EscoGPRS.vue')),
     Eldis_GPRS: asyncImport(() => import('./Connections/EldisGPRS.vue')),
-    IOT_Vega_Server: asyncImport(() => import('./Connections/IOTVegaServer.vue')),
+    IOT_Vega_Server: asyncImport(() =>
+      import('./Connections/IOTVegaServer.vue')
+    ),
     Modem: asyncImport(() => import('./Connections/Modem.vue')),
     Radio: asyncImport(() => import('./Connections/Radio.vue')),
     OptoPortIEC1107: asyncImport(() => import('./Connections/OptoIEC.vue')),
@@ -47,23 +67,27 @@ export default {
     Lers_Plus: asyncImport(() => import('./Connections/LersPlus.vue')),
     LoRa: asyncImport(() => import('./Connections/LoRa.vue')),
     Karat902: asyncImport(() => import('./Connections/Karat902.vue')),
-    Eldis1203_GPRS: asyncImport(() => import('./Connections/Eldis1203GPRS.vue')),
-    ExpantionPanel
+    Eldis1203_GPRS: asyncImport(() =>
+      import('./Connections/Eldis1203GPRS.vue')
+    ),
+    ExpantionPanel,
   },
   props: {
     connectionTypes: Array,
     groupType: Number,
-    error: Object
+    error: Object,
   },
   data() {
     return {
-      localGroupType: this.groupType
+      localGroupType: this.groupType,
     }
   },
   computed: {
     component() {
       if (this.connectionTypes !== null && this.localGroupType) {
-        const type = this.connectionTypes.find(r => r.type === this.localGroupType)
+        const type = this.connectionTypes.find(
+          (r) => r.type === this.localGroupType
+        )
 
         if (type) {
           return type.component
@@ -74,7 +98,9 @@ export default {
     },
     componentData() {
       if (this.connectionTypes !== null && this.localGroupType) {
-        const type = this.connectionTypes.find(r => r.type === this.localGroupType)
+        const type = this.connectionTypes.find(
+          (r) => r.type === this.localGroupType
+        )
 
         if (type) {
           return type.data
@@ -82,7 +108,7 @@ export default {
       }
 
       return null
-    }
+    },
   },
   watch: {
     groupType(value) {
@@ -90,7 +116,7 @@ export default {
     },
     localGroupType(value) {
       this.$emit('changeConnectionGroupType', value)
-    }
+    },
   },
   methods: {
     getData() {
@@ -105,8 +131,8 @@ export default {
     onGroupChanged(prop, value) {
       this.componentData.group[prop] = value
       this.$emit('groupChanged', this.componentData.group)
-    }
-  }
+    },
+  },
 }
 </script>
 

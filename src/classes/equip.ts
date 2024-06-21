@@ -124,6 +124,8 @@ interface IEquip {
   equipTypeModificationId?: number | null
   equipSettings?: Array<EquipSetting> | null
   equipSettingTable?: EquipSettingTable | null
+  timeZones?: Array<any>
+  timeZonesType?: number
 }
 
 interface ColdWater {
@@ -172,6 +174,8 @@ export class Equip extends BaseObject {
   equipTypeModificationId?: number | null
   equipSettings?: Array<EquipSetting> | null
   equipSettingTable?: EquipSettingTable | null
+  timeZones: Array<any>
+  timeZonesType: number
 
   constructor({
     uuid = undefined,
@@ -220,6 +224,8 @@ export class Equip extends BaseObject {
     equipTypeModificationId = null,
     equipSettings = [],
     equipSettingTable = null,
+    timeZones = [],
+    timeZonesType = -1
   }: IEquip) {
     super(uuid)
 
@@ -250,6 +256,8 @@ export class Equip extends BaseObject {
     this.equipTypeModificationId = equipTypeModificationId
     this.equipSettings = equipSettings
     this.equipSettingTable = equipSettingTable
+    this.timeZones = Equip.store.state.env.timeZones
+    this.timeZonesType = timeZonesType
   }
 
   isBusAddressVisible(type: number) {
@@ -356,6 +364,7 @@ export class Equip extends BaseObject {
     this.timeLastChecking = data.timeLastChecking
     this.timeNextChecking = data.timeNextChecking
     this.equipTypeModificationId = data.equipTypeModificationId
+    this.timeZonesType = data.timeZone.id
   }
 
   async save() {
@@ -385,6 +394,7 @@ export class Equip extends BaseObject {
       equipTypeModificationId?: number | null
       equipSettings?: Array<EquipSetting> | null
       equipSettingTable?: EquipSettingTable | null
+      timeZonesType: number
     }
 
     const props: Props = {
@@ -402,7 +412,10 @@ export class Equip extends BaseObject {
       coldWater: this.coldWater,
       equipSettings: this.equipSettings,
       equipSettingTable: this.equipSettingTable,
+      timeZonesType: this.timeZonesType
     }
+    
+    props.timeZonesType = Equip.store.state.equip.timeZonesType ?? -1
 
     if (this.isBusAddressVisible(this.equipType)) {
       props.busAddress = this.busAddress

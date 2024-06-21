@@ -175,6 +175,12 @@
           @changeConnectionGroupType="onGroupTypeChange"
           @groupChanged="onGroupChanged"
         />
+        <equip-detail-time-sync
+          style="grid-column: span 2"
+          :timeZonesType="localEquip.timeZonesType"
+          :timeZones="localEquip.timeZones"
+          @onChangedTimeZoneType="handleTimeZoneType"
+        />
       </div>
     </expantion-panel>
     <expantion-panel caption="Средство измерения" :opened="false">
@@ -427,6 +433,7 @@ import { wizardSourceSelectSet } from '@/plugins/wizardComponents/wizardSourceSe
 
 import EquipDetailModifications from '@/components/Equip/EquipDetailModifications.vue'
 import EquipDetailSetting from '@/components/Equip/EquipDetailSetting.vue'
+import EquipDetailTimeSync from '@/components/Equip/EquipDetailTimeSync.vue'
 
 export default {
   components: {
@@ -439,6 +446,7 @@ export default {
     Wizard,
     EquipDetailModifications,
     EquipDetailSetting,
+    EquipDetailTimeSync,
   },
   props: {
     equip: {
@@ -823,9 +831,13 @@ export default {
     updatedEquipSetting(changedValues) {
       this.onChange('equipSetting', changedValues)
     },
+    handleTimeZoneType(timeZonesType) {
+      this.onChange('timeZone', timeZonesType)
+      this.$store.state.equip.timeZonesType = timeZonesType 
+    },
   }, // end methods
 }
-</script>
+</script> 
 
 <style scoped>
 .equip-grid {

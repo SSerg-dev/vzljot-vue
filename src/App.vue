@@ -225,6 +225,7 @@ export default {
 
     this.connection.on('vspStateChange', (r) => {
       this.$store.commit('vsp', r)
+      
       if (r.isOpened === false) {
         this.onVspClosed()
       } else {
@@ -398,6 +399,7 @@ export default {
         await this.connection.start()
 
         this.$store.commit('connection', this.connection)
+        
       } catch (error) {
         console.log('start', error)
         setTimeout(this.start, 0)

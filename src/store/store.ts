@@ -6,8 +6,6 @@ import { matchType } from '@/plugins/api'
 import { Card, card } from '@/store/card'
 import { Equip, equip } from '@/store/equip'
 
-// import { moduleCard } from '@/store/card'
-
 type EnumType = {
   [key: string]: any
 }
@@ -41,6 +39,7 @@ interface Env {
   resultTypes: any
   seasonTypes: any
   setTypes: EnumType
+  timeZones: any[]
 }
 
 const env: Env = {
@@ -65,6 +64,7 @@ const env: Env = {
   },
   seasonTypes: {},
   setTypes: {},
+  timeZones: []
 }
 
 interface State {
@@ -84,9 +84,6 @@ interface State {
 }
 
 export const store = createStore<State>({
-  // modules: {
-  //   card: moduleCard
-  // },
   state: {
     collator: new Intl.Collator(['en-US', 'ru-RU']),
     colors: null,

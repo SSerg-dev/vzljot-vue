@@ -24,7 +24,6 @@
 <script>
 import { mapGetters } from 'vuex'
 
-// $$
 const EquipSettingParamValueTypeEnum = Object.freeze({
   none: 'none',
   string: 'string',
@@ -56,14 +55,9 @@ export default {
     ...mapGetters({
       getEquip: 'getEquip',
     }),
-    // $$
     enumValue() {
       const { valueType, readOnly } = this.param
       let result 
-      // console.log('$$ this.param', JSON.stringify(this.param))
-      // console.log('$$ valueType', JSON.stringify(valueType))
-      
-      //console.log('$$ readOnly', JSON.stringify(readOnly))
 
       switch (valueType) {
         case 'List':
@@ -93,7 +87,6 @@ export default {
   mounted() {
     this.items = this.param.paramValues
     this.values = this.param.value
-    // console.log('$$ this.param', JSON.stringify(this.param))
   },
   beforeUnmount() {},
 
