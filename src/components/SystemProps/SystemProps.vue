@@ -131,10 +131,16 @@
                 </div>
               </div>
             </expantion>
+            <system-props-time-sync
+              style="grid-column: span 2"
+              :timeZonesType="localTimeZonesType || 0"
+              :timeZones="localTimeZones || []"
+              @onChangedTimeZoneType="handleTimeZoneType"
+            />
           </div>
         </tabx>
         <tabx text="Сбор и рассылка данных">
-          <div class="grid" style="width: fit-content">
+          <div class="grid" style="width: fit-content"> 
             <div class="grid two">
               <label>Состояние:</label>
               <select v-model="pollData.enabled">
@@ -338,10 +344,7 @@
                       v-bind="periodEquipDatabaseParamsData"
                     />
                   </tabx>
-                  <tabx
-                    text="Синхронизация времени"
-                    v-if="pollData.timeSync"
-                  >
+                  <tabx text="Синхронизация времени" v-if="pollData.timeSync">
                     <poll-period-props
                       @change="onPeriodTimeSyncChange"
                       v-bind="periodTimeSyncData"
@@ -517,7 +520,7 @@
                         !reportData[r.type].enableCorrection
                       "
                       >Рассчитывать средние значения при Tраб не менее,
-                      дн:</label
+                      дн.:</label
                     >
                     <number-box
                       v-model="reportData[r.type].timeWork"
@@ -1008,6 +1011,7 @@ import Tabx from '../Tabs/Tabx.vue'
 import Wizard from '../Wizard.vue'
 import SystemPropsPoints from './SystemPropsPoints.vue'
 import SystemPropsEquips from './SystemPropsEquips.vue'
+import SystemPropsTimeSync from '@/components/SystemProps/SystemPropsTimeSync.vue'
 
 const wizardSms = (phone) => {
   return {
@@ -1050,6 +1054,7 @@ export default {
     Wizard,
     SystemPropsPoints,
     SystemPropsEquips,
+    SystemPropsTimeSync,
   },
   data() {
     return {
@@ -1063,6 +1068,10 @@ export default {
       hasChanges: false,
       saving: false,
       loading: true,
+
+      localTimeZones: [],
+      localTimeZonesType: 0,
+
       error: {
         emailHost: null,
         emailUser: null,
@@ -1320,6 +1329,11 @@ export default {
       () => this.certificates.server,
       () => (this.hasChanges = true)
     )
+    this.$watch(
+      () => this.$store.state.env.timeZones,
+      () => (this.localTimeZones = this.$store.state.env.timeZones),
+      { deep: true }
+    )
   },
   beforeUnmount() {
     this.$emitter.emit('componentBeforeUnmount', {
@@ -1460,6 +1474,7 @@ export default {
         const { data } = await this.$http.get('system/props')
         this.server = data.server
         this.commonData = data.commonData
+        this.localTimeZonesType = data.commonData.TimeZonesTypeSystem
         this.pollData = data.pollData
         this.viewData = data.viewData
         this.temperatureGraphData = data.temperatureGraphData
@@ -1616,7 +1631,10 @@ export default {
     onPeriodTimeSyncChange(value, prop) {
       this.pollData.periodTimeSync[prop] = value
     },
-  },
+    handleTimeZoneType(timeZonesType) {
+      this.commonData.timeZonesTypeSystem = timeZonesType
+    },
+  }, // end methods
 }
 </script>
 

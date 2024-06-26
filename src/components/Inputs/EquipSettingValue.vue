@@ -1,6 +1,7 @@
 <template>
   <div>
     <select
+      v-if="enumValue === 'list'"
       ref="selectElement"
       @change="handleOptionChange"
       @mousedown="enableSelect"
@@ -12,12 +13,18 @@
         :value="item.value"
         :selected="hasSelected(item)"
       >
-        <div>
-          {{ item }}
-          <!-- <p>Enum Value: {{ enumValue }}</p> -->
-        </div>
+        {{ item }}
       </option>
     </select>
+
+    <input
+      type="text"
+      v-if="enumValue === 'string'"
+      v-model="inputValue"
+      @input="handleInputValue"
+    />
+
+    <div class="none" v-if="enumValue === 'none'"></div>
   </div>
 </template>
 
@@ -50,6 +57,7 @@ export default {
   data: () => ({
     items: {},
     values: '',
+    inputValue: '',
   }),
   computed: {
     ...mapGetters({
@@ -57,7 +65,7 @@ export default {
     }),
     enumValue() {
       const { valueType, readOnly } = this.param
-      let result 
+      let result
 
       switch (valueType) {
         case 'List':
@@ -87,10 +95,15 @@ export default {
   mounted() {
     this.items = this.param.paramValues
     this.values = this.param.value
+    this.inputValue = this.param.value
   },
   beforeUnmount() {},
 
   methods: {
+    handleInputValue(event) {
+      this.inputValue = event.target.value
+      // console.log('$$ this.inputValue', this.inputValue)
+    },
     handleOptionChange(event) {
       const selectedId =
         +event.target.options[event.target.selectedIndex].getAttribute(
@@ -103,10 +116,10 @@ export default {
         name: this.param.name,
         value: selectedId,
       }
+      // console.log('$$ changedValues', JSON.stringify(changedValues))
 
       this.$emitter.emit('equip-setting-value:update', changedValues)
     },
-
     hasSelected(item) {
       let result
       const selectElement = this.$refs.selectElement
@@ -135,6 +148,20 @@ export default {
 select {
   min-width: 190px;
   color: #ddd;
+  border-color: #ddd;
+}
+input {
+  min-width: 190px;
+  color: black;
+  border-color: #ddd;
+}
+.none {
+  min-width: 190px;
+  min-height: 22px;
+  padding: 1px 4px;
+  color: #ddd;
+  border: solid 1px;
+  border-radius: 3px;
   border-color: #ddd;
 }
 </style>

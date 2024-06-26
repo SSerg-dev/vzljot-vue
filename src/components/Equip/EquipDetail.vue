@@ -480,6 +480,13 @@ export default {
       (value) => (this.localError = JSON.parse(JSON.stringify(value))),
       { deep: true }
     )
+    this.$watch(
+      () => this.localEquip.timeZones,
+      (value) => {
+        this.$store.state.env.timeZones = value 
+      },
+      { deep: true }
+    )
   },
   computed: {
     hasSetDataColdWater() {

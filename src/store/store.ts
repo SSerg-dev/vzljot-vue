@@ -40,6 +40,7 @@ interface Env {
   seasonTypes: any
   setTypes: EnumType
   timeZones: any[]
+  timeZonesSystem: any[]
 }
 
 const env: Env = {
@@ -64,7 +65,8 @@ const env: Env = {
   },
   seasonTypes: {},
   setTypes: {},
-  timeZones: []
+  timeZones: [],
+  timeZonesSystem: []
 }
 
 interface State {

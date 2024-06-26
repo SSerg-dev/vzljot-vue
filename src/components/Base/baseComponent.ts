@@ -215,7 +215,7 @@ export function setupTreeComponent<
 
   function onBeforeChange(event: { uuid: string; node: any; target: any }) {
     if (event.uuid === uuid) {
-      if (hasChanges.value && !store.state.equip.hasNotSave) {
+      if (hasChanges.value) {  
         wizard.value = {
           event,
           name: 'save',
@@ -227,13 +227,12 @@ export function setupTreeComponent<
             },
           },
         }
-      } else {
+      } else { 
         emitter?.emit('afterNodeChange', {
           node: event.node,
           target: event.target,
         })
       }
-      store.state.equip.hasNotSave = false
     }
   }
 

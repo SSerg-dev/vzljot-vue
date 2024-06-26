@@ -1,5 +1,4 @@
 <template>
-  
   <div class="grid">
     <div class="grid">
       <div class="grid two">
@@ -19,10 +18,12 @@
         <label :disabled="disabled">Данные:</label>
         <div class="grid" style="grid-template-columns: repeat(3, 200px)">
           <template
-            v-for="[k, v] in Object.entries($store.state.env.pollDataTypes)"
+            v-for="([k, v], index) in Object.entries(
+              $store.state.env.pollDataTypes
+            )"
           >
             <check-box
-              v-if="value[v.type] !== null"
+              v-if="value[v.type] !== null && hasShowDataColdWater(index)"
               :key="k"
               v-model="value[v.type]"
               :disabled="disabled"
@@ -35,7 +36,7 @@
         </div>
       </div>
     </div>
-    
+
     <div class="grid">
       <div class="grid two">
         <label :disabled="disabled"
@@ -198,6 +199,7 @@
               v-bind="periodEquipCustomizingData"
             />
           </tabx>
+
           <tabx text="Рассылка параметров ХВ" v-if="pollData.setDataColdWater">
             <poll-period-props
               @change="onPeriodSetDataColdWaterChange"
@@ -340,6 +342,19 @@ export default {
     },
   },
   computed: {
+    hasSetDataColdWater() {
+      return this.$store.state.equip.hasSetDataColdWater
+    },
+    hasShowDataColdWater() {
+      return (index) => {
+        if (this.hasSetDataColdWater) {
+          return true
+        } else {
+          const indicesToCheck = [6, 7, 8]
+          return !indicesToCheck.includes(index)
+        }
+      }
+    },
     hasDataColdWater() {
       return this.value.setDataColdWater
     },

@@ -89,7 +89,10 @@ export default {
       equipTypeModificationId: null,
       startTimeLastChecking: null,
       startTimeNextChecking: null,
+      prevTimeLastChecking: null,
+      prevTimeNextChecking: null,
       isStartTime: false,
+      day: 24 * 60 * 60 * 1000,
 
       localData: null,
       equipTypeId: null,
@@ -130,27 +133,56 @@ export default {
         this.timeLastChecking = newVal.nodeChange.timeLastChecking ?? null
         this.timeNextChecking = newVal.nodeChange.timeNextChecking ?? null
 
+        if (this.timeLastChecking) {
+          store.state.card.timeLastChecking = this.timeLastChecking
+        }
+        if (this.timeNextChecking) {
+          store.state.card.timeNextChecking = this.timeNextChecking
+        }
+
         if (!this.startTimeLastChecking) {
           this.startTimeLastChecking = newVal.nodeChange.timeLastChecking
         }
         if (!this.startTimeNextChecking) {
           this.startTimeNextChecking = newVal.nodeChange.timeNextChecking
         }
+        // logic last exist and next exist
+        if (this.timeLastChecking > 0 && this.timeNextChecking > 0) {
+          if (this.timeLastChecking < newVal.nodeChange.timeNextChecking) {
+            this.timeLastChecking = newVal.nodeChange.timeLastChecking ?? null
+            this.timeNextChecking = newVal.nodeChange.timeNextChecking ?? null
 
-        if (this.timeLastChecking < newVal.nodeChange.timeNextChecking) {
-          this.timeLastChecking = newVal.nodeChange.timeLastChecking ?? null
-          this.timeNextChecking = newVal.nodeChange.timeNextChecking ?? null
+            store.state.equip.hasNotSave = false
+          } else {
+            if (!this.prevTimeLastChecking) {
+              this.prevTimeLastChecking = oldVal.nodeChange?.timeLastChecking
+            }
+            this.timeLastChecking = this.prevTimeLastChecking
 
-          store.state.equip.hasNotSave = false
-        } else {
-          this.timeLastChecking = oldVal.nodeChange?.timeLastChecking
-          this.timeNextChecking = oldVal.nodeChange?.timeNextChecking
-          
-          store.state.equip.hasNotSave = true
+            if (!this.prevTimeNextChecking) {
+              this.prevTimeNextChecking = oldVal.nodeChange?.timeNextChecking
+            }
+            this.timeNextChecking = this.prevTimeNextChecking
 
-          if (this.isStartTime) {
-            this.message()
+            store.state.equip.hasNotSave = true
+
+            if (this.isStartTime) {
+              this.message()
+            }
           }
+        }
+        // logic last exist and next not exist
+        if (this.timeLastChecking > 0 && !this.timeNextChecking) {
+          this.timeLastChecking = newVal.nodeChange.timeLastChecking ?? null
+          store.state.equip.hasNotSave = false
+        }
+
+        if (
+          this.timeLastChecking > 0 &&
+          this.timeNextChecking > 0 &&
+          this.timeLastChecking >= this.timeNextChecking
+        ) {
+          this.timeNextChecking = this.timeNextChecking + this.day
         }
 
         this.equipTypeModificationId = newVal.nodeChange.equipTypeModificationId
@@ -206,11 +238,11 @@ export default {
 
       this.$toast.show(
         `⚠️ Дата следующей поверки должна быть больше даты предыдущей поверки.`,
-        this.delay
+        (this.delay = 4000)
       )
       setTimeout(() => {
         this.$emitter.emit('preserver-component:display', 'none')
-      }, this.delay)
+      }, (this.delay = 4000))
     },
 
     // eslint-disable-next-line no-unused-vars

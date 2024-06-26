@@ -81,7 +81,6 @@ export default {
         || this.value.equipCustomizing
         || this.value.setDataColdWater
         || this.value.coldWater
-        || this.value.timeSync
         || this.value.equipDatabaseParams;
     },
     forcePollEquipSettingsDisabled() {
@@ -126,7 +125,7 @@ export default {
     validate() {
       Object.keys(this.error).forEach(r => (this.error[r] = { value: false, title: '' }))
 
-      if (!(this.archiveOptionSelected || this.otherOptionSelected) && !this.disabled) {
+      if (!(this.archiveOptionSelected || this.otherOptionSelected || this.value.timeSync) && !this.disabled) {
         this.error.data.value = true
         this.error.data.title = 'Необходимо выбрать хотя бы один тип данных.'
       }

@@ -17,7 +17,7 @@ export interface Equip {
   validateTypes: ValidateTypes | null 
   hasSetDataColdWater: boolean | null
   timeZonesType: number | null
-   
+  timeZonesTypeSystem: number | null 
 }
 
 export interface EquipSettingTable {
@@ -63,5 +63,6 @@ export const equip: Equip = {
   hasNotSave: false,
   validateTypes: validateTypes || null,
   hasSetDataColdWater: null, 
-  timeZonesType: null
+  timeZonesType: null,
+  timeZonesTypeSystem: null
 }

@@ -126,6 +126,7 @@ interface IEquip {
   equipSettingTable?: EquipSettingTable | null
   timeZones?: Array<any>
   timeZonesType?: number
+  timeZonesSystem?: Array<any>
 }
 
 interface ColdWater {
@@ -176,6 +177,7 @@ export class Equip extends BaseObject {
   equipSettingTable?: EquipSettingTable | null
   timeZones: Array<any>
   timeZonesType: number
+  timeZonesSystem: Array<any>
 
   constructor({
     uuid = undefined,
@@ -225,7 +227,8 @@ export class Equip extends BaseObject {
     equipSettings = [],
     equipSettingTable = null,
     timeZones = [],
-    timeZonesType = -1
+    timeZonesType = -1,
+    timeZonesSystem = []
   }: IEquip) {
     super(uuid)
 
@@ -258,6 +261,7 @@ export class Equip extends BaseObject {
     this.equipSettingTable = equipSettingTable
     this.timeZones = Equip.store.state.env.timeZones
     this.timeZonesType = timeZonesType
+    this.timeZonesSystem = Equip.store.state.env.timeZonesSystem
   }
 
   isBusAddressVisible(type: number) {
@@ -331,7 +335,7 @@ export class Equip extends BaseObject {
       const month = originalDate.getUTCMonth()
       const date = originalDate.getUTCDate()
 
-      const dateOnly = new Date(Date.UTC(year, month, date))
+      const dateOnly = new Date(Date.UTC(year, month, date, 0, 0, 0, 0))
 
       return dateOnly.getTime()
     }
