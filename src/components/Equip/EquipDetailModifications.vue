@@ -65,6 +65,8 @@ import { mapGetters } from 'vuex'
 
 import { store } from '@/store/store'
 
+// import { debounce } from '@/utils/common.functions'
+
 export default {
   name: 'EquipDetailModifications',
   components: {
@@ -110,6 +112,9 @@ export default {
       interval: 0,
 
       loading: true,
+
+      isMessage: true,
+      isEquipChanged: true,
     }
   },
   computed: {
@@ -130,29 +135,33 @@ export default {
         this.equipTypeId = newVal.nodeChange.equipType
 
         // init
-        this.timeLastChecking = newVal.nodeChange.timeLastChecking ?? null
-        this.timeNextChecking = newVal.nodeChange.timeNextChecking ?? null
-
+        // ------------------------------
+        if (newVal.nodeChange.timeLastChecking)
+          this.timeLastChecking = newVal.nodeChange.timeLastChecking
+        if (newVal.nodeChange.timeNextChecking)
+          this.timeNextChecking = newVal.nodeChange.timeNextChecking
+        // ------------------------------
         if (this.timeLastChecking) {
           store.state.card.timeLastChecking = this.timeLastChecking
         }
         if (this.timeNextChecking) {
           store.state.card.timeNextChecking = this.timeNextChecking
         }
-
+        // ------------------------------
         if (!this.startTimeLastChecking) {
           this.startTimeLastChecking = newVal.nodeChange.timeLastChecking
         }
         if (!this.startTimeNextChecking) {
           this.startTimeNextChecking = newVal.nodeChange.timeNextChecking
+          store.state.card.startTimeNextChecking = newVal.nodeChange.timeNextChecking
         }
+        // ------------------------------
+
         // logic last exist and next exist
         if (this.timeLastChecking > 0 && this.timeNextChecking > 0) {
           if (this.timeLastChecking < newVal.nodeChange.timeNextChecking) {
             this.timeLastChecking = newVal.nodeChange.timeLastChecking ?? null
             this.timeNextChecking = newVal.nodeChange.timeNextChecking ?? null
-
-            store.state.equip.hasNotSave = false
           } else {
             if (!this.prevTimeLastChecking) {
               this.prevTimeLastChecking = oldVal.nodeChange?.timeLastChecking
@@ -164,26 +173,37 @@ export default {
             }
             this.timeNextChecking = this.prevTimeNextChecking
 
-            store.state.equip.hasNotSave = true
-
-            if (this.isStartTime) {
+            if (this.isStartTime && this.isMessage && this.isEquipChanged) {
+              // debounce(this.message(), 3000)
               this.message()
             }
+            this.isMessage = !this.isMessage
           }
         }
         // logic last exist and next not exist
         if (this.timeLastChecking > 0 && !this.timeNextChecking) {
           this.timeLastChecking = newVal.nodeChange.timeLastChecking ?? null
-          store.state.equip.hasNotSave = false
         }
 
+        // ------------------------------
+        if (!this.timeLastChecking) {
+          this.timeLastChecking = store.state.card.timeLastChecking
+        }
+        // if (!this.timeNextChecking) {
+        //   this.timeNextChecking = store.state.card.timeNextChecking
+        // }
+        // ------------------------------
+        /*
         if (
           this.timeLastChecking > 0 &&
           this.timeNextChecking > 0 &&
           this.timeLastChecking >= this.timeNextChecking
         ) {
-          this.timeNextChecking = this.timeNextChecking + this.day
+          // this.timeNextChecking = this.timeNextChecking + this.day
+          this.timeLastChecking = this.startTimeLastChecking
+          this.timeNextChecking = this.startTimeNextChecking
         }
+        */
 
         this.equipTypeModificationId = newVal.nodeChange.equipTypeModificationId
       }
@@ -204,6 +224,8 @@ export default {
 
     this.$emitter.on('equip-detail:create-equip', this.onCreateEquip)
     this.$emitter.on('equip-detail:change-equip-type', this.onChangeEquipType)
+
+    this.$emitter.on('equip:open', this.onEquipOpen)
 
     this.$watch(
       () => this.equipType.interval,
@@ -233,16 +255,19 @@ export default {
   },
 
   methods: {
+    onEquipOpen(options) {
+      this.isEquipChanged = options.isEquipChanged
+    },
     message() {
       this.$emitter.emit('preserver-component:display', 'block')
 
       this.$toast.show(
         `⚠️ Дата следующей поверки должна быть больше даты предыдущей поверки.`,
-        (this.delay = 4000)
+        (this.delay = 3000)
       )
       setTimeout(() => {
         this.$emitter.emit('preserver-component:display', 'none')
-      }, (this.delay = 4000))
+      }, (this.delay = 3000))
     },
 
     // eslint-disable-next-line no-unused-vars

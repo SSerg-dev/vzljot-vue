@@ -19,9 +19,9 @@
         </preserver-component>
       </tabx>
 
-      <tab v-if="$store.state.user?.userRights.equip" text="Настройки прибора">
+      <!-- <tab v-if="$store.state.user?.userRights.equip" text="Настройки прибора">
         <equip-detail-setting />
-      </tab>
+      </tab> -->
 
       <tab
         text="Отчеты"
@@ -134,7 +134,7 @@ import Tabx from '../Tabs/Tabx.vue'
 import Tabs from '../Tabs/Tabs.vue'
 import Wizard from '../Wizard.vue'
 import { setupTreeComponent } from '../Base/baseComponent'
-import EquipDetailSetting from '@/components/Equip/EquipDetailSetting.vue'
+// import EquipDetailSetting from '@/components/Equip/EquipDetailSetting.vue'
 import { Events } from '@/events'
 import { Emitter } from 'mitt'
 
@@ -158,7 +158,7 @@ export default defineComponent({
     Tabx,
     Tabs,
     Wizard,
-    EquipDetailSetting,
+    // EquipDetailSetting,
   },
   props: {
     uuid: {

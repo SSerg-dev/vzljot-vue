@@ -147,7 +147,6 @@ export default {
   },
 
   created() {
-    this.$emitter.on('message', this.processMessage)
     this.$emitter.on('equip-setting-value:update', this.change)
 
     this.pageInfo.Items =

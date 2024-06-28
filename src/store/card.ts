@@ -9,6 +9,8 @@ export interface Card {
   equipTypeModificationId: number | null
   timeLastChecking: number | null
   timeNextChecking: number | null
+  startTimeLastChecking: number | null
+  startTimeNextChecking: number | null
   nodeChange: any | null
   nodeCreate: any | null
 }
@@ -24,6 +26,8 @@ export const card: Card = {
   equipTypeModificationId: null,
   timeLastChecking: null,
   timeNextChecking: null,
+  startTimeLastChecking: null,
+  startTimeNextChecking: null,
   nodeChange: null,
   nodeCreate: null,
 }

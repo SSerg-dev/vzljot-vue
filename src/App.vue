@@ -438,7 +438,12 @@ export default {
           this.currentMenu = name
           break
         case 'points':
+          this.onPoint(true)
+          this.onEquip(false)
+          this.currentMenu = name
+          break
         case 'equips':
+          this.onPoint(false)
           this.onEquip(true)
           this.currentMenu = name
           break
@@ -528,6 +533,12 @@ export default {
         isInfoChanged: flag,
       }
       this.$emitter.emit('info:open', options)
+    },
+    onPoint(flag) {
+      let options = {
+        isPointChanged: flag,
+      }
+      this.$emitter.emit('equip:open', options)
     },
     onEquip(flag) {
       let options = {

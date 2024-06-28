@@ -137,7 +137,6 @@ export default {
     }
   },
   created() {
-    this.$emitter.on('message', this.processMessage)
     this.currentDate = this.getCurrentDate()
   },
   async mounted() {

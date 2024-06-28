@@ -140,9 +140,9 @@ interface ColdWater {
 
 interface EquipSetting {
   id: number
-  caption: string | null
-  name: string | null
-  value: string | null
+  caption: string
+  name: string
+  value: string
 }
 
 export class Equip extends BaseObject {
@@ -228,7 +228,7 @@ export class Equip extends BaseObject {
     equipSettingTable = null,
     timeZones = [],
     timeZonesType = -1,
-    timeZonesSystem = []
+    timeZonesSystem = [],
   }: IEquip) {
     super(uuid)
 
@@ -416,9 +416,9 @@ export class Equip extends BaseObject {
       coldWater: this.coldWater,
       equipSettings: this.equipSettings,
       equipSettingTable: this.equipSettingTable,
-      timeZonesType: this.timeZonesType
+      timeZonesType: this.timeZonesType,
     }
-    
+
     props.timeZonesType = Equip.store.state.equip.timeZonesType ?? -1
 
     if (this.isBusAddressVisible(this.equipType)) {
@@ -452,11 +452,27 @@ export class Equip extends BaseObject {
         props.protocol = this.protocol
       }
     }
-
+    // $$  
     if (this.timeLastChecking !== null) {
       props.timeLastChecking = this.timeLastChecking
     }
-    if (this.timeNextChecking !== null) {
+
+    // $$
+    if (this.timeNextChecking !== null && this.timeLastChecking !== null) {
+      if (
+        typeof this.timeNextChecking === 'number' &&
+        typeof this.timeLastChecking === 'number'
+      ) {
+        if (this.timeNextChecking > this.timeLastChecking) { 
+          props.timeNextChecking = this.timeNextChecking
+        } else {
+          props.timeNextChecking = Equip.store.state.card.startTimeNextChecking
+          // $$
+          // props.timeLastChecking = Equip.store.state.card.startTimeLastChecking
+          console.log('$$ ++ props.timeNextChecking', JSON.stringify(props.timeNextChecking))
+        }
+      }
+    } else if (this.timeNextChecking === 0) {
       props.timeNextChecking = this.timeNextChecking
     }
 
