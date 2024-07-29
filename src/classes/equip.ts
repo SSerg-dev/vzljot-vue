@@ -469,7 +469,7 @@ export class Equip extends BaseObject {
           props.timeNextChecking = Equip.store.state.card.startTimeNextChecking
           // $$
           // props.timeLastChecking = Equip.store.state.card.startTimeLastChecking
-          console.log('$$ ++ props.timeNextChecking', JSON.stringify(props.timeNextChecking))
+          console.log('$$ ++ props.timeNextChecking', JSON.stringify(props.timeNextChecking)) 
         }
       }
     } else if (this.timeNextChecking === 0) {
