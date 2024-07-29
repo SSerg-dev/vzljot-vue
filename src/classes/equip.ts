@@ -269,14 +269,20 @@ export class Equip extends BaseObject {
       const types: any = Equip.matchType(Equip.store.state.env.equipTypeCodes)
 
       return ![
-        types.vzljotASDT,
-        types.multical601,
-        types.multical602,
-        types.multical66CDE,
-        types.multicalIII,
+        types.VzljotASDT,
+        types.Multical601,
+        types.Multical602,
+        types.Multical66CDE,
+        types.MulticalIII,
         types.EK270_LIS200,
         types.SKU_01,
-        types.vzljot_ASSV2,
+        types.TSSh_1M_02,
+        types.ELDIS_EL_1203,
+        types.VegaSI11,
+        types.VegaSI12,
+        types.VegaTP11,
+        types.VegaSI11_rev2,
+        types.Vzljot_ASSV2,
       ].includes(type)
     }
     return false

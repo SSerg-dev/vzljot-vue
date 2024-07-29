@@ -23,7 +23,7 @@
             )"
           >
             <check-box
-              v-if="value[v.type] !== null && hasShowDataColdWater(index)"
+              v-if="value[v.type] !== null && hasShowDataColdWater(index) && hasShowTimeSync(index)"
               :key="k"
               v-model="value[v.type]"
               :disabled="disabled"
@@ -342,6 +342,19 @@ export default {
     },
   },
   computed: {
+    hasTimeSync() {
+      return this.$store.state.equip.hasTimeSync
+    },
+    hasShowTimeSync() {
+      return (index) => {
+        if (this.hasTimeSync) {
+          return true
+        } else {
+          const indicesToCheck = [9]
+          return !indicesToCheck.includes(index)
+        }
+      }
+    },
     hasSetDataColdWater() {
       return this.$store.state.equip.hasSetDataColdWater
     },

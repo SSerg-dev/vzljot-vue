@@ -105,7 +105,8 @@ export default {
     id: Number,
     hasEquipEvents: Boolean,
     hasSetDataColdWater: Boolean,
-    hasColdWater: Boolean
+    hasColdWater: Boolean,
+    hasTimeSync: Boolean
   },
   data() {
     return {

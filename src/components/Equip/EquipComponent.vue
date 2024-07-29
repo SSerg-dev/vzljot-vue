@@ -227,7 +227,8 @@ export default defineComponent({
       }
     })
     onMounted(() => {
-      store.state.equip.hasSetDataColdWater = props.hasSetDataColdWater
+      store.state.equip.hasSetDataColdWater = props.hasSetDataColdWater;
+      store.state.equip.hasTimeSync = props.hasTimeSync;
     })
 
     function onGroupChange() {

@@ -16,6 +16,7 @@ export interface Equip {
   hasNotSave: boolean | null
   validateTypes: ValidateTypes | null 
   hasSetDataColdWater: boolean | null
+  hasTimeSync: boolean | null
   timeZonesType: number | null
   timeZonesTypeSystem: number | null 
 }
@@ -63,6 +64,7 @@ export const equip: Equip = {
   hasNotSave: false,
   validateTypes: validateTypes || null,
   hasSetDataColdWater: null, 
+  hasTimeSync: null,
   timeZonesType: null,
   timeZonesTypeSystem: null
 }
