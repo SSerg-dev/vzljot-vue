@@ -278,10 +278,10 @@ export class Equip extends BaseObject {
         types.SKU_01,
         types.TSSh_1M_02,
         types.ELDIS_EL_1203,
-        types.VegaSI11,
-        types.VegaSI12,
-        types.VegaTP11,
-        types.VegaSI11_rev2,
+        types.vegaSI11,
+        types.vegaSI12,
+        types.vegaTP11,
+        types.vegaSI11_rev2,
         types.Vzljot_ASSV2,
       ].includes(type)
     }
@@ -458,29 +458,41 @@ export class Equip extends BaseObject {
         props.protocol = this.protocol
       }
     }
-    // $$  
+
+    // $$
     if (this.timeLastChecking !== null) {
       props.timeLastChecking = this.timeLastChecking
     }
 
-    // $$
-    if (this.timeNextChecking !== null && this.timeLastChecking !== null) {
-      if (
-        typeof this.timeNextChecking === 'number' &&
-        typeof this.timeLastChecking === 'number'
+    if (
+      typeof this.timeNextChecking === 'number' &&
+      typeof this.timeLastChecking === 'number'
+    ) {
+      if (this.getDateOnlyTimestamp(this.timeNextChecking!) > this.getDateOnlyTimestamp(this.timeLastChecking!)) {
+        props.timeNextChecking = this.timeNextChecking
+      } else if (
+        typeof Equip.store.state.card.startTimeNextChecking === 'number' &&
+        this.timeLastChecking < Equip.store.state.card.startTimeNextChecking &&
+        this.timeLastChecking < this.timeNextChecking
       ) {
-        if (this.timeNextChecking > this.timeLastChecking) { 
-          props.timeNextChecking = this.timeNextChecking
-        } else {
-          props.timeNextChecking = Equip.store.state.card.startTimeNextChecking
-          // $$
-          // props.timeLastChecking = Equip.store.state.card.startTimeLastChecking
-          console.log('$$ ++ props.timeNextChecking', JSON.stringify(props.timeNextChecking)) 
-        }
+        props.timeNextChecking = Equip.store.state.card.startTimeNextChecking
       }
-    } else if (this.timeNextChecking === 0) {
-      props.timeNextChecking = this.timeNextChecking
     }
+
+    if (this.timeLastChecking === 0) {
+      props.timeNextChecking = 0
+    }
+
+    if (
+      typeof this.timeLastChecking === 'number' &&
+      typeof this.timeNextChecking === 'number' &&
+      this.getDateOnlyTimestamp(this.timeLastChecking!) >=
+        this.getDateOnlyTimestamp(this.timeNextChecking!) 
+    ) {
+      props.timeNextChecking = 0
+    }
+    
+    // ----------------------------------
 
     if (this.equipTypeModificationId !== null) {
       props.equipTypeModificationId = this.equipTypeModificationId

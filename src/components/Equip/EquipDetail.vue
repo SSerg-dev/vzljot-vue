@@ -46,7 +46,7 @@
           }"
         >
           <label
-            v-if="
+            v-if=" 
               !localEquip.isGroupType('none') &&
               localEquip.isBusAddressVisible(localEquip.equipType)
             "
@@ -70,6 +70,7 @@
               maxlength="80"
             />
           </label>
+
           <label
             >Заводской номер:
             <input

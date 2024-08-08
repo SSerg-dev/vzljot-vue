@@ -28,3 +28,18 @@ sleep(4000).then(() => {
   console.log('run after 4 sec')
 })
 */
+
+export function getDateOnlyTimestamp(timestamp) {
+  if (timestamp) {
+    const originalDate = new Date(timestamp)
+
+    const year = originalDate.getUTCFullYear()
+    const month = originalDate.getUTCMonth()
+    const date = originalDate.getUTCDate()
+
+    const dateOnly = new Date(Date.UTC(year, month, date, 0, 0, 0, 0))
+
+    return dateOnly.getTime()
+  }
+  return 0
+}

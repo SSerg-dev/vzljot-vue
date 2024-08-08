@@ -93,6 +93,9 @@ export default {
       startTimeNextChecking: null,
       prevTimeLastChecking: null,
       prevTimeNextChecking: null,
+      changedLastChecking: null,
+      changedNextChecking: null,
+
       isStartTime: false,
       day: 24 * 60 * 60 * 1000,
 
@@ -153,32 +156,41 @@ export default {
         }
         if (!this.startTimeNextChecking) {
           this.startTimeNextChecking = newVal.nodeChange.timeNextChecking
-          store.state.card.startTimeNextChecking = newVal.nodeChange.timeNextChecking
+          store.state.card.startTimeNextChecking =
+            newVal.nodeChange.timeNextChecking
         }
         // ------------------------------
-
         // logic last exist and next exist
         if (this.timeLastChecking > 0 && this.timeNextChecking > 0) {
           if (this.timeLastChecking < newVal.nodeChange.timeNextChecking) {
             this.timeLastChecking = newVal.nodeChange.timeLastChecking ?? null
             this.timeNextChecking = newVal.nodeChange.timeNextChecking ?? null
-          } else {
-            if (!this.prevTimeLastChecking) {
-              this.prevTimeLastChecking = oldVal.nodeChange?.timeLastChecking
-            }
-            this.timeLastChecking = this.prevTimeLastChecking
+          } else if (
+            this.timeLastChecking >= newVal.nodeChange.timeNextChecking ||
+            this.timeLastChecking >= this.timeNextChecking
+          ) {
+            // if (!this.prevTimeLastChecking) {
+            //   this.prevTimeLastChecking = oldVal.nodeChange?.timeLastChecking
+            // } else this.timeLastChecking = this.prevTimeLastChecking
 
-            if (!this.prevTimeNextChecking) {
-              this.prevTimeNextChecking = oldVal.nodeChange?.timeNextChecking
-            }
-            this.timeNextChecking = this.prevTimeNextChecking
+            // if (!this.prevTimeNextChecking) {
+            //   this.prevTimeNextChecking = oldVal.nodeChange?.timeNextChecking
+            // } else this.timeNextChecking = this.prevTimeNextChecking
 
             if (this.isStartTime && this.isMessage && this.isEquipChanged) {
-              // debounce(this.message(), 3000)
               this.message()
             }
             this.isMessage = !this.isMessage
-          }
+          } 
+          // else if (
+          //   this.timeLastChecking === newVal.nodeChange.timeNextChecking ||
+          //   this.timeLastChecking === this.timeNextChecking
+          // ) {
+          //   if (this.isStartTime && this.isMessage && this.isEquipChanged) {
+          //     this.message()
+          //   }
+          //   this.isMessage = !this.isMessage
+          // }
         }
         // logic last exist and next not exist
         if (this.timeLastChecking > 0 && !this.timeNextChecking) {
@@ -189,21 +201,6 @@ export default {
         if (!this.timeLastChecking) {
           this.timeLastChecking = store.state.card.timeLastChecking
         }
-        // if (!this.timeNextChecking) {
-        //   this.timeNextChecking = store.state.card.timeNextChecking
-        // }
-        // ------------------------------
-        /*
-        if (
-          this.timeLastChecking > 0 &&
-          this.timeNextChecking > 0 &&
-          this.timeLastChecking >= this.timeNextChecking
-        ) {
-          // this.timeNextChecking = this.timeNextChecking + this.day
-          this.timeLastChecking = this.startTimeLastChecking
-          this.timeNextChecking = this.startTimeNextChecking
-        }
-        */
 
         this.equipTypeModificationId = newVal.nodeChange.equipTypeModificationId
       }
@@ -344,8 +341,8 @@ export default {
     },
 
     handleLastCheckingChange(event) {
-      let changedLastChecking = new Date(event).getTime()
-      this.$emit('last-checking-updated', changedLastChecking)
+      this.changedLastChecking = new Date(event).getTime()
+      this.$emit('last-checking-updated', this.changedLastChecking)
 
       const options = {
         timeLastChecking: event,
@@ -353,8 +350,8 @@ export default {
       this.$store.commit('setCard', options)
     },
     handleNextCheckingChange(event) {
-      let changedNextChecking = new Date(event).getTime()
-      this.$emit('next-checking-updated', changedNextChecking)
+      this.changedNextChecking = new Date(event).getTime()
+      this.$emit('next-checking-updated', this.changedNextChecking)
 
       const options = {
         timeNextChecking: event,
