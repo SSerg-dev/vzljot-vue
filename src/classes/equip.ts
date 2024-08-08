@@ -492,8 +492,6 @@ export class Equip extends BaseObject {
       props.timeNextChecking = 0
     }
     
-    // ----------------------------------
-
     if (this.equipTypeModificationId !== null) {
       props.equipTypeModificationId = this.equipTypeModificationId
     }

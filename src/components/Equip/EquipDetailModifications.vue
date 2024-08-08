@@ -169,34 +169,16 @@ export default {
             this.timeLastChecking >= newVal.nodeChange.timeNextChecking ||
             this.timeLastChecking >= this.timeNextChecking
           ) {
-            // if (!this.prevTimeLastChecking) {
-            //   this.prevTimeLastChecking = oldVal.nodeChange?.timeLastChecking
-            // } else this.timeLastChecking = this.prevTimeLastChecking
-
-            // if (!this.prevTimeNextChecking) {
-            //   this.prevTimeNextChecking = oldVal.nodeChange?.timeNextChecking
-            // } else this.timeNextChecking = this.prevTimeNextChecking
-
             if (this.isStartTime && this.isMessage && this.isEquipChanged) {
               this.message()
             }
             this.isMessage = !this.isMessage
-          } 
-          // else if (
-          //   this.timeLastChecking === newVal.nodeChange.timeNextChecking ||
-          //   this.timeLastChecking === this.timeNextChecking
-          // ) {
-          //   if (this.isStartTime && this.isMessage && this.isEquipChanged) {
-          //     this.message()
-          //   }
-          //   this.isMessage = !this.isMessage
-          // }
+          }
         }
         // logic last exist and next not exist
         if (this.timeLastChecking > 0 && !this.timeNextChecking) {
           this.timeLastChecking = newVal.nodeChange.timeLastChecking ?? null
         }
-
         // ------------------------------
         if (!this.timeLastChecking) {
           this.timeLastChecking = store.state.card.timeLastChecking
