@@ -393,17 +393,6 @@
       />
     </expantion-panel>
 
-    <!-- <expantion-panel
-      caption="Настройки прибора"
-      :opened="false"
-      style="display: none"
-    >
-      <equip-detail-setting
-        v-bind="{ equip: localEquip }"
-        @equip-setting-update="updatedEquipSetting"
-      />
-    </expantion-panel> -->
-
     <transition>
       <wizard
         v-if="wizard"
@@ -433,7 +422,6 @@ import { wizardSelectSet } from '@/plugins/wizardComponents/wizardSelectSet'
 import { wizardSourceSelectSet } from '@/plugins/wizardComponents/wizardSourceSelectSet'
 
 import EquipDetailModifications from '@/components/Equip/EquipDetailModifications.vue'
-// import EquipDetailSetting from '@/components/Equip/EquipDetailSetting.vue'
 import EquipDetailTimeSync from '@/components/Equip/EquipDetailTimeSync.vue'
 
 export default {
@@ -446,7 +434,6 @@ export default {
     ObjectProps,
     Wizard,
     EquipDetailModifications,
-    // EquipDetailSetting,
     EquipDetailTimeSync,
   },
   props: {
@@ -606,6 +593,7 @@ export default {
     },
     onChange(prop, value) {
       this.$emit('changed', prop, value)
+
       if (this.action !== 'create') {
         this.action = 'change'
       }

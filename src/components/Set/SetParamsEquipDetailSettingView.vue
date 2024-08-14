@@ -4,7 +4,7 @@
       v-bind="{
         readOnly: !$store.state.user?.userRights.equipEdit,
         saving,
-        disabled: !hasChanges,
+        disabled: !hasChanges, 
       }"
       @saveClick="onSaveClick()"
     >
@@ -168,11 +168,15 @@ export default {
       getEquip: 'getEquip',
     }),
     editName() {
-      return this.localEditName
+      return this.localEditName 
     },
   },
 
   beforeUnmount() {
+    const options = {
+      hasEquipSettingEdit: false,
+    }
+    this.$store.commit('setEquip', options)
   },
 
   methods: {

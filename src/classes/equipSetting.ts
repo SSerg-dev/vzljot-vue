@@ -69,7 +69,7 @@ export default class EquipSetting extends BaseObject {
     if (this.equipSettings) {
       props.equipSettings = this.equipSettings
     }
-
+    
     const { data } = await this.http.post('equip/updateEquipSettings', props, {
       headers: {
         'Content-Type': 'application/json',

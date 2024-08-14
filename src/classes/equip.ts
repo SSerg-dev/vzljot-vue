@@ -459,7 +459,6 @@ export class Equip extends BaseObject {
       }
     }
 
-    // $$
     if (this.timeLastChecking !== null) {
       props.timeLastChecking = this.timeLastChecking
     }

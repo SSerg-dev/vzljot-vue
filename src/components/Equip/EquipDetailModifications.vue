@@ -119,7 +119,7 @@ export default {
       isMessage: true,
       isEquipChanged: true,
     }
-  },
+  }, 
   computed: {
     ...mapGetters({
       getCard: 'getCard',
@@ -136,7 +136,6 @@ export default {
 
       if (newVal.nodeChange) {
         this.equipTypeId = newVal.nodeChange.equipType
-
         // init
         // ------------------------------
         if (newVal.nodeChange.timeLastChecking)

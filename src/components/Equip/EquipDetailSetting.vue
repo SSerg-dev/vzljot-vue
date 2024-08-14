@@ -46,16 +46,15 @@ export default {
         serialNumber: newValue.serialNumber,
         equipTypeName: newValue.equipTypes[0].name,
       }
-      this.$store.commit('setEquip', options)
+      this.$store.commit('setEquip', options) 
       this.isVisible = true
     },
   },
   created() {
     this.$emitter.on('equip-setting-value:update', this.update)
-    this.$emitter.on('set-params-equip-setting:update', this.change) 
+    this.$emitter.on('set-params-equip-setting:update', this.change)
 
     this.$emitter.on('equip-setting-value:update', this.change)
-
     this.$watch(
       () => this.equip,
       (value) => (this.localEquip = new Equip(value)),
@@ -87,7 +86,6 @@ export default {
   display: grid;
   gap: 5px 3px;
   min-width: 450px;
-
 }
 
 /* equip-setting */

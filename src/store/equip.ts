@@ -18,7 +18,8 @@ export interface Equip {
   hasSetDataColdWater: boolean | null
   hasTimeSync: boolean | null
   timeZonesType: number | null
-  timeZonesTypeSystem: number | null 
+  timeZonesTypeSystem: number | null
+  hasEquipSettingEdit: boolean 
 }
 
 export interface EquipSettingTable {
@@ -66,5 +67,6 @@ export const equip: Equip = {
   hasSetDataColdWater: null, 
   hasTimeSync: null,
   timeZonesType: null,
-  timeZonesTypeSystem: null
+  timeZonesTypeSystem: null,
+  hasEquipSettingEdit: false
 }

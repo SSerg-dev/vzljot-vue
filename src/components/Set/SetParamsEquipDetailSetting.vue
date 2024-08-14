@@ -7,7 +7,7 @@
         @click="onAddClick()"
       />
       <div
-        :class="['button', 'fas', 'fa-times-circle', { disabled: true }]" 
+        :class="['button', 'fas', 'fa-times-circle', { disabled: true }]"
         title="Удалить"
         @click="onRemoveClick()"
       />
@@ -138,16 +138,13 @@ export default {
   },
   created() {
     this.currentDate = this.getCurrentDate()
+    this.load()
   },
-  async mounted() {
-    await this.load()
-    this.localItemsSorted = this.localItems
-      .slice()
-      .sort((a, b) => new Date(a.timeStart) - new Date(b.timeStart))
-  },
+  mounted() {},
   computed: {
     ...mapGetters({
       getEquip: 'getEquip',
+      getCard: 'getCard',
     }),
     computedHeight() {
       /*
@@ -190,6 +187,11 @@ export default {
       this.localTimeStart = this.localItemsSorted[i].timeStart
       this.localProperties = this.localItemsSorted[i].properties
 
+      const options = {
+        hasEquipSettingEdit: true,
+      }
+      this.$store.commit('setEquip', options)
+
       this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
 
       const obj = new Set(r)
@@ -219,7 +221,7 @@ export default {
 
       try {
         const { data } = await this.$http.get('equip/equipSettings', {
-          params: { equipId: this.getEquip.id },
+          params: { equipId: this.getCard.selectedNodeId },
         })
 
         this.dataItems = data.data.values.map((r) => {
@@ -227,6 +229,9 @@ export default {
             checked: r.properties === 1 ? true : false,
           })
         })
+        this.localItemsSorted = this.localItems
+          .slice()
+          .sort((a, b) => new Date(a.timeStart) - new Date(b.timeStart))
       } catch (error) {
         this.$store.commit('error', error)
       } finally {
@@ -305,6 +310,7 @@ export default {
 }
 .container {
   height: 100%;
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;

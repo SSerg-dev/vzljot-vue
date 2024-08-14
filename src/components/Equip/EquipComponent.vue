@@ -6,7 +6,7 @@
           v-bind="{
             readOnly: !$store.state.user?.userRights.equipEdit,
             saving,
-            disabled: !hasChanges || loading,
+            disabled: !hasChanges || loading || hasEquipSettingEdit,
             loading,
           }"
           @saveClick="save()"
@@ -18,10 +18,11 @@
           />
         </preserver-component>
       </tabx>
-
-      <!-- <tab v-if="$store.state.user?.userRights.equip" text="Настройки прибора">
-        <equip-detail-setting />
-      </tab> -->
+      <tab v-if="$store.state.user?.userRights.equip" text="Настройки прибора">
+        <equip-detail-setting
+        v-bind="{ equip: localItem }" 
+        />
+      </tab>
 
       <tab
         text="Отчеты"
@@ -48,7 +49,7 @@
             hasEquipEvents: hasEquipEvents,
             hasSetDataColdWater: hasSetDataColdWater,
             hasColdWater: hasColdWater,
-            hasTimeSync: hasTimeSync
+            hasTimeSync: hasTimeSync,
           }"
         />
       </tab>
@@ -112,6 +113,7 @@
 <script lang="ts">
 import { defineComponent, PropType, reactive } from 'vue'
 import { onBeforeMount, getCurrentInstance, onMounted } from 'vue'
+import { computed } from 'vue'
 
 import { ReportObjectTypeEnum } from '@/classes/enum/ReportObjectTypeEnum'
 
@@ -134,7 +136,7 @@ import Tabx from '../Tabs/Tabx.vue'
 import Tabs from '../Tabs/Tabs.vue'
 import Wizard from '../Wizard.vue'
 import { setupTreeComponent } from '../Base/baseComponent'
-// import EquipDetailSetting from '@/components/Equip/EquipDetailSetting.vue'
+import EquipDetailSetting from '@/components/Equip/EquipDetailSetting.vue'
 import { Events } from '@/events'
 import { Emitter } from 'mitt'
 
@@ -158,7 +160,7 @@ export default defineComponent({
     Tabx,
     Tabs,
     Wizard,
-    // EquipDetailSetting,
+    EquipDetailSetting,
   },
   props: {
     uuid: {
@@ -192,7 +194,7 @@ export default defineComponent({
     hasTimeSync: {
       type: Boolean as PropType<boolean>,
       required: true,
-    }
+    },
   },
   setup(props) {
     const {
@@ -216,6 +218,10 @@ export default defineComponent({
     const localEquip = reactive({})
     const instance = getCurrentInstance()
 
+    const hasEquipSettingEdit = computed(
+      () => store.state.equip.hasEquipSettingEdit
+    )
+
     onBeforeMount(() => {
       if (instance) {
         const emitter: Emitter<Events> =
@@ -223,12 +229,13 @@ export default defineComponent({
 
         emitter.on('equip-detail:equip', (equip: Equip) => {
           Object.assign(localEquip, equip)
+
         })
       }
     })
     onMounted(() => {
-      store.state.equip.hasSetDataColdWater = props.hasSetDataColdWater;
-      store.state.equip.hasTimeSync = props.hasTimeSync;
+      store.state.equip.hasSetDataColdWater = props.hasSetDataColdWater
+      store.state.equip.hasTimeSync = props.hasTimeSync
     })
 
     function onGroupChange() {
@@ -253,6 +260,7 @@ export default defineComponent({
       wizard,
 
       localEquip,
+      hasEquipSettingEdit,
     }
   },
 })

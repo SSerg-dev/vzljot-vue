@@ -212,7 +212,7 @@
               v-bind="periodColdWaterData"
             />
           </tabx>
-          <tabx text="База параметров" v-if="pollData.equipDatabaseParams">
+          <tabx text="База параметров" v-if="pollData.equipDatabaseParams"> 
             <poll-period-props
               @change="onPeriodEquipDatabaseParamsChange"
               v-bind="periodEquipDatabaseParamsData"
