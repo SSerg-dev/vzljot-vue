@@ -36,7 +36,7 @@ export default class EquipSetting extends BaseObject {
     id = undefined,
     name = '',
 
-    equipSettingTable = null,
+    equipSettingTable = null, 
     equipSettings = [],
   }: IEquipSetting) {
     super(uuid)

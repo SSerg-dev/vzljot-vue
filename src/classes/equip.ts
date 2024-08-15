@@ -122,8 +122,6 @@ interface IEquip {
   timeLastChecking?: number | null
   timeNextChecking?: number | null
   equipTypeModificationId?: number | null
-  equipSettings?: Array<EquipSetting> | null
-  equipSettingTable?: EquipSettingTable | null
   timeZones?: Array<any>
   timeZonesType?: number
   timeZonesSystem?: Array<any>
@@ -173,8 +171,6 @@ export class Equip extends BaseObject {
   timeLastChecking?: number | null
   timeNextChecking?: number | null
   equipTypeModificationId?: number | null
-  equipSettings?: Array<EquipSetting> | null
-  equipSettingTable?: EquipSettingTable | null
   timeZones: Array<any>
   timeZonesType: number
   timeZonesSystem: Array<any>
@@ -224,8 +220,6 @@ export class Equip extends BaseObject {
     timeLastChecking = null,
     timeNextChecking = null,
     equipTypeModificationId = null,
-    equipSettings = [],
-    equipSettingTable = null,
     timeZones = [],
     timeZonesType = -1,
     timeZonesSystem = [],
@@ -257,8 +251,6 @@ export class Equip extends BaseObject {
     this.timeLastChecking = this.getDateOnlyTimestamp(timeLastChecking)
     this.timeNextChecking = this.getDateOnlyTimestamp(timeNextChecking)
     this.equipTypeModificationId = equipTypeModificationId
-    this.equipSettings = equipSettings
-    this.equipSettingTable = equipSettingTable
     this.timeZones = Equip.store.state.env.timeZones
     this.timeZonesType = timeZonesType
     this.timeZonesSystem = Equip.store.state.env.timeZonesSystem
@@ -288,7 +280,7 @@ export class Equip extends BaseObject {
     return false
   }
 
-  isGroupType(type: string) {
+  isGroupType(type: string) { 
     if (this.groupType) {
       return (
         Equip.store.state.env.connectionGroupTypes[this.groupType].type === type
@@ -402,8 +394,6 @@ export class Equip extends BaseObject {
       timeLastChecking?: number | null
       timeNextChecking?: number | null
       equipTypeModificationId?: number | null
-      equipSettings?: Array<EquipSetting> | null
-      equipSettingTable?: EquipSettingTable | null
       timeZonesType: number
     }
 
@@ -420,8 +410,6 @@ export class Equip extends BaseObject {
       groupType: this.groupType,
       analyze: this.analyze,
       coldWater: this.coldWater,
-      equipSettings: this.equipSettings,
-      equipSettingTable: this.equipSettingTable,
       timeZonesType: this.timeZonesType,
     }
 
@@ -467,7 +455,10 @@ export class Equip extends BaseObject {
       typeof this.timeNextChecking === 'number' &&
       typeof this.timeLastChecking === 'number'
     ) {
-      if (this.getDateOnlyTimestamp(this.timeNextChecking!) > this.getDateOnlyTimestamp(this.timeLastChecking!)) {
+      if (
+        this.getDateOnlyTimestamp(this.timeNextChecking!) >
+        this.getDateOnlyTimestamp(this.timeLastChecking!)
+      ) {
         props.timeNextChecking = this.timeNextChecking
       } else if (
         typeof Equip.store.state.card.startTimeNextChecking === 'number' &&
@@ -486,11 +477,11 @@ export class Equip extends BaseObject {
       typeof this.timeLastChecking === 'number' &&
       typeof this.timeNextChecking === 'number' &&
       this.getDateOnlyTimestamp(this.timeLastChecking!) >=
-        this.getDateOnlyTimestamp(this.timeNextChecking!) 
+        this.getDateOnlyTimestamp(this.timeNextChecking!)
     ) {
       props.timeNextChecking = 0
     }
-    
+
     if (this.equipTypeModificationId !== null) {
       props.equipTypeModificationId = this.equipTypeModificationId
     }
@@ -548,17 +539,7 @@ export class Equip extends BaseObject {
         return obj
       })
     }
-
-    this.equipSettings = Equip.store.state.equip.equipSettingSave
-    if (this.equipSettings) {
-      props.equipSettings = this.equipSettings
-    }
-
-    this.equipSettingTable = Equip.store.state.equip.equipSettingTable
-    if (this.equipSettingTable) {
-      props.equipSettingTable = this.equipSettingTable
-    }
-
     await this.http.post('equip/equip', props)
   }
 }
+ 
