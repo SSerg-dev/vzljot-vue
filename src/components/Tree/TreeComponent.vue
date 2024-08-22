@@ -1,14 +1,42 @@
 <template>
-  <div class="tree-wrapper" tabIndex="0" @keydown.up.prevent="up(selectedNode)" @keydown.down.prevent="down(selectedNode)"
-    @keydown.enter.prevent="enter(selectedNode)" @keyup.left="left(selectedNode)" @keyup.right="right(selectedNode)"
-    @click="onClick" @mouseover="mouseover($event)" @mouseout="mouseout($event)">
-    <div v-if="hoveredNode" class="button-panel"
-      :style="hoverRect ? { top: `${hoverRect.top - offsetTop + $el.scrollTop}px` } : null">
-      <fab-button v-if="hoveredNode && hoveredNode.canAdd()" @click="$emit('create', hoveredNode)" :fabStyle="fabStyle"
-        class="fas fa-plus" title="Добавить..." :style="styleColors">
+  <div
+    class="tree-wrapper"
+    tabIndex="0"
+    @keydown.up.prevent="up(selectedNode)"
+    @keydown.down.prevent="down(selectedNode)"
+    @keydown.enter.prevent="enter(selectedNode)"
+    @keyup.left="left(selectedNode)"
+    @keyup.right="right(selectedNode)"
+    @click="onClick"
+    @mouseover="mouseover($event)"
+    @mouseout="mouseout($event)"
+  >
+    <div
+      v-if="hoveredNode"
+      class="button-panel"
+      :style="
+        hoverRect
+          ? { top: `${hoverRect.top - offsetTop + $el.scrollTop}px` }
+          : null
+      "
+    >
+      <fab-button
+        v-if="hoveredNode && hoveredNode.canAdd()"
+        @click="$emit('create', hoveredNode)"
+        :fabStyle="fabStyle"
+        class="fas fa-plus"
+        title="Добавить..."
+        :style="styleColors"
+      >
       </fab-button>
-      <fab-button v-if="hoveredNode && hoveredNode.canDelete()" @click="$emit('delete', hoveredNode)" :fabStyle="fabStyle"
-        class="fas fa-times" title="Удалить..." :style="styleColors">
+      <fab-button
+        v-if="hoveredNode && hoveredNode.canDelete()"
+        @click="$emit('delete', hoveredNode)"
+        :fabStyle="fabStyle"
+        class="fas fa-times"
+        title="Удалить..."
+        :style="styleColors"
+      >
       </fab-button>
     </div>
   </div>
@@ -29,8 +57,8 @@ export default {
   props: {
     data: {
       type: Object,
-      required: true
-    }
+      required: true,
+    },
   },
   data() {
     const itemTypes = matchType(this.$store.state.env.itemTypes)
@@ -44,7 +72,7 @@ export default {
         width: '22px',
         height: '22px',
         borderRadius: '2px',
-        marginRight: '3px'
+        marginRight: '3px',
       },
       itemTypes: [
         'address',
@@ -58,10 +86,10 @@ export default {
         'pointList',
         'set',
         'symbolSchema',
-        'systemNode'
+        'systemNode',
       ],
-      nodeTypes: this.data.nodeTypes.map(r => itemTypes[r]),
-      components: []
+      nodeTypes: this.data.nodeTypes.map((r) => itemTypes[r]),
+      components: [],
     }
   },
   computed: {
@@ -69,11 +97,13 @@ export default {
       return this.$el.getBoundingClientRect().top
     },
     hoverRect() {
-      return this.hoveredNode ? this.hoveredNode.domBody().getBoundingClientRect() : null
+      return this.hoveredNode
+        ? this.hoveredNode.domBody().getBoundingClientRect()
+        : null
     },
     styleColors() {
       return this.$store.getters.styleColors
-    }
+    },
   },
   created() {
     this.$emitter.on('updateObject', this.update)
@@ -110,7 +140,7 @@ export default {
       }
     },
     build(data) {
-      this.items = data.map(item => new Node(item, null, this.$el))
+      this.items = data.map((item) => new Node(item, null, this.$el))
       this.getList(this.items)
       let arr = []
       createHtml(this.items, arr)
@@ -185,9 +215,15 @@ export default {
       }
     },
     async enter(node) {
-      let deniedNodes = ['points', 'equips', 'equipLists', 'pointLists', 'balanceGroups', 'reportTasks', 'pointGroups'].map(
-        r => this.$store.getters.reversedItemTypes[r]
-      )
+      let deniedNodes = [
+        'points',
+        'equips',
+        'equipLists',
+        'pointLists',
+        'balanceGroups',
+        'reportTasks',
+        'pointGroups',
+      ].map((r) => this.$store.getters.reversedItemTypes[r])
       if (node && isFolder(node) && !deniedNodes.includes(node.type)) {
         if (node.expanded) {
           this.removeNodes(node.children)
@@ -204,7 +240,7 @@ export default {
         toggle.classList.add('loading')
         let { data } = await this.$http.get(url, { params: node })
 
-        let children = data.map(child => new Node(child, node, node.$el))
+        let children = data.map((child) => new Node(child, node, node.$el))
         this.getList(children)
         node.expanded = true
         node.createChildren(children)
@@ -232,7 +268,8 @@ export default {
         }
         if (message.event === 'add') {
           if (!node) {
-            let parentNode = this.list[`${message.item.parent.type}_${message.item.parent.id}`]
+            let parentNode =
+              this.list[`${message.item.parent.type}_${message.item.parent.id}`]
             if (parentNode) {
               parentNode.setFolder(true)
               if (parentNode.childrenLoaded) {
@@ -253,7 +290,10 @@ export default {
           // console.log('node', node, item)
           // debugger
           item.update(node)
-          if (item.parent.type !== node.parent.type || item.parent.id !== node.parent.id) {
+          if (
+            item.parent.type !== node.parent.type ||
+            item.parent.id !== node.parent.id
+          ) {
             this.removeNodes([item])
             item.delete()
             let parentNode = this.list[`${node.parent.type}_${node.parent.id}`]
@@ -314,10 +354,16 @@ export default {
 
             if (this.selectedNode !== node) {
               if (
-                this.itemTypes.includes(this.$store.state.env.itemTypes[this.selectedNode.type].type) &&
+                this.itemTypes.includes(
+                  this.$store.state.env.itemTypes[this.selectedNode.type].type
+                ) &&
                 this.nodeTypes.includes(this.selectedNode.type)
               ) {
-                this.$emitter.emit('beforeNodeChange', { uuid: this.selectedNode.uuid, node, target })
+                this.$emitter.emit('beforeNodeChange', {
+                  uuid: this.selectedNode.uuid,
+                  node,
+                  target,
+                })
               } else {
                 node.$el = target.parentNode
                 this.select(node)
@@ -352,7 +398,12 @@ export default {
             this.hoveredElement = event.target
             break
           }
-          if (classList[i].indexOf('equip') + classList[i].indexOf('point') + classList[i].indexOf('status') > -1) {
+          if (
+            classList[i].indexOf('equip') +
+              classList[i].indexOf('point') +
+              classList[i].indexOf('status') >
+            -1
+          ) {
             this.hoveredElement = event.target.parentNode.parentNode
             break
           }
@@ -361,7 +412,10 @@ export default {
             break
           }
         }
-        if (this.hoveredElement && this.hoveredNode !== this.list[this.hoveredElement.getAttribute('id')]) {
+        if (
+          this.hoveredElement &&
+          this.hoveredNode !== this.list[this.hoveredElement.getAttribute('id')]
+        ) {
           this.hoveredNode = this.list[this.hoveredElement.getAttribute('id')]
         }
       }
@@ -374,7 +428,11 @@ export default {
       if (relatedTarget !== this.$el) {
         if (relatedTarget) {
           while (relatedTarget && relatedTarget !== this.$el) {
-            if (relatedTarget === this.hoveredElement || relatedTarget.className === 'button-panel') return
+            if (
+              relatedTarget === this.hoveredElement ||
+              relatedTarget.className === 'button-panel'
+            )
+              return
             relatedTarget = relatedTarget.parentNode
           }
         }
@@ -382,7 +440,11 @@ export default {
         if (relatedTarget === this.$el) {
           if (target) {
             while (target) {
-              if (target === this.hoveredElement || target.className === 'button-panel') return
+              if (
+                target === this.hoveredElement ||
+                target.className === 'button-panel'
+              )
+                return
               target = target.parentNode
             }
           }
@@ -419,7 +481,8 @@ export default {
         this.$el.scrollTop = this.$el.scrollTop - (wrapper.top - current.top)
       }
       if (current.bottom > wrapper.bottom) {
-        this.$el.scrollTop = this.$el.scrollTop + (current.bottom - wrapper.bottom)
+        this.$el.scrollTop =
+          this.$el.scrollTop + (current.bottom - wrapper.bottom)
       }
     },
     search(item) {
@@ -442,11 +505,13 @@ export default {
               node.toggle(true)
             }
           }
-          this.$nextTick().then(() => this.select(this.list[`${item.type}_${item.id}`]))
+          this.$nextTick().then(() =>
+            this.select(this.list[`${item.type}_${item.id}`])
+          )
         })
-        .catch(error => this.$store.commit('error', error))
-    }
-  }
+        .catch((error) => this.$store.commit('error', error))
+    },
+  },
 }
 </script>
 
@@ -527,7 +592,7 @@ export default {
   outline: #777 dotted 1px;
 }
 
-.node .body>div {
+.node .body > div {
   margin: 0 5px 0 0;
 }
 

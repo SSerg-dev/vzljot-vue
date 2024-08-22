@@ -23,7 +23,7 @@
           :is="component"
           v-bind="Object.assign({}, componentData, { error })"
           @changed="onGroupChanged"
-          @changeConnectionType="onChangeConnectionType"
+          @changeConnectionType="onChangeConnectionType" 
         />
       </transition>
     </expantion-panel>

@@ -4,7 +4,12 @@
       <div class="modal-wrapper">
         <div class="modal-header">
           <slot name="header"> Header </slot>
-          <div v-if="cancellable" class="fas fa-times icon" @click="$emit('cancel')" title="Закрыть" />
+          <div
+            v-if="cancellable"
+            class="fas fa-times icon"
+            @click="$emit('cancel')"
+            title="Закрыть"
+          />
         </div>
         <div class="modal-content">
           <slot name="content"> Content </slot>
@@ -26,16 +31,16 @@ export default {
   props: {
     background: {
       type: String,
-      default: 'rgba(169, 175, 183, 0.7)'
+      default: 'rgba(169, 175, 183, 0.7)',
     },
     okDisabled: {
       type: Boolean,
-      default: false
+      default: false,
     },
     cancellable: {
       type: Boolean,
-      default: true
-    }
+      default: true,
+    },
   },
   computed: {
     backgroundStyle() {
@@ -51,10 +56,16 @@ export default {
         'justify-content': 'center',
         overflow: 'auto',
         'z-index': '10000',
-        transition: 'opacity .3s ease'
+        transition: 'opacity .3s ease',
       }
+    },
+  },
+  beforeUnmount() {
+    const options = {
+      isNodeCreate: false,
     }
-  }
+    this.$store.commit('setCard', options)
+  },
 }
 </script>
 

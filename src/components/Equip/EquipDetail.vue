@@ -46,7 +46,7 @@
           }"
         >
           <label
-            v-if=" 
+            v-if="
               !localEquip.isGroupType('none') &&
               localEquip.isBusAddressVisible(localEquip.equipType)
             "
@@ -184,214 +184,216 @@
         />
       </div>
     </expantion-panel>
-    <expantion-panel caption="Средство измерения" :opened="false">
-      <equip-detail-modifications
-        v-bind="{ equip: localEquip }"
-        @modifications-updated="handleModificationsUpdated"
-        @last-checking-updated="handleLastCheckingUpdated"
-        @next-checking-updated="handleNextCheckingUpdated"
-      />
-    </expantion-panel>
+    <div v-if="!isCreate">
+      <expantion-panel caption="Средство измерения" :opened="false">
+        <equip-detail-modifications
+          v-bind="{ equip: localEquip }"
+          @modifications-updated="handleModificationsUpdated"
+          @last-checking-updated="handleLastCheckingUpdated"
+          @next-checking-updated="handleNextCheckingUpdated"
+        />
+      </expantion-panel>
 
-    <expantion-panel
-      v-if="equip.id !== null"
-      caption="Сбор и рассылка данных"
-      :opened="false"
-    >
-      <data-capture
-        ref="dataCapture"
-        v-bind="{ pollData: localEquip.pollData, error }"
-        @changed="onChange"
-      />
-    </expantion-panel>
-    <expantion-panel
-      v-if="localEquip.id !== null"
-      caption="Анализ"
-      :opened="false"
-    >
-      <div class="equip-grid">
-        <check-box
-          @update:modelValue="
-            onChange('analyze', { ...localEquip.analyze, checked: $event })
-          "
-          v-model="localEquip.analyze.checked"
-          >Выполнять анализ настроечных параметров</check-box
-        >
-        <div class="equip-grid two">
-          <label :disabled="!localEquip.analyze.checked"
-            >Набор эталонных настроек:</label
-          >
-          <div
-            style="
-              display: grid;
-              grid-template-columns: 1fr min-content min-content;
-              gap: 3px;
-              align-items: center;
+      <expantion-panel
+        v-if="equip.id !== null"
+        caption="Сбор и рассылка данных"
+        :opened="false"
+      >
+        <data-capture
+          ref="dataCapture"
+          v-bind="{ pollData: localEquip.pollData, error }"
+          @changed="onChange"
+        />
+      </expantion-panel>
+      <expantion-panel
+        v-if="localEquip.id !== null"
+        caption="Анализ"
+        :opened="false"
+      >
+        <div class="equip-grid">
+          <check-box
+            @update:modelValue="
+              onChange('analyze', { ...localEquip.analyze, checked: $event })
             "
+            v-model="localEquip.analyze.checked"
+            >Выполнять анализ настроечных параметров</check-box
           >
-            <input
-              :disabled="!localEquip.analyze.checked"
-              type="text"
-              readonly
-              v-model="localEquip.analyze.standard.name"
-              :class="{ 'validation-error': localError.set }"
-              :title="localError.set"
-            />
-            <div
-              :disabled="!localEquip.analyze.checked"
-              class="fas fa-ellipsis-h icon equip-button"
-              @click="selectSet(localEquip.id, 'standard')"
-              title="Выбрать набор..."
-            />
-            <div
-              :disabled="!localEquip.analyze.checked"
-              class="fas fa-times icon equip-button"
-              @click="clearStandardSet(localEquip.id, 'source')"
-              title="Очистить набор"
-            />
-          </div>
-          <label :disabled="!localEquip.analyze.checked"
-            >Набор проектных настроек:</label
-          >
-          <div
-            style="
-              display: grid;
-              grid-template-columns: 1fr min-content min-content;
-              gap: 3px;
-              align-items: center;
-            "
-          >
-            <input
-              :disabled="!localEquip.analyze.checked"
-              type="text"
-              readonly
-              v-model="localEquip.analyze.project.name"
-              :class="{ 'validation-error': localError.set }"
-              :title="localError.set"
-            />
-            <div
-              :disabled="!localEquip.analyze.checked"
-              class="fas fa-ellipsis-h icon equip-button"
-              @click="selectSet(localEquip.id, 'project')"
-              title="Выбрать набор..."
-            />
-            <div
-              :disabled="!localEquip.analyze.checked"
-              class="fas fa-times icon equip-button"
-              @click="clearProjectSet()"
-              title="Очистить набор"
-            />
-          </div>
-          <label :disabled="!localEquip.analyze.checked"
-            >Допустимая погрешность, %:</label
-          >
-          <input
-            type="number"
-            @input="
-              onChange('analyze', {
-                ...localEquip.analyze,
-                margin: $event.target.value,
-              })
-            "
-            v-model="localEquip.analyze.margin"
-            style="width: 60px"
-            step="0.1"
-            :min="0"
-            :max="5"
-            :disabled="!localEquip.analyze.checked"
-            :class="{ 'validation-error': localError.margin }"
-            :title="localError.margin"
-          />
-        </div>
-      </div>
-    </expantion-panel>
-
-    <expantion-panel
-      v-if="hasSetDataColdWater"
-      caption="Рассылка параметров холодной воды"
-      :opened="false"
-    >
-      <div class="connection-type cold-water-container">
-        <div class="container-1">
-          <div class="item-1-1">
-            <check-box
-              v-model="localEquip.coldWater.checkedTemperature"
-              @update:modelValue="handleColdWaterCheck('temperature', $event)"
-              >Выполнять рассылку температуры ХВ</check-box
+          <div class="equip-grid two">
+            <label :disabled="!localEquip.analyze.checked"
+              >Набор эталонных настроек:</label
             >
-          </div>
-
-          <div class="item-1-2">
-            <check-box
-              v-model="localEquip.coldWater.checkedPressure"
-              @update:modelValue="handleColdWaterCheck('pressure', $event)"
-              >Выполнять рассылку давления ХВ</check-box
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr min-content min-content;
+                gap: 3px;
+                align-items: center;
+              "
             >
-          </div>
-        </div>
-
-        <div class="container-2">
-          <div class="item-2-1">
-            <label>Источник:</label>
-          </div>
-
-          <div class="item-2-2">
+              <input
+                :disabled="!localEquip.analyze.checked"
+                type="text"
+                readonly
+                v-model="localEquip.analyze.standard.name"
+                :class="{ 'validation-error': localError.set }"
+                :title="localError.set"
+              />
+              <div
+                :disabled="!localEquip.analyze.checked"
+                class="fas fa-ellipsis-h icon equip-button"
+                @click="selectSet(localEquip.id, 'standard')"
+                title="Выбрать набор..."
+              />
+              <div
+                :disabled="!localEquip.analyze.checked"
+                class="fas fa-times icon equip-button"
+                @click="clearStandardSet(localEquip.id, 'source')"
+                title="Очистить набор"
+              />
+            </div>
+            <label :disabled="!localEquip.analyze.checked"
+              >Набор проектных настроек:</label
+            >
+            <div
+              style="
+                display: grid;
+                grid-template-columns: 1fr min-content min-content;
+                gap: 3px;
+                align-items: center;
+              "
+            >
+              <input
+                :disabled="!localEquip.analyze.checked"
+                type="text"
+                readonly
+                v-model="localEquip.analyze.project.name"
+                :class="{ 'validation-error': localError.set }"
+                :title="localError.set"
+              />
+              <div
+                :disabled="!localEquip.analyze.checked"
+                class="fas fa-ellipsis-h icon equip-button"
+                @click="selectSet(localEquip.id, 'project')"
+                title="Выбрать набор..."
+              />
+              <div
+                :disabled="!localEquip.analyze.checked"
+                class="fas fa-times icon equip-button"
+                @click="clearProjectSet()"
+                title="Очистить набор"
+              />
+            </div>
+            <label :disabled="!localEquip.analyze.checked"
+              >Допустимая погрешность, %:</label
+            >
             <input
-              :disabled="
-                !(
-                  localEquip.coldWater.checkedTemperature ||
-                  localEquip.coldWater.checkedPressure
-                )
+              type="number"
+              @input="
+                onChange('analyze', {
+                  ...localEquip.analyze,
+                  margin: $event.target.value,
+                })
               "
-              type="text"
-              readonly
-              v-model="localEquip.coldWater.source.name"
-              :class="{ 'validation-error': localError.source }"
-              :title="localError.source"
-            />
-          </div>
-
-          <div class="item-2-3">
-            <div
-              :disabled="
-                !(
-                  localEquip.coldWater.checkedTemperature ||
-                  localEquip.coldWater.checkedPressure
-                )
-              "
-              class="fas fa-ellipsis-h icon equip-button"
-              @click="handleColdWaterSourceSelect(localEquip.id, 'source')"
-              title="Выбрать источник..."
-            />
-          </div>
-
-          <div class="item-2-4">
-            <div
-              :disabled="
-                !(
-                  localEquip.coldWater.checkedTemperature ||
-                  localEquip.coldWater.checkedPressure
-                )
-              "
-              class="fas fa-times icon equip-button"
-              @click="handleColdWaterSourceClear"
-              title="Очистить источник"
+              v-model="localEquip.analyze.margin"
+              style="width: 60px"
+              step="0.1"
+              :min="0"
+              :max="5"
+              :disabled="!localEquip.analyze.checked"
+              :class="{ 'validation-error': localError.margin }"
+              :title="localError.margin"
             />
           </div>
         </div>
-      </div>
-    </expantion-panel>
+      </expantion-panel>
 
-    <expantion-panel
-      v-if="localEquip.customProps && localEquip.customProps.length > 0"
-      caption="Пользовательские параметры"
-      :opened="false"
-    >
-      <object-props
-        v-bind="{ customProps: localEquip.customProps }"
-        @changed="onChange"
-      />
-    </expantion-panel>
+      <expantion-panel
+        v-if="hasSetDataColdWater"
+        caption="Рассылка параметров холодной воды"
+        :opened="false"
+      >
+        <div class="connection-type cold-water-container">
+          <div class="container-1">
+            <div class="item-1-1">
+              <check-box
+                v-model="localEquip.coldWater.checkedTemperature"
+                @update:modelValue="handleColdWaterCheck('temperature', $event)"
+                >Выполнять рассылку температуры ХВ</check-box
+              >
+            </div>
+
+            <div class="item-1-2">
+              <check-box
+                v-model="localEquip.coldWater.checkedPressure"
+                @update:modelValue="handleColdWaterCheck('pressure', $event)"
+                >Выполнять рассылку давления ХВ</check-box
+              >
+            </div>
+          </div>
+
+          <div class="container-2">
+            <div class="item-2-1">
+              <label>Источник:</label>
+            </div>
+
+            <div class="item-2-2">
+              <input
+                :disabled="
+                  !(
+                    localEquip.coldWater.checkedTemperature ||
+                    localEquip.coldWater.checkedPressure
+                  )
+                "
+                type="text"
+                readonly
+                v-model="localEquip.coldWater.source.name"
+                :class="{ 'validation-error': localError.source }"
+                :title="localError.source"
+              />
+            </div>
+
+            <div class="item-2-3">
+              <div
+                :disabled="
+                  !(
+                    localEquip.coldWater.checkedTemperature ||
+                    localEquip.coldWater.checkedPressure
+                  )
+                "
+                class="fas fa-ellipsis-h icon equip-button"
+                @click="handleColdWaterSourceSelect(localEquip.id, 'source')"
+                title="Выбрать источник..."
+              />
+            </div>
+
+            <div class="item-2-4">
+              <div
+                :disabled="
+                  !(
+                    localEquip.coldWater.checkedTemperature ||
+                    localEquip.coldWater.checkedPressure
+                  )
+                "
+                class="fas fa-times icon equip-button"
+                @click="handleColdWaterSourceClear"
+                title="Очистить источник"
+              />
+            </div>
+          </div>
+        </div>
+      </expantion-panel>
+
+      <expantion-panel
+        v-if="localEquip.customProps && localEquip.customProps.length > 0"
+        caption="Пользовательские параметры"
+        :opened="false"
+      >
+        <object-props
+          v-bind="{ customProps: localEquip.customProps }"
+          @changed="onChange"
+        />
+      </expantion-panel>
+    </div>
 
     <transition>
       <wizard
@@ -471,12 +473,15 @@ export default {
     this.$watch(
       () => this.localEquip.timeZones,
       (value) => {
-        this.$store.state.env.timeZones = value 
+        this.$store.state.env.timeZones = value
       },
       { deep: true }
     )
   },
   computed: {
+    isCreate() {
+      return this.$store.state.card.isNodeCreate
+    },
     hasSetDataColdWater() {
       return this.$store.state.equip.hasSetDataColdWater
     },
@@ -829,11 +834,11 @@ export default {
     },
     handleTimeZoneType(timeZonesType) {
       this.onChange('timeZone', timeZonesType)
-      this.$store.state.equip.timeZonesType = timeZonesType 
+      this.$store.state.equip.timeZonesType = timeZonesType
     },
   }, // end methods
 }
-</script> 
+</script>
 
 <style scoped>
 .equip-grid {

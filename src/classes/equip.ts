@@ -280,7 +280,7 @@ export class Equip extends BaseObject {
     return false
   }
 
-  isGroupType(type: string) { 
+  isGroupType(type: string) {
     if (this.groupType) {
       return (
         Equip.store.state.env.connectionGroupTypes[this.groupType].type === type
@@ -305,6 +305,7 @@ export class Equip extends BaseObject {
 
     const options = {
       nodeCreate: data,
+      isNodeCreate: true,
     }
     store.commit('setCard', options)
 
@@ -367,6 +368,7 @@ export class Equip extends BaseObject {
     this.timeNextChecking = data.timeNextChecking
     this.equipTypeModificationId = data.equipTypeModificationId
     this.timeZonesType = data.timeZone.id
+    Equip.store.state.equip.timeZonesType = data.timeZone.id
   }
 
   async save() {
@@ -542,4 +544,3 @@ export class Equip extends BaseObject {
     await this.http.post('equip/equip', props)
   }
 }
- 

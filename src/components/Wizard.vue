@@ -167,7 +167,7 @@ export default {
   },
   data() {
     return {
-      currentComponent: this.initComponent(this.component),
+      currentComponent: this.initComponent(this.component), 
       currentValue: null,
       loading: false,
     }
@@ -195,7 +195,6 @@ export default {
       if (this.currentComponent.event === null) {
         return false
       }
-
       return (
         this.currentValue === null ||
         (Array.isArray(this.currentValue) && this.currentValue.length === 0

@@ -176,6 +176,7 @@ export const store = createStore<State>({
         state.card.timeNextChecking = payload.timeNextChecking
       if (payload.nodeChange) state.card.nodeChange = payload.nodeChange
       if (payload.nodeCreate) state.card.nodeCreate = payload.nodeCreate
+      if (typeof payload.isNodeCreate === 'boolean') state.card.isNodeCreate = payload.isNodeCreate
     },
 
     setEquip: (state, payload) => {
@@ -242,6 +243,7 @@ export const store = createStore<State>({
         timeNextChecking: state.card.timeNextChecking,
         nodeChange: state.card.nodeChange,
         nodeCreate: state.card.nodeCreate,
+        isNodeCreate: state.card.isNodeCreate
       }
     },
     getEquip: (state) => {

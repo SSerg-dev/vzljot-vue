@@ -57,29 +57,19 @@ export default {
       return [this.firstTimeZone, ...this.$store.state.env.timeZones]
     },
 
-    component() {
+    currentTimeZone() {
       if (this.timeZones !== null && this.localTimeZoneType) {
-        const type = this.timeZones.find(
-          (r) => r.type === this.localTimeZoneType
-        )
-
-        if (type) {
-          return type.component
-        }
+        return this.timeZones.find((r) => r.type === this.localTimeZoneType)
       }
-
       return null
     },
+    component() {
+      const timeZone = this.currentTimeZone
+      return timeZone ? timeZone.component : null
+    },
     componentData() {
-      if (this.timeZones !== null && this.localTimeZoneType) {
-        const type = this.timeZones.find(
-          (r) => r.type === this.localTimeZoneType
-        )
-        if (type) {
-          return type.data
-        }
-      }
-      return null
+      const timeZone = this.currentTimeZone
+      return timeZone ? timeZone.data : null
     },
   },
   watch: {

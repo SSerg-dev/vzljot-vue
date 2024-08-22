@@ -131,6 +131,11 @@
                 </div>
               </div>
             </expantion>
+            <system-props-not-make-delta
+              style="grid-column: span 2; margin-bottom: 5px;"
+              :notMakeDelta="localNotMakeDelta" 
+              @onChangedNotMakeDelta="handleNotMakeDelta"
+            /> 
             <system-props-time-sync
               style="grid-column: span 2"
               :timeZonesType="localTimeZonesType || 0"
@@ -1012,6 +1017,7 @@ import Wizard from '../Wizard.vue'
 import SystemPropsPoints from './SystemPropsPoints.vue'
 import SystemPropsEquips from './SystemPropsEquips.vue'
 import SystemPropsTimeSync from '@/components/SystemProps/SystemPropsTimeSync.vue'
+import SystemPropsNotMakeDelta from '@/components/SystemProps/SystemPropsNotMakeDelta.vue'
 
 const wizardSms = (phone) => {
   return {
@@ -1055,6 +1061,7 @@ export default {
     SystemPropsPoints,
     SystemPropsEquips,
     SystemPropsTimeSync,
+    SystemPropsNotMakeDelta
   },
   data() {
     return {
@@ -1071,6 +1078,7 @@ export default {
 
       localTimeZones: [],
       localTimeZonesType: 0,
+      localNotMakeDelta: false,      
 
       error: {
         emailHost: null,
@@ -1471,14 +1479,16 @@ export default {
 
     async edit() {
       try {
-        const { data } = await this.$http.get('system/props')
+        const { data } = await this.$http.get('system/props') 
+
         this.server = data.server
         this.commonData = data.commonData
-        this.localTimeZonesType = data.commonData.TimeZonesTypeSystem
+        this.localTimeZonesType = data.commonData.timeZonesTypeSystem
         this.pollData = data.pollData
         this.viewData = data.viewData
         this.temperatureGraphData = data.temperatureGraphData
         this.reportData = data.reportData
+        this.localNotMakeDelta = data.commonData.notMakeDeltaAfterNull 
 
         if (data.mailingData.sms.port) {
           data.mailingData.sms.port = this.ports.find(
@@ -1546,6 +1556,7 @@ export default {
         }
 
         obj.pollData.dateStart = new Date(this.pollData.dateStart).getTime()
+
         await this.$http.post('system/props', obj)
 
         this.hasChanges = false
@@ -1633,6 +1644,9 @@ export default {
     },
     handleTimeZoneType(timeZonesType) {
       this.commonData.timeZonesTypeSystem = timeZonesType
+    },
+    handleNotMakeDelta(notMakeDelta) {
+      this.commonData.notMakeDeltaAfterNull = notMakeDelta
     },
   }, // end methods
 }

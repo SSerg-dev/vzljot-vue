@@ -23,7 +23,11 @@
             )"
           >
             <check-box
-              v-if="value[v.type] !== null && hasShowDataColdWater(index) && hasShowTimeSync(index)"
+              v-if="
+                value[v.type] !== null &&
+                hasShowDataColdWater(index) &&
+                hasShowTimeSync(index)
+              "
               :key="k"
               v-model="value[v.type]"
               :disabled="disabled"
@@ -212,7 +216,7 @@
               v-bind="periodColdWaterData"
             />
           </tabx>
-          <tabx text="База параметров" v-if="pollData.equipDatabaseParams"> 
+          <tabx text="База параметров" v-if="pollData.equipDatabaseParams">
             <poll-period-props
               @change="onPeriodEquipDatabaseParamsChange"
               v-bind="periodEquipDatabaseParamsData"

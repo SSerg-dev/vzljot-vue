@@ -13,6 +13,7 @@ export interface Card {
   startTimeNextChecking: number | null
   nodeChange: any | null
   nodeCreate: any | null
+  isNodeCreate: boolean | null
 }
 
 export const card: Card = {
@@ -30,6 +31,7 @@ export const card: Card = {
   startTimeNextChecking: null,
   nodeChange: null,
   nodeCreate: null,
+  isNodeCreate: false
 }
 
 
