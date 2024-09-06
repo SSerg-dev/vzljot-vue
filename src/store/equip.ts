@@ -19,7 +19,11 @@ export interface Equip {
   hasTimeSync: boolean | null
   timeZonesType: number | null
   timeZonesTypeSystem: number | null
-  hasEquipSettingEdit: boolean 
+  hasEquipSettingEdit: boolean
+  hasVegaEquip: boolean 
+  hasVegaEquipArray: any[]
+  groupType: number | null
+  connectionGroup: object | null
 }
 
 export interface EquipSettingTable {
@@ -68,5 +72,9 @@ export const equip: Equip = {
   hasTimeSync: null,
   timeZonesType: null,
   timeZonesTypeSystem: null,
-  hasEquipSettingEdit: false
+  hasEquipSettingEdit: false,
+  hasVegaEquip: false,
+  hasVegaEquipArray: [null],
+  groupType: null,
+  connectionGroup: {}
 }

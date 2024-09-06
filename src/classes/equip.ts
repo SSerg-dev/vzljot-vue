@@ -280,6 +280,20 @@ export class Equip extends BaseObject {
     return false
   }
 
+  isVegaVisible(type: number) {
+    if (type !== null) {
+      const types: any = Equip.matchType(Equip.store.state.env.equipTypeCodes)
+
+      return [
+        types.vegaSI11,
+        types.vegaSI12,
+        types.vegaTP11,
+        types.vegaSI11_rev2,
+      ].includes(type)
+    }
+    return false
+  }
+
   isGroupType(type: string) {
     if (this.groupType) {
       return (
@@ -369,6 +383,7 @@ export class Equip extends BaseObject {
     this.equipTypeModificationId = data.equipTypeModificationId
     this.timeZonesType = data.timeZone.id
     Equip.store.state.equip.timeZonesType = data.timeZone.id
+    Equip.store.state.equip.groupType = data.groupType
   }
 
   async save() {
@@ -497,6 +512,12 @@ export class Equip extends BaseObject {
         props.group = JSON.parse(
           JSON.stringify(this.connectionTypes[index].data.group)
         )
+        const adapter = this.connectionTypes[index].data.group.adapter
+        const isVegaVisible = this.isVegaVisible(this.equipType)
+
+        if (adapter && isVegaVisible) {
+          props.serialNumber = adapter
+        }
       }
     }
 

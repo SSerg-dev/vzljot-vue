@@ -133,7 +133,7 @@
           </div>
         </fieldset>
         <fieldset v-if="$store.state.user?.userRights.isModerator || $store.state.user?.userRights.webViewEdit">
-          <legend>Отображение вкладок в Web</legend>
+          <legend>Отображение вкладок</legend>
           <div style="display: grid; grid-gap: 5px 3px; grid-template-columns: auto; align-items: baseline">
             <check-box v-if="localUser.view.useWebSystem.visible" v-model="localUser.view.useWebSystem.value" @update:modelValue="onChangeViewWebSystem()">Использовать параметры системы</check-box>
             <check-box :disabled="localUser.view.useWebSystem.value" v-model="localUser.view.info" @update:modelValue="onChangeView('info', $event)">Информация</check-box>

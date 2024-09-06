@@ -34,8 +34,22 @@
             {{ item.name }}
           </option>
         </select>
+
         <input v-else v-model="equipTypeInfo.name" type="text" readonly />
+
+        <label v-if="hasShowVegaFields">Идентификатор DevEUI (hex):</label>
+        <input
+          v-if="hasShowVegaFields"
+          v-model.trim="localEquip.serialNumber"
+          @input="onChange('serialNumber', $event.target.value)"
+          type="text"
+          maxlength="200"
+          :class="{ 'validation-error': localError.serialNumber }"
+          :title="localError.serialNumber"
+        />
+
         <div />
+
         <div
           :style="{
             'justify-content': 'right',
@@ -71,18 +85,21 @@
             />
           </label>
 
-          <label
-            >Заводской номер:
-            <input
-              v-model.trim="localEquip.serialNumber"
-              @input="onChange('serialNumber', $event.target.value)"
-              type="text"
-              style="width: 100px"
-              maxlength="30"
-              :class="{ 'validation-error': localError.serialNumber }"
-              :title="localError.serialNumber"
-            />
-          </label>
+          <div v-if="!localEquip.isVegaVisible(localEquip.equipType)">
+            <label>
+              Заводской номер:
+              <input
+                v-model.trim="localEquip.serialNumber"
+                @input="onChange('serialNumber', $event.target.value)"
+                type="text"
+                style="width: 100px"
+                maxlength="30"
+                :class="{ 'validation-error': localError.serialNumber }"
+                :title="localError.serialNumber"
+              />
+            </label>
+          </div>
+
           <div
             v-if="
               localEquip.isGroupType('comPort') && !isConnectionTypeEthernet
@@ -457,6 +474,9 @@ export default {
       isTemperature: false,
       isPressure: false,
       oldColdWaterSource: null,
+      localConnectionGroupAdapter:
+        this.$store.state.equip.connectionGroup.adapter,
+      notConnectType: 10,
     }
   },
   created() {
@@ -477,8 +497,26 @@ export default {
       },
       { deep: true }
     )
+    this.$watch(
+      () => this.$store.state.equip.connectionGroup.adapter,
+      (value) => {
+        if (value) {
+          this.localConnectionGroupAdapter = value
+        }
+      },
+      { deep: true }
+    )
   },
   computed: {
+    hasShowVegaFields() {
+      return (
+        (this.localEquip.isVegaVisible(this.localEquip.equipType) &&
+          this.action === 'create' &&
+          this.localEquip.groupType === this.notConnectType) ||
+        (this.action !== 'create' &&
+          this.localEquip.groupType === this.notConnectType)
+      )
+    },
     isCreate() {
       return this.$store.state.card.isNodeCreate
     },
@@ -724,6 +762,8 @@ export default {
             timeNextChecking: null,
           },
         }
+        this.$store.state.equip.connectionGroup.adapter = ''
+
         this.$store.commit('setCard', options)
         this.$emitter.emit('equip-detail:create-equip', type)
 

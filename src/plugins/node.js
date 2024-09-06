@@ -20,14 +20,14 @@ export class Node {
     this.$el = el
 
     if (obj.children && obj.children.length > 0) {
-      this.children = obj.children.map(child => new Node(child, this, el))
+      this.children = obj.children.map((child) => new Node(child, this, el))
     }
 
     updateNodeProps(this, obj)
   }
 }
 
-Node.prototype.updateState = function(state) {
+Node.prototype.updateState = function (state) {
   if (state !== this.state) {
     let domBody = this.domBody()
     let firstNode = domBody.childNodes[0]
@@ -35,7 +35,9 @@ Node.prototype.updateState = function(state) {
       firstNode.classList.remove(firstNode.classList[0])
       firstNode.classList.add(store.state.env.statuses[state].image)
     } else {
-      if (firstNode.classList.contains(store.state.env.statuses[this.state].class)) {
+      if (
+        firstNode.classList.contains(store.state.env.statuses[this.state].class)
+      ) {
         firstNode.classList.remove(store.state.env.statuses[this.state].class)
         firstNode.classList.add(store.state.env.statuses[state].class)
       }
@@ -44,7 +46,7 @@ Node.prototype.updateState = function(state) {
   }
 }
 
-Node.prototype.update = function(obj) {
+Node.prototype.update = function (obj) {
   let state = this.state
   this.text = obj.text
   this.isFolder = obj.isFolder
@@ -66,7 +68,11 @@ Node.prototype.update = function(obj) {
 
   if (store.state.env.itemTypes[this.type].type === 'node') {
     let firstNode = domBody.childNodes[0]
-    if (firstNode.classList.contains(store.state.env.nodeTypes[this.nodeType].image)) {
+    if (
+      firstNode.classList.contains(
+        store.state.env.nodeTypes[this.nodeType].image
+      )
+    ) {
       firstNode.classList.remove(store.state.env.nodeTypes[this.nodeType].image)
       firstNode.classList.add(store.state.env.nodeTypes[obj.nodeType].image)
     }
@@ -81,28 +87,28 @@ Node.prototype.update = function(obj) {
   updateNodeProps(this, obj)
 }
 
-Node.prototype.getId = function() {
+Node.prototype.getId = function () {
   return `${this.type}_${this.id}`
 }
 
-Node.prototype.domToggle = function() {
+Node.prototype.domToggle = function () {
   return this.$el.querySelector(`.node[id="${this.getId()}"] > .toggle`)
 }
 
-Node.prototype.domBody = function() {
+Node.prototype.domBody = function () {
   return this.$el.querySelector(`.node[id="${this.getId()}"] > .body`)
 }
 
-Node.prototype.domChildren = function() {
+Node.prototype.domChildren = function () {
   return this.$el.querySelectorAll(`.node[id="${this.getId()}"] > .node`)
 }
 
-Node.prototype.domNode = function() {
+Node.prototype.domNode = function () {
   let element = this.$el.querySelector(`.node[id="${this.getId()}"]`)
   return element === null ? this.$el : element
 }
 
-Node.prototype.select = function(value) {
+Node.prototype.select = function (value) {
   let body = this.domBody()
   if (body) {
     value ? body.classList.add('selected') : body.classList.remove('selected')
@@ -110,19 +116,21 @@ Node.prototype.select = function(value) {
   this.selected = value
 }
 
-Node.prototype.toggle = function(value) {
+Node.prototype.toggle = function (value) {
   let toggle = this.domToggle()
   if (toggle) {
     value ? toggle.classList.add('opened') : toggle.classList.remove('opened')
   }
   let children = this.domChildren()
   for (let i = 0; i < children.length; i++) {
-    value ? children[i].classList.remove('hidden') : children[i].classList.add('hidden')
+    value
+      ? children[i].classList.remove('hidden')
+      : children[i].classList.add('hidden')
   }
   this.expanded = value
 }
 
-Node.prototype.clear = function() {
+Node.prototype.clear = function () {
   this.children = []
   this.toggle(false)
 
@@ -134,7 +142,7 @@ Node.prototype.clear = function() {
   this.childrenLoaded = false
 }
 
-Node.prototype.delete = function() {
+Node.prototype.delete = function () {
   let domNode = this.domNode()
   domNode.parentNode.removeChild(domNode)
 
@@ -145,12 +153,15 @@ Node.prototype.delete = function() {
   }
 }
 
-Node.prototype.setFolder = function(value) {
+Node.prototype.setFolder = function (value) {
   let toggle = this.domToggle()
   let domBody = this.domBody()
   if (value) {
     if (!toggle) {
-      domBody.insertAdjacentHTML('beforebegin', `<div class="toggle fas ${this.expanded ? 'opened' : ''}"></div>`)
+      domBody.insertAdjacentHTML(
+        'beforebegin',
+        `<div class="toggle fas ${this.expanded ? 'opened' : ''}"></div>`
+      )
       domBody.classList.remove('nofolder')
     }
   } else {
@@ -167,7 +178,7 @@ Node.prototype.setFolder = function(value) {
   this.isFolder = value
 }
 
-Node.prototype.createChild = function(child) {
+Node.prototype.createChild = function (child) {
   let arr = []
   this.children.push(child)
   createHtml([child], arr, this)
@@ -182,7 +193,7 @@ Node.prototype.createChild = function(child) {
   }
 }
 
-Node.prototype.createChildren = function(children) {
+Node.prototype.createChildren = function (children) {
   // let s = window.performance.now()
 
   let arr = []
@@ -191,12 +202,10 @@ Node.prototype.createChildren = function(children) {
   this.domNode().insertAdjacentHTML('beforeend', arr.join(''))
   this.childrenLoaded = true
 
-  // console.log('createChildren', this.childrenLoaded)
-
   // console.log('insert html', Math.round(window.performance.now() - s) + ' ms')
 }
 
-Node.prototype.canAdd = function() {
+Node.prototype.canAdd = function () {
   switch (store.state.env.itemTypes[this.type].type) {
     case 'equipLists':
       return store.state.user.userRights.equipListEdit // || store.state.user.userRights.equipList
@@ -212,8 +221,15 @@ Node.prototype.canAdd = function() {
     case 'equip':
       return (
         store.state.user.userRights.equipEditFull &&
-        (this.parent ? store.state.env.itemTypes[this.parent.type].type !== 'equip' : true) &&
-        (Object.prototype.hasOwnProperty.call(this, 'code') ? this.code === 'APS79' || this.code === 'Vzljot_ASPD051A' || this.code.indexOf('SPT96') !== -1 || this.code.indexOf('SPG76') !== -1 : false)
+        (this.parent
+          ? store.state.env.itemTypes[this.parent.type].type !== 'equip'
+          : true) &&
+        (Object.prototype.hasOwnProperty.call(this, 'code')
+          ? this.code === 'APS79' ||
+            this.code === 'Vzljot_ASPD051A' ||
+            this.code.indexOf('SPT96') !== -1 ||
+            this.code.indexOf('SPG76') !== -1
+          : false)
       )
     case 'node':
     case 'address':
@@ -224,7 +240,7 @@ Node.prototype.canAdd = function() {
   }
 }
 
-Node.prototype.canDelete = function() {
+Node.prototype.canDelete = function () {
   switch (store.state.env.itemTypes[this.type].type) {
     case 'equipList':
       return store.state.user.userRights.equipListEdit
@@ -247,18 +263,33 @@ Node.prototype.canDelete = function() {
 }
 
 export function createHtml(nodes, arr, parent) {
-  sortedChildren(nodes).forEach(node => {
+  sortedChildren(nodes).forEach((node) => {
     let isFolder = (node.children && node.children.length) || node.isFolder
-    arr.push(`<div class="node${parent && parent.childrenLoaded && !parent.expanded ? ' hidden' : ''}" id="${node.getId()}">`)
+    arr.push(
+      `<div class="node${
+        parent && parent.childrenLoaded && !parent.expanded ? ' hidden' : ''
+      }" id="${node.getId()}">`
+    )
     if (isFolder) {
-      arr.push(`<div class="toggle fas ${node.expanded ? 'opened' : ''}"></div>`)
+      arr.push(
+        `<div class="toggle fas ${node.expanded ? 'opened' : ''}"></div>`
+      )
     }
 
     arr.push(`<div class="body ${isFolder ? '' : 'nofolder'}">`)
-    if (store.state.env.itemTypes[node.type].type === 'point' && store.state.env.statuses[node.state].image !== '') {
-      arr.push(`<div class="${store.state.env.statuses[node.state].image}"></div>`)
+    if (
+      store.state.env.itemTypes[node.type].type === 'point' &&
+      store.state.env.statuses[node.state].image !== ''
+    ) {
+      arr.push(
+        `<div class="${store.state.env.statuses[node.state].image}"></div>`
+      )
     }
-    arr.push(`<div class="${getImage(node)} ${store.state.env.statuses[node.state].class}"></div>${node.text}</div>`)
+    arr.push(
+      `<div class="${getImage(node)} ${
+        store.state.env.statuses[node.state].class
+      }"></div>${node.text}</div>`
+    )
     createHtml(node.children, arr, node)
     arr.push('</div>')
   })
@@ -275,15 +306,25 @@ function sortedChildren(children) {
 }
 
 function updateNodeProps(node, obj) {
-  if (Object.prototype.hasOwnProperty.call(obj, 'systemType')) node.systemType = obj.systemType
-  if (Object.prototype.hasOwnProperty.call(obj, 'nodeType')) node.nodeType = obj.nodeType
+  if (Object.prototype.hasOwnProperty.call(obj, 'systemType'))
+    node.systemType = obj.systemType
+  if (Object.prototype.hasOwnProperty.call(obj, 'nodeType'))
+    node.nodeType = obj.nodeType
   if (Object.prototype.hasOwnProperty.call(obj, 'code')) node.code = obj.code
-  if (Object.prototype.hasOwnProperty.call(obj, 'addressType')) node.addressType = obj.addressType
-  if (Object.prototype.hasOwnProperty.call(obj, 'hasSet')) node.hasSet = obj.hasSet
-  if (Object.prototype.hasOwnProperty.call(obj, 'hasEquipEvents')) node.hasEquipEvents = obj.hasEquipEvents
-  if (Object.prototype.hasOwnProperty.call(obj, 'hasSetDataColdWater')) node.hasSetDataColdWater = obj.hasSetDataColdWater
-  if (Object.prototype.hasOwnProperty.call(obj, 'hasColdWater')) node.hasColdWater = obj.hasColdWater
-  if (Object.prototype.hasOwnProperty.call(obj, 'hasTimeSync')) node.hasTimeSync = obj.hasTimeSync
-  if (Object.prototype.hasOwnProperty.call(obj, 'connectionGroupType')) node.connectionGroupType = obj.connectionGroupType
-  if (Object.prototype.hasOwnProperty.call(obj, 'reportTypes')) node.reportTypes = obj.reportTypes
+  if (Object.prototype.hasOwnProperty.call(obj, 'addressType'))
+    node.addressType = obj.addressType
+  if (Object.prototype.hasOwnProperty.call(obj, 'hasSet'))
+    node.hasSet = obj.hasSet
+  if (Object.prototype.hasOwnProperty.call(obj, 'hasEquipEvents'))
+    node.hasEquipEvents = obj.hasEquipEvents
+  if (Object.prototype.hasOwnProperty.call(obj, 'hasSetDataColdWater'))
+    node.hasSetDataColdWater = obj.hasSetDataColdWater
+  if (Object.prototype.hasOwnProperty.call(obj, 'hasColdWater'))
+    node.hasColdWater = obj.hasColdWater
+  if (Object.prototype.hasOwnProperty.call(obj, 'hasTimeSync'))
+    node.hasTimeSync = obj.hasTimeSync
+  if (Object.prototype.hasOwnProperty.call(obj, 'connectionGroupType'))
+    node.connectionGroupType = obj.connectionGroupType
+  if (Object.prototype.hasOwnProperty.call(obj, 'reportTypes'))
+    node.reportTypes = obj.reportTypes
 }

@@ -341,6 +341,8 @@ export default {
       avatar: null,
       nodeToDelete: null,
       wizard: null,
+      delay: 4000,
+      isMessage: true,
     }
   },
   computed: {
@@ -462,11 +464,53 @@ export default {
       this.component = component
       this.currentNode = node
     },
+    async message() {
+      this.$emitter.emit('preserver-component:display', 'block')
+
+      this.$toast.show(
+        `⚠️  В группе уже есть оборудование с идентификатором DevEUI вместо заводского номера.`,
+        this.delay
+      )
+      setTimeout(() => {
+        this.$emitter.emit('preserver-component:display', 'none')
+      }, this.delay)
+    },
+
+    hasVegaEquip(id) {
+      if (this.$store.state.equip.hasVegaEquipArray.length === 0) {
+        return false
+      }
+      const item = this.$store.state.equip.hasVegaEquipArray.find(
+        (entry) => entry?.id === id
+      )
+      if (typeof item?.isPermit === 'boolean') {
+        return item.isPermit === true ? item.isPermit : false
+      }
+      return false
+    },
     async onCreateClick(node) {
+      this.$emitter.emit('tree-layout:create', node)
+      
+      const isPermit = this.hasVegaEquip(node.id)
+      if (isPermit && node.children.length === 1 ) {
+        if (this.isMessage) {
+          this.message()
+        }
+        this.isMessage = !this.isMessage
+        return
+      }
+
       this.wizard = await wizardCreate(this.$http, node)
     },
     async remove(node) {
       try {
+        if (this.$store.state.equip.hasVegaEquipArray.length > 0) {
+          this.$store.state.equip.hasVegaEquipArray =
+            this.$store.state.equip.hasVegaEquipArray.filter(
+              (item) => !item.isPermit
+            )
+        }
+
         await this.$http.delete(
           `${this.itemTypes[node.type].type}/delete/${node.id}`
         )

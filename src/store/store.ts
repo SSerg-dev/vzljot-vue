@@ -219,7 +219,14 @@ export const store = createStore<State>({
       if (payload.hasNotSave) state.equip.hasNotSave = payload.hasNotSave
       if (typeof payload.hasEquipSettingEdit === 'boolean') {
         state.equip.hasEquipSettingEdit = payload.hasEquipSettingEdit
-      }  
+      }
+      if (typeof payload.hasVegaEquip === 'boolean') {
+        state.equip.hasVegaEquip = payload.hasVegaEquip
+      }
+      if (payload.groupType)
+        state.equip.groupType = payload.groupType
+      if (payload.connectionGroup)
+        state.equip.connectionGroup = payload.connectionGroup
     },
   },
   getters: {
@@ -260,7 +267,10 @@ export const store = createStore<State>({
         equipSettingIndex: state.equip.equipSettingIndex,
         equipSettingHeight: state.equip.equipSettingHeight,
         hasNotSave: state.equip.hasNotSave,
-        hasEquipSettingEdit: state.equip.hasEquipSettingEdit  
+        hasEquipSettingEdit: state.equip.hasEquipSettingEdit,  
+        hasVegaEquip: state.equip.hasVegaEquip,
+        groupType:  state.equip.groupType,
+        connectionGroup: state.equip.connectionGroup
       }
     },
 

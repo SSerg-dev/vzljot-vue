@@ -3,11 +3,7 @@
     <div class="group-connection-type-grid two">
       <label>Тип подключения:</label>
       <select v-model="localGroupType" @change="onChanged(localGroupType)">
-        <option 
-          v-for="r in connectionTypes" 
-          :key="r.type" 
-          :value="r.type"
-          >
+        <option v-for="r in connectionTypes" :key="r.type" :value="r.type">
           {{ r.name }}
         </option>
       </select>
@@ -23,7 +19,7 @@
           :is="component"
           v-bind="Object.assign({}, componentData, { error })"
           @changed="onGroupChanged"
-          @changeConnectionType="onChangeConnectionType" 
+          @changeConnectionType="onChangeConnectionType"
         />
       </transition>
     </expantion-panel>
@@ -88,12 +84,10 @@ export default {
         const type = this.connectionTypes.find(
           (r) => r.type === this.localGroupType
         )
-
         if (type) {
           return type.component
         }
       }
-
       return null
     },
     componentData() {
@@ -101,12 +95,15 @@ export default {
         const type = this.connectionTypes.find(
           (r) => r.type === this.localGroupType
         )
-
         if (type) {
+          const options = {
+            connectionGroup: type.data.group,
+          }
+          this.$store.commit('setEquip', options)
+
           return type.data
         }
       }
-
       return null
     },
   },

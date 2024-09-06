@@ -2,24 +2,100 @@
   <div class="connection-type">
     <div class="connection-type two">
       <label>Сервер LoRa:</label>
-      <select @change="onChange('serverLoRa', $event.target.value)" v-model="localServerLoRa" :class="{ 'validation-error': localError.serverLoRa }" :title="localError.serverLoRa">
-        <option v-for="r in group.loraServers" :key="r.id" :value="r.id">{{ r.name }}</option>
+      <select
+        @change="onChange('serverLoRa', $event.target.value)"
+        v-model="localServerLoRa"
+        :class="{ 'validation-error': localError.serverLoRa }"
+        :title="localError.serverLoRa"
+      >
+        <option v-for="r in group.loraServers" :key="r.id" :value="r.id">
+          {{ r.name }}
+        </option>
       </select>
     </div>
     <div class="connection-type two">
       <label>Идентификатор DevEUI (hex):</label>
-      <input @input="onChange('adapter', $event.target.value)" v-model="localAdapter" type="text" :class="{ 'validation-error': localError.adapter }" :title="localError.adapter" maxlength="16" style="width: 150px" />
+      <input
+        @input="onChange('adapter', $event.target.value)"
+        v-model="localAdapter"
+        type="text"
+        :class="{ 'validation-error': localError.adapter }"
+        :title="localError.adapter"
+        maxlength="16"
+        style="width: 150px"
+      />
     </div>
     <div class="connection-type two">
       <label>Тайм-аут:</label>
-      <div class="connection-type" style="grid-template-columns: repeat(8, min-content); white-space: nowrap; align-items: baseline;">
-        <number-box @update:modelValue="onChange('timeOut', (($event * 24 + localHours) * 60 + localMinutes) * 60 + localSeconds)" v-model="localDays" style="width: 30px" :min="0" :max="31" :class="{ 'validation-error': localError.timeOut }" :title="localError.timeOut" />
+      <div
+        class="connection-type"
+        style="
+          grid-template-columns: repeat(8, min-content);
+          white-space: nowrap;
+          align-items: baseline;
+        "
+      >
+        <number-box
+          @update:modelValue="
+            onChange(
+              'timeOut',
+              (($event * 24 + localHours) * 60 + localMinutes) * 60 +
+                localSeconds
+            )
+          "
+          v-model="localDays"
+          style="width: 30px"
+          :min="0"
+          :max="31"
+          :class="{ 'validation-error': localError.timeOut }"
+          :title="localError.timeOut"
+        />
         <label>д.</label>
-        <number-box @update:modelValue="onChange('timeOut', ((localDays * 24 + $event) * 60 + localMinutes) * 60 + localSeconds)" v-model="localHours" style="width: 30px" :min="0" :max="23" :class="{ 'validation-error': localError.timeOut }" :title="localError.timeOut" />
+        <number-box
+          @update:modelValue="
+            onChange(
+              'timeOut',
+              ((localDays * 24 + $event) * 60 + localMinutes) * 60 +
+                localSeconds
+            )
+          "
+          v-model="localHours"
+          style="width: 30px"
+          :min="0"
+          :max="23"
+          :class="{ 'validation-error': localError.timeOut }"
+          :title="localError.timeOut"
+        />
         <label>ч.</label>
-        <number-box @update:modelValue="onChange('timeOut', ((localDays * 24 + localHours) * 60 + $event) * 60 + localSeconds)" v-model="localMinutes" style="width: 30px" :min="0" :max="59" :class="{ 'validation-error': localError.timeOut }" :title="localError.timeOut" />
+        <number-box
+          @update:modelValue="
+            onChange(
+              'timeOut',
+              ((localDays * 24 + localHours) * 60 + $event) * 60 + localSeconds
+            )
+          "
+          v-model="localMinutes"
+          style="width: 30px"
+          :min="0"
+          :max="59"
+          :class="{ 'validation-error': localError.timeOut }"
+          :title="localError.timeOut"
+        />
         <label>мин.</label>
-        <number-box @update:modelValue="onChange('timeOut', ((localDays * 24 + localHours) * 60 + localMinutes) * 60 + $event)" v-model="localSeconds" style="width: 30px" :min="0" :max="59" :class="{ 'validation-error': localError.timeOut }" :title="localError.timeOut" />
+        <number-box
+          @update:modelValue="
+            onChange(
+              'timeOut',
+              ((localDays * 24 + localHours) * 60 + localMinutes) * 60 + $event
+            )
+          "
+          v-model="localSeconds"
+          style="width: 30px"
+          :min="0"
+          :max="59"
+          :class="{ 'validation-error': localError.timeOut }"
+          :title="localError.timeOut"
+        />
         <label>сек.</label>
       </div>
     </div>
@@ -31,11 +107,11 @@ import NumberBox from '../../Inputs/NumberBox.vue'
 
 export default {
   components: {
-    NumberBox
+    NumberBox,
   },
   props: {
     group: Object,
-    error: Object
+    error: Object,
   },
   data() {
     const { days, hours, minutes, seconds } = this.getTime(this.group.timeOut)
@@ -50,8 +126,8 @@ export default {
       localError: {
         adapter: null,
         timeOut: null,
-        serverLoRa: null
-      }
+        serverLoRa: null,
+      },
     }
   },
   watch: {
@@ -70,11 +146,11 @@ export default {
       this.localSeconds = seconds
     },
     error(value) {
-      Object.keys(this.localError).forEach(r => (this.localError[r] = null))
+      Object.keys(this.localError).forEach((r) => (this.localError[r] = null))
       if (value) {
         Object.entries(value).forEach(([k, v]) => (this.localError[k] = v))
       }
-    }
+    },
   },
   methods: {
     onChange(prop, value) {
@@ -90,9 +166,9 @@ export default {
         days,
         hours,
         minutes,
-        seconds
+        seconds,
       }
-    }
-  }
+    },
+  },
 }
 </script>

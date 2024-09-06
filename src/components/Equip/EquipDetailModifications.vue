@@ -240,7 +240,7 @@ export default {
       this.$emitter.emit('preserver-component:display', 'block')
 
       this.$toast.show(
-        `⚠️ Дата следующей поверки должна быть больше даты предыдущей поверки.`,
+        `⚠️  Дата следующей поверки должна быть больше даты предыдущей поверки.`,
         (this.delay = 3000)
       )
       setTimeout(() => {

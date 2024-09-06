@@ -1,23 +1,51 @@
 <template>
   <div class="map-container">
-    <search-component :style="inited ? { display: 'flex' } : null" v-bind="searchData" @changed="search" @mouseenter="setMapEvents(false)" @mouseleave="setMapEvents(true)" class="search" />
-    <div :style="inited ? { display: 'flex' } : null" class="checkboxes" @mouseenter="setMapEvents(false)" @mouseleave="setMapEvents(true)">
+    <search-component
+      :style="inited ? { display: 'flex' } : null"
+      v-bind="searchData"
+      @changed="search"
+      @mouseenter="setMapEvents(false)"
+      @mouseleave="setMapEvents(true)"
+      class="search"
+    />
+    <div
+      :style="inited ? { display: 'flex' } : null"
+      class="checkboxes"
+      @mouseenter="setMapEvents(false)"
+      @mouseleave="setMapEvents(true)"
+    >
       <label v-for="r in $store.state.env.nodeTypes" :key="r.type">
-        <input type="checkbox" :value="r.type" v-model="filter.objects" @change="updateObjects" />
+        <input
+          type="checkbox"
+          :value="r.type"
+          v-model="filter.objects"
+          @change="updateObjects"
+        />
         <div :class="['fas', r.image, 'icon']" :title="r.text" />
       </label>
       <label>
-        <input type="checkbox" checked value="point" v-model="filter.objects" @change="updateObjects" />
+        <input
+          type="checkbox"
+          checked
+          value="point"
+          v-model="filter.objects"
+          @change="updateObjects"
+        />
         <div class="fas fa-circle icon" title="Точки учета"></div>
       </label>
       <hr style="margin-left: 0; margin-right: 0" />
       <label
         v-for="(key, index) in Object.keys(statuses)
-          .filter(key => key >= 0)
+          .filter((key) => key >= 0)
           .sort()"
         :key="index"
       >
-        <input type="checkbox" :value="key" v-model="filter.statuses" @change="updateObjects" />
+        <input
+          type="checkbox"
+          :value="key"
+          v-model="filter.statuses"
+          @change="updateObjects"
+        />
         <div :class="statuses[key].image" :title="statuses[key].text"></div>
       </label>
     </div>
@@ -43,10 +71,10 @@ import SearchComponent from '../SearchComponent.vue'
 export default {
   name: 'vue-map',
   components: {
-    SearchComponent
+    SearchComponent,
   },
   props: {
-    userMap: Object
+    userMap: Object,
   },
   data() {
     return {
@@ -58,8 +86,8 @@ export default {
       searchData: {
         url: 'point/findObjectsOnMap',
         variableWidth: true,
-        settings: ['node', 'point']
-      }
+        settings: ['node', 'point'],
+      },
     }
   },
   computed: {
@@ -81,14 +109,14 @@ export default {
         minZoom: 0,
         maxZoom: 18,
         worldCopyJump: true,
-        zoomControl: false
+        zoomControl: false,
       })
 
       L.control
         .zoom({
           position: 'topright',
           zoomInTitle: 'Увеличить',
-          zoomOutTitle: 'Уменьшить'
+          zoomOutTitle: 'Уменьшить',
         })
         .addTo(map)
 
@@ -100,15 +128,15 @@ export default {
         maxClusterRadius: 120,
         disableClusteringAtZoom: 15,
         spiderfyOnMaxZoom: false,
-        iconCreateFunction: e => {
+        iconCreateFunction: (e) => {
           return new L.DivIcon({
             html: this.getCluster(e),
             className: 'cluster',
-            iconSize: new L.Point(40, 40)
+            iconSize: new L.Point(40, 40),
           })
-        }
+        },
       })
-    }
+    },
   },
   created() {
     this.$emitter.on('updateObject', this.updateMap)
@@ -127,7 +155,7 @@ export default {
         maxX = 0,
         maxY = 0
 
-      Object.values(this.mapObjects).forEach(value => {
+      Object.values(this.mapObjects).forEach((value) => {
         if (value.coords[0] < minX || minX === 0) minX = value.coords[0]
         if (value.coords[1] < minY || minY === 0) minY = value.coords[1]
         if (value.coords[0] > maxX || maxX === 0) maxX = value.coords[0]
@@ -150,7 +178,9 @@ export default {
       checkboxesPanel.addTo(this.map)
 
       const map = this.$store.state.env.maps[this.userMap.id]
-      const mapOptions = map.connections.find(r => r?.name === this.userMap.connection)
+      const mapOptions = map.connections.find(
+        (r) => r?.name === this.userMap.connection
+      )
       let tileLayer = null
 
       switch (map.type) {
@@ -161,23 +191,39 @@ export default {
             const { data } = await Axios.get(url.toString(), {
               params: {
                 service: 'WMS',
-                request: 'GetCapabilities'
-              }
+                request: 'GetCapabilities',
+              },
             })
 
             const parser = new DOMParser()
             const dom = parser.parseFromString(data, 'text/xml')
             const wmsLayers = {}
 
-            for (const layer of dom.querySelectorAll('Capability > Layer[queryable="1"] > Layer')) {
+            for (const layer of dom.querySelectorAll(
+              'Capability > Layer[queryable="1"] > Layer'
+            )) {
               const name = layer.querySelector('Name').textContent
               const box = layer.querySelector('EX_GeographicBoundingBox')
               wmsLayers[name] = {
                 title: layer.querySelector('Title').textContent,
                 bounds: [
-                  [parseFloat(box.querySelector('southBoundLatitude').textContent), parseFloat(box.querySelector('westBoundLongitude').textContent)],
-                  [parseFloat(box.querySelector('northBoundLatitude').textContent), parseFloat(box.querySelector('eastBoundLongitude').textContent)]
-                ]
+                  [
+                    parseFloat(
+                      box.querySelector('southBoundLatitude').textContent
+                    ),
+                    parseFloat(
+                      box.querySelector('westBoundLongitude').textContent
+                    ),
+                  ],
+                  [
+                    parseFloat(
+                      box.querySelector('northBoundLatitude').textContent
+                    ),
+                    parseFloat(
+                      box.querySelector('eastBoundLongitude').textContent
+                    ),
+                  ],
+                ],
               }
             }
 
@@ -186,7 +232,8 @@ export default {
               format: 'image/png',
               layers: mapOptions.data.layer,
               version: '1.3.0',
-              attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
+              attribution:
+                '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>',
             })
 
             tileLayer.addTo(this.map)
@@ -197,7 +244,8 @@ export default {
           break
         default:
           tileLayer = L.tileLayer('https://{s}.tile.osm.org/{z}/{x}/{y}.png', {
-            attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>'
+            attribution:
+              '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a>',
           })
 
           tileLayer.addEventListener('tileerror', function (e) {
@@ -206,20 +254,33 @@ export default {
 
           tileLayer.addTo(this.map)
 
-          this.map.panTo(new L.LatLng(xc === 0 ? this.coords.latitude : xc, yc === 0 ? this.coords.longitude : yc))
+          this.map.panTo(
+            new L.LatLng(
+              xc === 0 ? this.coords.latitude : xc,
+              yc === 0 ? this.coords.longitude : yc
+            )
+          )
 
           break
       }
 
-      Object.keys(this.mapObjects).forEach(key => this.initObject(this.mapObjects[key]))
+      Object.keys(this.mapObjects).forEach((key) =>
+        this.initObject(this.mapObjects[key])
+      )
       this.map.addLayer(this.markerCluster)
       this.inited = true
     },
     search(item) {
       let obj = this.getObject(item)
       if (obj) {
-        let type = this.itemTypes[obj.type].type === 'node' ? this.nodeTypes[obj.nodeType].type : this.itemTypes[obj.type].type
-        if (this.filter.objects.indexOf(type) !== -1 && this.filter.statuses.indexOf(obj.state.toString()) !== -1) {
+        let type =
+          this.itemTypes[obj.type].type === 'node'
+            ? this.nodeTypes[obj.nodeType].type
+            : this.itemTypes[obj.type].type
+        if (
+          this.filter.objects.indexOf(type) !== -1 &&
+          this.filter.statuses.indexOf(obj.state.toString()) !== -1
+        ) {
           this.map.setView(obj.coords, 18, 1)
           this.handleObjectClick({ target: obj.Marker })
         }
@@ -229,13 +290,22 @@ export default {
       this.markerCluster.clearLayers()
 
       let markers = Object.values(this.mapObjects)
-        .filter(item => {
-          let type = this.itemTypes[item.type].type === 'node' ? this.nodeTypes[item.nodeType].type : this.itemTypes[item.type].type
-          return this.filter.objects.indexOf(type) !== -1 && this.filter.statuses.indexOf(item.state.toString()) !== -1
+        .filter((item) => {
+          let type =
+            this.itemTypes[item.type].type === 'node'
+              ? this.nodeTypes[item.nodeType].type
+              : this.itemTypes[item.type].type
+          return (
+            this.filter.objects.indexOf(type) !== -1 &&
+            this.filter.statuses.indexOf(item.state.toString()) !== -1
+          )
         })
-        .map(item => {
+        .map((item) => {
           let type = this.itemTypes[item.type].type
-          let index = (type === 'point' ? this.statuses[item.state].image : this.nodeTypes[item.nodeType].image) + item.state
+          let index =
+            (type === 'point'
+              ? this.statuses[item.state].image
+              : this.nodeTypes[item.nodeType].image) + item.state
           item.Marker = L.marker(item.coords, { icon: this.iconCache[index] })
           item.MarkerShown = true
           item.Marker.LinkedMapObject = item
@@ -265,10 +335,10 @@ export default {
         return sum + items[current]
       }, 0)
 
-      let slices = Object.keys(items).map(value => {
+      let slices = Object.keys(items).map((value) => {
         return {
           percent: items[value] / count,
-          color: this.statuses[value].color
+          color: this.statuses[value].color,
         }
       })
 
@@ -280,14 +350,19 @@ export default {
         return [Math.round(x * 100000) / 100000, Math.ceil(y * 100000) / 100000]
       }
 
-      var pathes = slices.map(item => {
+      var pathes = slices.map((item) => {
         const start = getCoordsForPercent(percent)
         percent += item.percent
         const end = getCoordsForPercent(percent)
-        return `<path d="M ${start[0]} ${start[1]} A 1 1 0 ${item.percent > 0.5 ? 1 : 0} 1 ${end[0]} ${end[1]} L 0 0" fill="${item.color}"/>`
+        return `<path d="M ${start[0]} ${start[1]} A 1 1 0 ${
+          item.percent > 0.5 ? 1 : 0
+        } 1 ${end[0]} ${end[1]} L 0 0" fill="${item.color}"/>`
       })
 
-      let path = pathes.length === 1 ? `<circle r="1" fill="${slices[0].color}" />` : pathes.join('')
+      let path =
+        pathes.length === 1
+          ? `<circle r="1" fill="${slices[0].color}" />`
+          : pathes.join('')
 
       return `<svg viewBox="-1 -1 2 2">${path}<circle r=".6" class="text-circle"></circle><text class="cluster-text" dy=".45em">${e.getChildCount()}</text></svg>`
     },
@@ -305,7 +380,10 @@ export default {
     },
     initObject(item) {
       let type = this.itemTypes[item.type].type
-      var index = (type === 'point' ? this.statuses[item.state].image : this.nodeTypes[item.nodeType].image) + item.state
+      var index =
+        (type === 'point'
+          ? this.statuses[item.state].image
+          : this.nodeTypes[item.nodeType].image) + item.state
 
       if (this.iconCache[index] === undefined) {
         switch (type) {
@@ -314,16 +392,20 @@ export default {
               className: this.statuses[item.state].image + ' point',
               iconSize: L.point(14, 14),
               iconAnchor: [7, 7],
-              popupAnchor: [0, -7]
+              popupAnchor: [0, -7],
             })
             break
           case 'node':
             this.iconCache[index] = L.divIcon({
-              html: `<div class="${this.nodeTypes[item.nodeType].image}"></div>`,
-              className: `fas ${this.statuses[item.state].image} icon node-marker`,
+              html: `<div class="${
+                this.nodeTypes[item.nodeType].image
+              }"></div>`,
+              className: `fas ${
+                this.statuses[item.state].image
+              } icon node-marker`,
               iconSize: L.point(26, 26),
               iconAnchor: [13, 13],
-              popupAnchor: [0, -13]
+              popupAnchor: [0, -13],
             })
             break
         }
@@ -345,22 +427,24 @@ export default {
       let type = this.itemTypes[e.target.LinkedMapObject.type].type
 
       this.$http
-        .get(type === 'point' ? 'map/point' : 'map/node', { params: { id: e.target.LinkedMapObject.id } })
-        .then(response => {
+        .get(type === 'point' ? 'map/point' : 'map/node', {
+          params: { id: e.target.LinkedMapObject.id },
+        })
+        .then((response) => {
           const wrapper = document.createElement('div')
           render(
             h(type === 'point' ? MarkerPopupPoint : MarkerPopupNode, {
               marker: response.data,
-              store: this.$store
+              store: this.$store,
             }),
             wrapper
           )
 
           e.target.LinkedMapObject.Marker.bindPopup(wrapper, {
-            className: 'custom'
+            className: 'custom',
           }).openPopup()
         })
-        .catch(error => {
+        .catch((error) => {
           this.$store.commit('error', error)
         })
     },
@@ -372,7 +456,10 @@ export default {
       }
     },
     updateMap(item) {
-      if (this.itemTypes[item.type].type === 'node' || this.itemTypes[item.type].type === 'point') {
+      if (
+        this.itemTypes[item.type].type === 'node' ||
+        this.itemTypes[item.type].type === 'point'
+      ) {
         if (item.hasOwnProperty('coords')) {
           let isPopupOpen = false
           let obj = this.getObject(item)
@@ -397,14 +484,15 @@ export default {
     async get() {
       this.filter = {
         objects: ['ordinary', 'residentialBuilding', 'point'],
-        statuses: Object.keys(this.$store.state.env.statuses).sort()
+        statuses: Object.keys(this.$store.state.env.statuses).sort(),
       }
       this.showLoader = true
       try {
         let { data } = await this.$http.get('map/data')
         if (this.mapObjects) {
-          Object.keys(this.mapObjects).forEach(key => {
-            if (this.mapObjects[key] && this.mapObjects[key].MarkerShown) this.markerCluster.removeLayer(this.mapObjects[key].Marker)
+          Object.keys(this.mapObjects).forEach((key) => {
+            if (this.mapObjects[key] && this.mapObjects[key].MarkerShown)
+              this.markerCluster.removeLayer(this.mapObjects[key].Marker)
             delete this.mapObjects[key]
           })
         }
@@ -414,8 +502,8 @@ export default {
         this.$store.commit('error', error)
       }
       this.showLoader = false
-    }
-  }
+    },
+  },
 }
 </script>
 

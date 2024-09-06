@@ -90,6 +90,7 @@ export default {
       ],
       nodeTypes: this.data.nodeTypes.map((r) => itemTypes[r]),
       components: [],
+      permitsMap: new Map(),
     }
   },
   computed: {
@@ -109,6 +110,7 @@ export default {
     this.$emitter.on('updateObject', this.update)
     this.$emitter.on('deleteObject', this.delete)
     this.$emitter.on('afterNodeChange', this.onAfterNodeChange)
+    this.$emitter.on('tree-layout:create', this.handleCreate)
   },
   mounted() {
     this.$nextTick().then(() => this.init())
@@ -233,12 +235,35 @@ export default {
         }
       }
     },
+    hasVegaEquip(children) {
+      const regex = /Vega/
+      return children
+        .map((child) => ({
+          child,
+          code: child.code,
+        }))
+        .some((node) => regex.test(node.code))
+    },
+
+    permits(id, isPermit) {
+      this.permitsMap.set(id, { id, isPermit })
+      return [...this.permitsMap.values()]
+    },
+
     async load(node, url) {
       let toggle = node.domToggle()
-
       try {
         toggle.classList.add('loading')
         let { data } = await this.$http.get(url, { params: node })
+
+        const isPermit = this.hasVegaEquip(data)
+
+        if (typeof node.id === 'number' && typeof isPermit === 'boolean') {
+          this.$store.state.equip.hasVegaEquipArray = this.permits(
+            node.id,
+            isPermit
+          )
+        }
 
         let children = data.map((child) => new Node(child, node, node.$el))
         this.getList(children)
@@ -345,6 +370,22 @@ export default {
         this.components.push({ id, type, key, component })
       }
     },
+    async handleCreate(node) {
+      node
+      // $$
+      /*
+      let { data } = await this.$http.get('tree/getChildren', { params: node })
+      const isPermit = this.hasVegaEquip(data)
+
+      if (typeof node.id === 'number' && typeof isPermit === 'boolean') {
+        this.$store.state.equip.hasVegaEquipArray = this.permits(
+          node.id,
+          isPermit
+        )
+      }
+      */
+    },
+
     onClick(event) {
       let target = event.target
       while (target) {
@@ -375,6 +416,7 @@ export default {
           }
           if (target.classList.contains('toggle') && target.parentNode) {
             const node = this.list[target.parentNode.getAttribute('id')]
+
             if (node) {
               if (isFolder(node)) {
                 if (node.childrenLoaded) {

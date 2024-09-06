@@ -53,17 +53,14 @@ export class GroupConnection extends BaseObject {
     const { data } = await this.http.get('groupConnection/create', {
       params: { systemNodeId: this.systemNode },
     })
-
     this.name = data.name
     this.groupType = data.groupType
     this.connectionTypes = data.connectionTypes
   }
-
   async init(id: number) {
     const { data } = await this.http.get('groupConnection/edit', {
       params: { id },
     })
-
     this.id = id
     this.name = data.name
     this.groupType = data.groupType

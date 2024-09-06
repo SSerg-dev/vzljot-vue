@@ -7,12 +7,13 @@
     <header class="header">Наименование</header>
     <div v-for="(r, i) in allEquipLists" :key="i" class="table-row">
       <span class="cell">
-        <input
+        <check-box
           type="checkbox"
           v-model="r.checked"
           :disabled="false"
           @click="handleCheckBox(i)"
-        />
+        >
+        </check-box>
       </span>
 
       <span class="cell icon">
@@ -33,9 +34,12 @@
 import { getImage } from '@/plugins/api.js'
 import User from '@/classes/user'
 import { sortByName } from '@/utils/common.functions.js'
+import CheckBox from '@/components/Inputs/CheckBox.vue'
 
 export default {
-  components: {},
+  components: {
+    CheckBox,
+  },
   props: {},
   data() {
     return {

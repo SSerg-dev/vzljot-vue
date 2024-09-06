@@ -944,7 +944,7 @@
                 учета</check-box
               >
             </expantion>
-            <expantion caption="Отображение вкладок в Web" :resizable="false">
+            <expantion caption="Отображение вкладок" :resizable="false">
               <div class="system-props-web">
                 <check-box v-model="viewData.info">Информация</check-box>
                 <check-box v-model="viewData.points">Точки учета</check-box>
@@ -965,7 +965,7 @@
               </expantion>
               <expantion
                 class="system-props-points-item"
-                caption="Отображение списков приборов в Web"
+                caption="Отображение списков приборов"
                 :resizable="false"
                 style="padding: 5px 0"
               >

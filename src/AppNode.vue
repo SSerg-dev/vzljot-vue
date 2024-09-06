@@ -1,7 +1,7 @@
 <template>
   <div class="detail-container">
     <h1 class="heading">{{ caption }}</h1>
-    <node v-if="$store.state.user" v-bind="{ uuid,  id }" @loaded="onLoaded" />
+    <node v-if="$store.state.user" v-bind="{ uuid, id }" @loaded="onLoaded" />
     <error />
     <spinner :show="!$store.state.user" :text="'Инициализация'" />
   </div>
@@ -21,37 +21,41 @@ export default {
   name: 'app',
   components: {
     Node,
-    Error
+    Error,
   },
   props: {
     baseUrl: String,
     colors: Object,
-    id: Number
+    id: Number,
   },
   data() {
     return {
       uuid: uuidv4(),
-      connection: new signalR.HubConnectionBuilder().withUrl(`${this.baseUrl}serviceHub`).configureLogging(signalR.LogLevel.Information).withAutomaticReconnect([0, 0, 5000]).build(),
-      node: null
+      connection: new signalR.HubConnectionBuilder()
+        .withUrl(`${this.baseUrl}serviceHub`)
+        .configureLogging(signalR.LogLevel.Information)
+        .withAutomaticReconnect([0, 0, 5000])
+        .build(),
+      node: null,
     }
   },
   created() {
     this.$store.commit('setColors', this.colors)
 
-    this.connection.on('login', r => {
+    this.connection.on('login', (r) => {
       let obj = JSON.parse(r)
       this.$store.commit('env', obj.data.env)
       this.$store.commit('user', obj.data.user)
       this.showLoader = false
     })
 
-    this.connection.on('onNotAuthentificated', user => {
+    this.connection.on('onNotAuthentificated', (user) => {
       if (this.$store.state.user && this.$store.state.user.name === user) {
         window.close()
       }
     })
 
-    this.connection.on('onLogout', user => {
+    this.connection.on('onLogout', (user) => {
       if (this.$store.state.user && this.$store.state.user.name === user) {
         window.close()
       }
@@ -66,12 +70,12 @@ export default {
     },
     styleColors() {
       return this.$store.getters.styleColors
-    }
+    },
   },
   methods: {
     onLoaded(node) {
       this.node = node
-    }
-  }
+    },
+  },
 }
 </script>
