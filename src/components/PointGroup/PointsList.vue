@@ -72,6 +72,7 @@ export default defineComponent({
   setup(props, { emit }) {
     const all = ref(false)
     const dataItems = ref<Array<Point>>(props.items.map(r => new Point(r)))
+      
     const pageInfo = ref({
       Page: 1,
       Items: 0,

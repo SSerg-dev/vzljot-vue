@@ -21,6 +21,7 @@ type UnitGroupType = {
 }
 
 interface Env {
+  statuses: any
   archiveTypes: any
   connectionGroupTypes: any
   equipTypeCodes: any
@@ -44,6 +45,7 @@ interface Env {
 }
 
 const env: Env = {
+  statuses: {},
   archiveTypes: {},
   connectionGroupTypes: {},
   equipTypeCodes: {},

@@ -16,7 +16,7 @@ export class Point {
     name,
     state,
     systemType,
-    hasArchives
+    hasArchives,
   }: {
     id: number
     name: string
@@ -33,6 +33,17 @@ export class Point {
 
   getSystemImage() {
     switch (this.systemType) {
+      case SchemeSystemTypeEnum.Level:
+        return 'point-level'
+      case SchemeSystemTypeEnum.Pressure:
+        return 'point-pressure'
+      case SchemeSystemTypeEnum.Refill:
+        return 'point-refill'
+      case SchemeSystemTypeEnum.STV:
+        return 'point-stv'
+      case SchemeSystemTypeEnum.SV:
+        return 'point-sv'
+
       case SchemeSystemTypeEnum.ES:
         return 'point-electric'
       case SchemeSystemTypeEnum.GS:

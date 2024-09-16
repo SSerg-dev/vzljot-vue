@@ -45,6 +45,7 @@ import DatePicker from '../Inputs/DatePicker.vue'
 const collator = new Intl.Collator(['en-US', 'ru-RU'])
 
 function getSystemText(systemType: SchemeSystemTypeEnum) {
+  
   switch (systemType) {
     case SchemeSystemTypeEnum.SO:
       return 'СО'
@@ -70,8 +71,9 @@ function getSystemText(systemType: SchemeSystemTypeEnum) {
       return 'Давление'
     case SchemeSystemTypeEnum.Temperature:
       return 'Температура'
-    case SchemeSystemTypeEnum.VO:
-      return 'Водоотведение'
+    case SchemeSystemTypeEnum.STV:
+      return 'Сточные воды'
+
     case SchemeSystemTypeEnum.SO_GVS:
       return 'СО+ГВС'
     case SchemeSystemTypeEnum.SO_Refill:

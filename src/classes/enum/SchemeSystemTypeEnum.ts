@@ -1,4 +1,5 @@
 export enum SchemeSystemTypeEnum {
+  
   None = 0,
   SO = 1,
   GVS = 2,
@@ -11,8 +12,8 @@ export enum SchemeSystemTypeEnum {
   SV = 256,
   Level = 512,
   Pressure = 1024,
-  Temperature = 2048,
-  VO = 4096,
+  Temperature = 2048, 
+  STV = 4096,
 
   SO_GVS = SO | GVS,
   SO_Refill = SO | Refill,
@@ -22,5 +23,6 @@ export enum SchemeSystemTypeEnum {
   SO_GVS_Refill_HVS = SO | GVS | Refill | HVS,
   SV_Refill = SV | Refill,
   SO_Refill_HVS = SO | Refill | HVS,
-  All = SO | GVS | HVS | ES | GS | PS | MS | Refill | SV | Level | Pressure | Temperature | VO
+  All = SO | GVS | HVS | ES | GS | PS | MS | Refill | SV | Level | Pressure | Temperature | STV
+  
 }

@@ -59,7 +59,7 @@ export default {
       }
     },
     onChange() {
-      if (!this.disabled) {
+      if (!this.disabled) {        
         this.$emit('checkChange', this.node, this.checked)
       }
     },

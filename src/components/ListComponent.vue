@@ -6,8 +6,8 @@ export default {
   props: {
     items: {
       type: Array,
-      default: () => []
-    }
+      default: () => [],
+    },
   },
   data() {
     return {
@@ -17,8 +17,8 @@ export default {
       pageInfo: {
         Page: 1,
         Items: 0,
-        Size: this.$store.getters.pageInfo.Size
-      }
+        Size: this.$store.getters.pageInfo.Size,
+      },
     }
   },
   created() {
@@ -27,7 +27,7 @@ export default {
 
     this.$watch(
       () => this.items,
-      value => (this.dataItems = value)
+      (value) => (this.dataItems = value)
     )
 
     this.$watch(
@@ -40,7 +40,7 @@ export default {
 
     this.$watch(
       () => this.filteredItems.length,
-      value => {
+      (value) => {
         if (!('get' in this)) {
           this.pageInfo.Items = value
         }
@@ -60,36 +60,44 @@ export default {
   },
   computed: {
     hasSelected() {
-      return this.dataItems.some(r => r.checked === true)
+      return this.dataItems.some((r) => r.checked === true)
     },
     filteredItems() {
-      return 'get' in this ? this.dataItems.slice(0) : this.dataItems.slice(0).sort(this.sort)
+      return 'get' in this
+        ? this.dataItems.slice(0)
+        : this.dataItems.slice(0).sort(this.sort)
     },
     localItems() {
       if ('get' in this && typeof this.get === 'function') {
         return this.filteredItems
       } else {
         const firstIndex = (this.pageInfo.Page - 1) * this.pageInfo.Size
-        const lastIndex = this.pageInfo.Page * this.pageInfo.Size > this.filteredItems.length ? this.filteredItems.length : this.pageInfo.Page * this.pageInfo.Size
+        const lastIndex =
+          this.pageInfo.Page * this.pageInfo.Size > this.filteredItems.length
+            ? this.filteredItems.length
+            : this.pageInfo.Page * this.pageInfo.Size
 
         return this.filteredItems.slice(firstIndex, lastIndex)
       }
     },
     hasFilterChanges() {
       const filter = this.emptyFilter()
-      return Object.keys(filter).some(r => this.filter[r] !== filter[r])
-    }
+      return Object.keys(filter).some((r) => this.filter[r] !== filter[r])
+    },
   },
   methods: {
     emptyFilter() {
       return {
-        name: null
+        name: null,
       }
     },
     onUpdate() {},
     onDelete() {},
     sort(a, b) {
-      return this.$store.state.collator.compare(a.name.toLowerCase(), b.name.toLowerCase())
+      return this.$store.state.collator.compare(
+        a.name.toLowerCase(),
+        b.name.toLowerCase()
+      )
     },
     onChangePage(page, size) {
       this.pageInfo.Size = size
@@ -100,14 +108,10 @@ export default {
       }
     },
     changeAll() {
-      this.dataItems.forEach(r => (r.checked = this.all))
+      this.dataItems.forEach((r) => (r.checked = this.all))
     },
     getImage(item) {
-      if (item instanceof ModemPool) {
-        return item.image
-      } else {
-        return getImage.call(this, item)
-      }
+      return item instanceof ModemPool ? item.image : getImage.call(this, item)
     },
     onClearFilterClick() {
       this.filter = this.emptyFilter()
@@ -118,7 +122,7 @@ export default {
     },
     matchType(types) {
       return matchType(types)
-    }
-  }
+    },
+  },
 }
 </script>

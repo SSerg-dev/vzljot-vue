@@ -391,7 +391,6 @@ export default {
     },
     nodeSelect(node) {
       let component = null
-
       if (node && this.$store.state.env) {
         const type = this.itemTypes[node.type].type
         if (type === 'points') {
@@ -490,8 +489,8 @@ export default {
     },
     async onCreateClick(node) {
       this.$emitter.emit('tree-layout:create', node)
-      
       const isPermit = this.hasVegaEquip(node.id)
+
       if (isPermit && node.children.length === 1 ) {
         if (this.isMessage) {
           this.message()

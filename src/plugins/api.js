@@ -1,21 +1,31 @@
 import { defineAsyncComponent, h } from 'vue'
 import { store } from '@/store/store'
 
-export const asyncImport = importPromise => {
+import { SchemeSystemTypeEnum } from '@/classes/enum/SchemeSystemTypeEnum'
+
+export const asyncImport = (importPromise) => {
   return defineAsyncComponent({
     loader: importPromise,
     loadingComponent: {
       render() {
-        return h('div', { class: 'loading-component' }, 'Ожидание компонента...')
-      }
+        return h(
+          'div',
+          { class: 'loading-component' },
+          'Ожидание компонента...'
+        )
+      },
     },
     errorComponent: {
       render() {
-        return h('div', { class: 'loading-component' }, 'Ошибка ожидания компонента')
-      }
+        return h(
+          'div',
+          { class: 'loading-component' },
+          'Ошибка ожидания компонента'
+        )
+      },
     },
     delay: 200,
-    timeout: 60000
+    timeout: 60000,
   })
 }
 
@@ -47,20 +57,29 @@ export function getImage(item) {
     case 'node':
       return `fas ${store.state.env.nodeTypes[item.nodeType].image} icon`
     case 'point':
-      return store.state.env.pointTypes[item.systemType]?.image ?? 'point-common'
+      return !store.state.env.pointTypes[item.systemType]?.image
+        ? getSystemImage(item.systemType)
+        : store.state.env.pointTypes[item.systemType]?.image // ?? 'point-common'
+
     case 'reportTask':
       return 'fas fa-file-alt icon'
     case 'balanceGroup':
       return 'fas fa-sitemap icon'
     case 'set':
     case 'setEquip':
-      return `fas icon center fa-tasks-alt${store.state.env.setTypes[item.setType].type === 'equipGroup' ? ' sign-group' : ''}${
-        item.availableForAll ? ' sign-link' : ''
-      }`
+      return `fas icon center fa-tasks-alt${
+        store.state.env.setTypes[item.setType].type === 'equipGroup'
+          ? ' sign-group'
+          : ''
+      }${item.availableForAll ? ' sign-link' : ''}`
     case 'sets':
       return 'fas fa-tasks-alt icon'
     case 'symbolSchema':
-      return `fas icon center fa-project-diagram  ${store.state.env.setTypes[item.setType].type === 'equipGroup' ? 'sign-group' : ''}`
+      return `fas icon center fa-project-diagram  ${
+        store.state.env.setTypes[item.setType].type === 'equipGroup'
+          ? 'sign-group'
+          : ''
+      }`
     case 'symbolSchemas':
       return 'fas fa-project-diagram icon'
     case 'setParam':
@@ -98,10 +117,10 @@ export function getImage(item) {
   return 'equip-root'
 }
 
-export let matchType = types => {
+export let matchType = (types) => {
   let obj = {}
   if (types) {
-    Object.keys(types).map(key => {
+    Object.keys(types).map((key) => {
       obj[types[key].type] = parseInt(key)
     })
   }
@@ -117,7 +136,49 @@ export function hexToRgb(color) {
 }
 
 export function rgbToHex(r, g, b) {
-  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+  return `#${r.toString(16).padStart(2, '0')}${g
+    .toString(16)
+    .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+}
+
+function getSystemImage(type) {
+  switch (type) {
+    case SchemeSystemTypeEnum.Level:
+      return 'point-level'
+    case SchemeSystemTypeEnum.Pressure:
+      return 'point-pressure'
+    case 'Refill':
+      return 'point-refill'
+    case SchemeSystemTypeEnum.STV:
+      return 'point-stv'
+    case SchemeSystemTypeEnum.SV:
+      return 'point-sv'
+
+    case SchemeSystemTypeEnum.ES:
+      return 'point-electric'
+    case SchemeSystemTypeEnum.GS:
+      return 'point-gas'
+    case SchemeSystemTypeEnum.GVS:
+      return 'point-gvs'
+    case SchemeSystemTypeEnum.GVS_Refill:
+      return 'point-gvs'
+    case SchemeSystemTypeEnum.HVS:
+      return 'point-hvs'
+    case SchemeSystemTypeEnum.PS:
+      return 'point-ps'
+    case SchemeSystemTypeEnum.SO:
+      return 'point-so'
+    case SchemeSystemTypeEnum.SO_Refill:
+      return 'point-so'
+    case SchemeSystemTypeEnum.SO_GVS:
+      return 'point-sogvs'
+    case SchemeSystemTypeEnum.SO_GVS_Refill:
+      return 'point-sogvs'
+    case SchemeSystemTypeEnum.PS | SchemeSystemTypeEnum.GVS:
+      return 'point-psgvs'
+    default:
+      return 'point-common'
+  }
 }
 
 function rgbToHsl(r, g, b) {
@@ -182,20 +243,39 @@ export function lightenDarken(color, amount) {
   let [h, s, l] = rgbToHsl(...hexToRgb(color))
   l += amount / 100
   let [r, g, b] = hslToRgb(...[h, s, Math.min(Math.max(0, l), 1)])
-  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+  return `#${r.toString(16).padStart(2, '0')}${g
+    .toString(16)
+    .padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
 }
 
-export const getISODateTime = value => {
+export const getISODateTime = (value) => {
   if (value instanceof Date) {
-    return `${value.getFullYear()}-${('0' + (value.getMonth() + 1)).slice(-2)}-${('0' + value.getDate()).slice(-2)}T${('0' + value.getHours()).slice(
+    return `${value.getFullYear()}-${('0' + (value.getMonth() + 1)).slice(
       -2
-    )}:${('0' + value.getMinutes()).slice(-2)}:${('0' + value.getSeconds()).slice(-2)}`
+    )}-${('0' + value.getDate()).slice(-2)}T${('0' + value.getHours()).slice(
+      -2
+    )}:${('0' + value.getMinutes()).slice(-2)}:${(
+      '0' + value.getSeconds()
+    ).slice(-2)}`
   }
   return value
 }
 
 export function* colorGenerator() {
-  let colors = ['ff0000', '7b68ee', 'ff8c00', '1e90ff', 'ffd700', '40e0d0', 'ff00ff', '0000cd', 'ff1493', '00ff7f', 'a52a2a', '32cd32']
+  let colors = [
+    'ff0000',
+    '7b68ee',
+    'ff8c00',
+    '1e90ff',
+    'ffd700',
+    '40e0d0',
+    'ff00ff',
+    '0000cd',
+    'ff1493',
+    '00ff7f',
+    'a52a2a',
+    '32cd32',
+  ]
   var index = 0
   while (true) {
     if (index === colors.length) {

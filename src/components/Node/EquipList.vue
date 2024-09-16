@@ -20,7 +20,7 @@
         <span class="cell">{{ r.name }}</span>
       </div>
     </div>
-    <pager v-bind="pageInfo" @go="onChangePage" />
+    <pager v-bind="pageInfo" @go="onChangePage" /> 
     <transition>
       <wizard v-if="wizard" v-bind="wizard" @cancel="onWizardCancel" @end="onWizardEnd" />
     </transition>
