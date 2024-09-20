@@ -21,6 +21,7 @@ type UnitGroupType = {
 }
 
 interface Env {
+  pointTypes: any
   statuses: any
   archiveTypes: any
   connectionGroupTypes: any
@@ -45,6 +46,7 @@ interface Env {
 }
 
 const env: Env = {
+  pointTypes: {},
   statuses: {},
   archiveTypes: {},
   connectionGroupTypes: {},

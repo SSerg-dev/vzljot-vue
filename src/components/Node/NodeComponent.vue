@@ -172,7 +172,7 @@ export default defineComponent({
 
     async function onAddEquips(equips: Array<any>) {
       localItem.value.addEquips(equips)
-    }
+    } 
 
     function onRemoveEquips(equips: Array<number>) {
       localItem.value.equips = localItem.value.equips.filter(

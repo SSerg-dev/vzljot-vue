@@ -148,6 +148,7 @@ const wizardEquipAdd = (http, limitEquips, allowedEquips, allowedEquipLists, equ
           data: {
             loader: async () => {
               if (data === 'equip') {
+
                 if (limitEquips) {
                   return allowedEquips.filter(r => !equips.includes(r.id))
                 } else {
@@ -162,12 +163,12 @@ const wizardEquipAdd = (http, limitEquips, allowedEquips, allowedEquipLists, equ
                   return data.filter(r => !equipLists.includes(r.id))
                 }
               }
-            },
+            }, 
             searchColumn: 'name',
             columns: [
               {
                 prop: 'name',
-                text: 'Наименование'
+                text: 'Наименование' 
               }
             ]
           }

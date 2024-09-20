@@ -9,7 +9,7 @@ export enum ColumnTypeEnum {
   ArchiveMonthTime = 'archiveMonthTime',
   PollCurrentTime = 'pollCurrentTime',
   TimeCreate = 'timeCreate',
-  TimeLastEdit = 'timeLastEdit'
+  TimeLastEdit = 'timeLastEdit',
 }
 
 export type PollMessage = {
@@ -59,7 +59,7 @@ export class Filter {
     port,
     pollSource,
     periodStart = null,
-    periodEnd = null
+    periodEnd = null,
   }: {
     state?: number
     type?: SchemeSystemTypeEnum
@@ -108,13 +108,7 @@ export class EquipCustomProperty {
   name: string
   value: string
 
-  constructor({
-    name,
-    value
-  }: {
-    name: string
-    value: string
-  }) {
+  constructor({ name, value }: { name: string; value: string }) {
     this.name = name
     this.value = value
   }
@@ -159,7 +153,7 @@ export class Equip {
     pollCurrentTime,
     nodes = [],
     pollSource,
-    custom
+    custom,
   }: {
     equipId: number
     name: string
@@ -189,10 +183,18 @@ export class Equip {
     this.timeCreate = timeCreate ? new Date(timeCreate) : timeCreate
     this.timeLastEdit = timeLastEdit ? new Date(timeLastEdit) : timeLastEdit
     this.points = points
-    this.archiveHourTime = archiveHourTime ? new Date(archiveHourTime) : archiveHourTime
-    this.archiveDayTime = archiveDayTime ? new Date(archiveDayTime) : archiveDayTime
-    this.archiveMonthTime = archiveMonthTime ? new Date(archiveMonthTime) : archiveMonthTime
-    this.pollCurrentTime = pollCurrentTime ? new Date(pollCurrentTime) : pollCurrentTime
+    this.archiveHourTime = archiveHourTime
+      ? new Date(archiveHourTime)
+      : archiveHourTime
+    this.archiveDayTime = archiveDayTime
+      ? new Date(archiveDayTime)
+      : archiveDayTime
+    this.archiveMonthTime = archiveMonthTime
+      ? new Date(archiveMonthTime)
+      : archiveMonthTime
+    this.pollCurrentTime = pollCurrentTime
+      ? new Date(pollCurrentTime)
+      : pollCurrentTime
     this.nodes = nodes
     this.pollSource = pollSource
     this.custom = custom
@@ -216,7 +218,7 @@ export class EquipList extends BaseObject {
     id = undefined,
     name = '',
     equips = [],
-    settings = {}
+    settings = {},
   }: {
     uuid?: string
     id?: number
@@ -228,32 +230,41 @@ export class EquipList extends BaseObject {
 
     this.id = id
     this.name = name
-    this.equips = equips.map(r => new Equip(r))
+    this.equips = equips.map((r) => new Equip(r))
     this.settings = settings
   }
 
   async init(id: number): Promise<void> {
-    const { data } = await this.http.get<{ id: number; name: string; equips: Array<Equip>; settings: any }>('equipList/equipList', { params: { id } })
+    const { data } = await this.http.get<{
+      id: number
+      name: string
+      equips: Array<Equip>
+      settings: any
+    }>('equipList/equipList', { params: { id } })
 
     this.id = data.id
     this.name = data.name
-    this.equips = data.equips.map(r => new Equip(r))
+    this.equips = data.equips.map((r) => new Equip(r))
     this.settings = data.settings
+    
   }
 
   async save() {
     await this.http.post('equipList/equipList', {
       id: this.id,
       name: this.name,
-      equips: this.equips.map(r => r.equipId)
+      equips: this.equips.map((r) => r.equipId),
     })
   }
 
   async addEquips(equips: Array<number>) {
     if (equips.length > 0) {
-      const { data } = await this.http.post<Array<Equip>>('equipList/addEquips', { equips })
+      const { data } = await this.http.post<Array<Equip>>(
+        'equipList/addEquips',
+        { equips }
+      )
 
-      data.forEach(r => new Equip(r))
+      data.forEach((r) => new Equip(r))
 
       this.equips.push(...data)
     }

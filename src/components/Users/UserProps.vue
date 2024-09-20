@@ -517,10 +517,7 @@
             "
           >
             <!-- $$ -->
-            <!-- <div class="">
-              <node-group-component v-bind="{ uuid: '', id: 0 }" />
-            </div> -->
-
+            <!-- <info-list /> -->
           </div>
         </fieldset>
       </div>
@@ -542,7 +539,7 @@ import DatePicker from '../Inputs/DatePicker.vue'
 import SelectorCombo from '../Inputs/SelectorCombo.vue'
 import VButton from '../Inputs/VButton.vue'
 
-// import NodeGroupComponent from '@/components/NodeGroup/NodeGroupComponent.vue'
+// import InfoList from '@/components/InfoList/InfoList.vue'
 
 export default {
   components: {
@@ -552,7 +549,7 @@ export default {
     DatePicker,
     SelectorCombo,
     VButton,
-    // NodeGroupComponent,
+    // InfoList,
   },
   props: {
     user: Object,

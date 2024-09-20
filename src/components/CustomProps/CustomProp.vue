@@ -110,7 +110,7 @@ export default defineComponent({
 
     watch(
       () => props.value.name,
-      value => (localName.value = value)
+      value => (localName.value = value) 
     )
 
     watch(

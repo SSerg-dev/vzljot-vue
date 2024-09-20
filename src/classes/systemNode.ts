@@ -48,7 +48,7 @@ const defaultGroups: Group = {
 
 interface ISystemNode {
   id: number
-  name: string
+  name?: string
   internalAddress: string
   applicationServicePort: number
   dataServicePort: number
@@ -72,7 +72,7 @@ export class SystemNode extends BaseObject {
   editable = SystemNode.store.state.user?.userRights.systemNodeEdit
 
   id: number | undefined
-  name: string
+  name?: string
   internalAddress: string
   applicationServicePort: number
   dataServicePort: number
@@ -157,7 +157,7 @@ export class SystemNode extends BaseObject {
     const { data } = await this.http.get<ISystemNode>('systemNode/systemNode', { params: { id } })
 
     this.id = data.id
-    this.name = data.name
+    this.name = data?.name ?? ''
     this.internalAddress = data.internalAddress
     this.applicationServicePort = data.applicationServicePort
     this.dataServicePort = data.dataServicePort

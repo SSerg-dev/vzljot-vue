@@ -59,7 +59,7 @@ export function getImage(item) {
     case 'point':
       return !store.state.env.pointTypes[item.systemType]?.image
         ? getSystemImage(item.systemType)
-        : store.state.env.pointTypes[item.systemType]?.image // ?? 'point-common'
+        : store.state.env.pointTypes[item.systemType]?.image
 
     case 'reportTask':
       return 'fas fa-file-alt icon'
@@ -147,7 +147,7 @@ function getSystemImage(type) {
       return 'point-level'
     case SchemeSystemTypeEnum.Pressure:
       return 'point-pressure'
-    case 'Refill':
+    case SchemeSystemTypeEnum.Refill:
       return 'point-refill'
     case SchemeSystemTypeEnum.STV:
       return 'point-stv'

@@ -199,7 +199,7 @@ export default {
         component: 'set-component',
         uuid: null, //obj.uuid,
         image: obj.image,
-        text: `Настройка прибора: ${r.name.replace(' 12', ' 12')}`,
+        text: `Настройки: ${r.name.replace(' 12', ' 12')}`,
         data: {
           uuid: obj.uuid,
           id: r.id,
@@ -211,7 +211,7 @@ export default {
       this.edit = true
     },
     onSaved(data) {
-      this.componentData.text = `${'Настройка прибора'}: ${data.name}`
+      this.componentData.text = `${'Настройки'}: ${data.name}`
     },
     close() {
       this.edit = false

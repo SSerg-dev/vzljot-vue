@@ -25,6 +25,8 @@
     />
 
     <div class="none" v-if="enumValue === 'none'"></div>
+
+    <div class="text" v-if="enumValue === 'text'">{{ this.param.value }}</div>
   </div>
 </template>
 
@@ -35,6 +37,7 @@ const EquipSettingParamValueTypeEnum = Object.freeze({
   none: 'none',
   string: 'string',
   list: 'list',
+  text: 'text',
 })
 
 export default {
@@ -58,6 +61,7 @@ export default {
     items: {},
     values: '',
     inputValue: '',
+    hasTextType: null,
   }),
   computed: {
     ...mapGetters({
@@ -74,21 +78,25 @@ export default {
             : EquipSettingParamValueTypeEnum.list
           break
         case 'None':
+          result = this.getViewType(readOnly)
+          break
+        case 'String':
           result = readOnly
-            ? EquipSettingParamValueTypeEnum.none
+            ? EquipSettingParamValueTypeEnum.text
             : EquipSettingParamValueTypeEnum.string
           break
+
         default:
           result = EquipSettingParamValueTypeEnum.none
           break
       }
 
-      return result
+      return result 
     },
   },
   watch: {
     editName(newVal) {
-      this.edit(newVal)
+      this.edit(newVal) 
     },
   },
   created() {},
@@ -100,9 +108,15 @@ export default {
   beforeUnmount() {},
 
   methods: {
+    getViewType(readOnly) {
+      this.inputValue = this.param.value
+      return readOnly
+        ? EquipSettingParamValueTypeEnum.text
+        : EquipSettingParamValueTypeEnum.string
+    },
+
     handleInputValue(event) {
       this.inputValue = event.target.value
-      // console.log('$$ this.inputValue', this.inputValue)
     },
     handleOptionChange(event) {
       const selectedId =
@@ -116,7 +130,6 @@ export default {
         name: this.param.name,
         value: selectedId,
       }
-      // console.log('$$ changedValues', JSON.stringify(changedValues))
 
       this.$emitter.emit('equip-setting-value:update', changedValues)
     },
@@ -155,7 +168,8 @@ input {
   color: black;
   border-color: #ddd;
 }
-.none {
+.none,
+.text {
   min-width: 190px;
   min-height: 22px;
   padding: 1px 4px;

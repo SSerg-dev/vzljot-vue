@@ -62,6 +62,7 @@ export default {
           response.data = response.data.filter((item) => item && item !== null)
 
           if (response.data) {
+
             let updatedArray = Array.from(
               new Set([
                 ...response.data.map((obj) => ({ ...obj, checked: false })),

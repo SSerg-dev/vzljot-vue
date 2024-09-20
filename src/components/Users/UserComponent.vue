@@ -429,6 +429,7 @@ const wizardEquipAdd = (http, equips, equipLists) => {
         defaultOption: types[0],
       },
       next(data) {
+        
         return {
           name: 'add',
           text: `Выбор ${data === 'equip' ? 'прибора' : 'списка приборов'}:`,
@@ -438,11 +439,13 @@ const wizardEquipAdd = (http, equips, equipLists) => {
             loader: async () => {
               if (data === 'equip') {
                 let { data } = await http.get('user/equips')
+
                 return data
-                  .filter((r) => !equips.includes(r.id))
+                  .filter((r) => !equips.includes(r.id)) 
                   .sort(sortByName)
               } else {
                 let { data } = await http.get('user/equipLists')
+
                 return data
                   .filter((r) => !equipLists.includes(r.id))
                   .sort(sortByName)
@@ -1437,7 +1440,7 @@ export default {
   padding: 0 auto;
   display: flex;
   flex-direction: row;
-  justify-content:flex-start;
+  justify-content: flex-start;
   gap: 0 100px;
 }
 .system-props-points-item {

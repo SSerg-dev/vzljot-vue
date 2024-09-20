@@ -3,21 +3,45 @@
     <tabs>
       <tabx v-if="$store.state.user?.userRights.equipList" text="Параметры">
         <preserver-component
-          v-bind="{ readOnly: !$store.state.user?.userRights.equipListEdit, saving, disabled: !hasChanges || loading, loading }"
+          v-bind="{
+            readOnly: !$store.state.user?.userRights.equipListEdit,
+            saving,
+            disabled: !hasChanges || loading,
+            loading,
+          }"
           @saveClick="save()"
         >
-          <equip-list-props v-bind="{ name: localItem.name, error: localError }" @changed="onChanged" />
+          <equip-list-props
+            v-bind="{ name: localItem.name, error: localError }"
+            @changed="onChanged"
+          />
         </preserver-component>
       </tabx>
-      <tabx v-if="$store.state.user?.userRights.equipList" text="Приборы" :selected="$store.state.user?.userRights.equipList">
+      <tabx
+        v-if="$store.state.user?.userRights.equipList"
+        text="Приборы"
+        :selected="$store.state.user?.userRights.equipList"
+      >
         <preserver-component
-          v-bind="{ readOnly: !$store.state.user?.userRights.equipListEdit, saving, disabled: !hasChanges || loading, loading }"
+          v-bind="{
+            readOnly: !$store.state.user?.userRights.equipListEdit,
+            saving,
+            disabled: !hasChanges || loading,
+            loading,
+          }"
           @saveClick="save()"
         >
-          <equips-list v-bind="{ items: localItem.equips, settings: localItem.settings }" @add="onAddEquips" @remove="onRemoveEquips" />
+          <equips-list
+            v-bind="{ items: localItem.equips, settings: localItem.settings }"
+            @add="onAddEquips"
+            @remove="onRemoveEquips"
+          />
         </preserver-component>
       </tabx>
-      <tab v-if="$store.state.user?.userRights.reportFile" text="Сформированные отчеты">
+      <tab
+        v-if="$store.state.user?.userRights.reportFile"
+        text="Сформированные отчеты"
+      >
         <report-file-list v-bind="{ id, type: 16 }" />
       </tab>
       <tab text="Состояние">
@@ -31,14 +55,34 @@
           v-bind="{
             id,
             type: DBTYPE,
-            periodStart: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 1, 0, 0, 0),
-            periodEnd: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 23, 59, 59)
+            periodStart: new Date(
+              new Date().getFullYear(),
+              new Date().getMonth(),
+              new Date().getDate() - 1,
+              0,
+              0,
+              0
+            ),
+            periodEnd: new Date(
+              new Date().getFullYear(),
+              new Date().getMonth(),
+              new Date().getDate(),
+              23,
+              59,
+              59
+            ),
           }"
         />
       </tab>
     </tabs>
     <transition-group>
-      <wizard v-if="wizard" v-bind="wizard" @cancel="onWizardCancel" @end="onWizardEnd" key="0" />
+      <wizard
+        v-if="wizard"
+        v-bind="wizard"
+        @cancel="onWizardCancel"
+        @end="onWizardEnd"
+        key="0"
+      />
       <spinner :show="loading" :text="'Загрузка...'" key="1" />
     </transition-group>
   </div>
@@ -46,6 +90,7 @@
 
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
+
 import { setupTreeComponent } from '../Base/baseComponent'
 import { EquipList, EquipListError } from '../../classes/equipList'
 
@@ -73,20 +118,31 @@ export default defineComponent({
     Tab,
     Tabx,
     Tabs,
-    Wizard
+    Wizard,
   },
   props: {
     uuid: {
       type: String as PropType<string>,
-      required: true
+      required: true,
     },
     id: {
       type: Number as PropType<number>,
-      required: true
-    }
+      required: true,
+    },
   },
   setup(props) {
-    const { hasChanges, loading, localError, localItem, onChanged, onWizardCancel, onWizardEnd, save, saving, wizard } = setupTreeComponent(
+    const {
+      hasChanges,
+      loading,
+      localError,
+      localItem,
+      onChanged,
+      onWizardCancel,
+      onWizardEnd,
+      save,
+      saving,
+      wizard,
+    } = setupTreeComponent(
       props.uuid,
       props.id,
       new EquipList({ uuid: props.uuid }),
@@ -103,12 +159,14 @@ export default defineComponent({
     }
 
     function onRemoveEquips(equips: Array<number>) {
-      localItem.value.equips = localItem.value.equips.filter(r => !equips.includes(r.equipId))
+      localItem.value.equips = localItem.value.equips.filter(
+        (r) => !equips.includes(r.equipId)
+      )
       hasChanges.value = true
     }
 
     return {
-      DBTYPE: 'DbEquipList', 
+      DBTYPE: 'DbEquipList',
       hasChanges,
       localItem,
       loading,
@@ -120,8 +178,8 @@ export default defineComponent({
       onWizardEnd,
       save,
       saving,
-      wizard
+      wizard,
     }
-  }
+  },
 })
 </script>
