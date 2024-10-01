@@ -17,8 +17,8 @@
         <span class="cell icon">
           <span :class="`fas ${r.image} clickable-icon`" title="Просмотр..." @click="viewClick(r)" />
         </span>
-        <span class="cell">{{ r.name }}</span>
-        <span class="cell">{{ loraTypes[r.operator].name }}</span>
+        <span class="cell">{{ r?.name }}</span>
+        <span class="cell">{{ loraTypes[r.operator]?.name }}</span>
         <span class="cell">{{ r.networkAddress }}</span>
       </div>
     </div>
@@ -26,7 +26,7 @@
     <transition-group>
       <props-component
         v-if="component"
-        v-bind="{ uuid: component.item.uuid, image: component.item.image, text: `LoRa-сервер: ${component.item.name}` }"
+        v-bind="{ uuid: component.item.uuid, image: component.item.image, text: `LoRa-сервер: ${component.item?.name}` }"
         :key="0"
       >
         <lora-server-component v-bind="component" @saved="onSaved" @changed="onChanged" />

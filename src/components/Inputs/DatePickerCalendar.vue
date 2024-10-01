@@ -165,6 +165,19 @@
         >
       </div>
     </div>
+    <div :class="`${pre}-foot`" v-if="m === 'HH'">
+      <div :class="`${pre}-hour`">
+        <a
+          :title="local.hourTip"
+          @click="
+            ;(showHours = !showHours), (showMinutes = showSeconds = false)
+          "
+          :class="{ on: showHours }"
+        >
+          {{ `${hour < 10 ? '0' + hour : hour}` }}
+        </a>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -374,6 +387,9 @@ export default {
     } else if (is('Y')) {
       this.m = 'Y'
       this.showYears = true
+    }
+    if (this.format.includes('DD.MM.YYYY HH')) {
+      this.m = 'HH'
     }
   },
 }

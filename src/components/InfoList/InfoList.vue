@@ -4,7 +4,7 @@
       <tabx
         text="Списки приборов"
       >
-        <info-equips-list />
+        <info-equips-list /> 
       </tabx>
       <tabx
         text="Списки точек учета"
@@ -32,7 +32,6 @@ export default defineComponent({
   },
   setup() {
     onBeforeMount(() => {
-      // console.log('$$ InfoList onBeforeMount')
     })
     return {
     }

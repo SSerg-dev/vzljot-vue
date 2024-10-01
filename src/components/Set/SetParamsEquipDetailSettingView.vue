@@ -15,25 +15,25 @@
           <date-picker
             v-model="localTimeStart"
             :format="dateFormat"
-            clearable
+            
             @update:modelValue="
               handleEquipSettingDate($event, this.getEquip.equipSettingIndex)
             "
           />
         </span>
 
-        <span class="cell check-box setting-item-3">
+        <label class="cell check-box setting-item-3 clickable-label">
           <check-box
             v-model="localProperties"
             @update:modelValue="
               handlePassSettingCheck($event, this.getEquip.equipSettingIndex)
             "
           ></check-box>
-        </span>
 
-        <span class="setting-item-4"
-          >Разрешить пропускать проверку настроек</span
-        >
+          <span class="setting-item-4"
+            >Разрешить пропускать проверку настроек</span
+          >
+        </label>
       </div>
 
       <div class="table-grid">
@@ -43,13 +43,13 @@
 
         <div
           v-for="(r, i) in localEquipSettingSorted[getEquip.equipSettingIndex]
-            .detailArray"
+            ?.detailArray"
           :key="i"
           class="table-row"
           :ref="(el) => (rowsElement[r.id] = el)"
         >
-          <span class="cell icon clickable-icon" title="Редактирование...">
-            <div :class="['fas', 'fa-cog', 'cog']" />
+          <span class="cell icon" title="Редактирование...">
+            <div :class="['fas', 'fa-cog', 'cog', 'clickable-icon']" />
           </span>
 
           <span class="cell" style="justify-content: start">{{
@@ -134,14 +134,14 @@ export default {
       busy: false,
       rowsElement: {},
       localEditName: '',
+      dateFormat: 'DD.MM.YYYY HH', 
 
-      dateFormat: 'DD.MM.YYYY',
       localTimeStart: null,
       localProperties: null,
       localEquipSettingId: null,
       localEquipSettingSorted: [],
 
-      equipSetting: new EquipSetting({}),
+      equipSetting: new EquipSetting({}), 
       mode: 'change',
     }
   },
@@ -152,7 +152,7 @@ export default {
     this.pageInfo.Items =
       this.getEquip.equipSetting[
         this.getEquip.equipSettingIndex
-      ].detailArray.length
+      ]?.detailArray?.length
 
     this.$store.getters.pageInfo.Items = this.pageInfo.Items
 
@@ -203,10 +203,8 @@ export default {
           timeStart: this.localTimeStart,
           properties: this.localProperties,
         },
-        equipSettingHeight:
-          this.localEquipSettingSorted[this.getEquip.equipSettingIndex]
-            .detailArray.length,
       }
+
       this.$store.commit('setEquip', options)
     },
 
@@ -216,6 +214,8 @@ export default {
     },
     handleEquipSettingDate(event, i) {
       this.localTimeStart = new Date(event)
+      this.localTimeStart.setMinutes(0, 0, 0)
+
       this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
 
       const changedValues = this.localTimeStart
@@ -315,18 +315,26 @@ export default {
   align-self: center;
   justify-self: center;
   margin-right: 5px;
+  margin-left: 10px;
 }
 .setting-item-4 {
   align-self: center;
   justify-self: center;
   margin-right: 0px;
+  margin-left: 5px;
 }
-.date-picker {
+/* .date-picker {
   width: 100px;
-}
+} */
 .check-box {
   display: flex;
   align-items: center;
   justify-content: end;
+}
+.clickable-label {
+  cursor: pointer;
+}
+.check-box input {
+  cursor: pointer;
 }
 </style>

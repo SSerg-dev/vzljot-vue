@@ -1,5 +1,5 @@
 <template>
-  <div class="content" :style="{ height: computedHeight }">
+  <div>
     <tool-bar v-if="$store.state.user?.userRights.setEdit">
       <div
         :class="['button', 'fas', 'fa-plus-circle', { disabled: true }]"
@@ -127,7 +127,6 @@ export default {
       dateFormat: 'DD.MM.YYYY',
       currentDate: new Date(),
 
-      coeff: 32,
       localItemsSorted: [],
 
       localTimeStart: null,
@@ -146,18 +145,6 @@ export default {
       getEquip: 'getEquip',
       getCard: 'getCard',
     }),
-    computedHeight() {
-      /*
-      const minHeight = 88
-      const itemHeight = 34
-      const itemCount = this.localItems.length 
-      
-      return `calc(${minHeight}px + ${
-        itemCount * itemHeight + this.getEquip.equipSettingHeight * this.coeff
-      }px)`
-      */
-      return `calc(389%)`
-    },
   },
   beforeUnmount() {
     if (cancel) this.cancel()
@@ -183,7 +170,9 @@ export default {
 
       this.$store.commit('setEquip', options)
     },
-    viewClick(r, i) {
+    async viewClick(r, i) {
+      await this.load()
+
       this.localTimeStart = this.localItemsSorted[i].timeStart
       this.localProperties = this.localItemsSorted[i].properties
 
@@ -229,9 +218,41 @@ export default {
             checked: r.properties === 1 ? true : false,
           })
         })
+
         this.localItemsSorted = this.localItems
           .slice()
           .sort((a, b) => new Date(a.timeStart) - new Date(b.timeStart))
+
+        // $$
+        if (typeof this.localItemsSorted[0]?.detailArray === 'object') {
+          const versionIndex = this.localItemsSorted[0].detailArray?.findIndex(
+            (item) => item.name === 'Version'
+          )
+          if (versionIndex !== -1) {
+            const versionItem = this.localItemsSorted[0].detailArray?.find(
+              (item) => item.name === 'Version'
+            )
+
+            const newParamValues = {}
+            const newParamKeys = {}
+
+            if (versionItem && versionItem.paramValues) {
+              const paramValues = versionItem.paramValues
+
+              Object.keys(paramValues).forEach((key, index) => {
+                newParamValues[index] = paramValues[key]
+              })
+              versionItem.paramValues = newParamValues
+
+              Object.keys(paramValues).forEach((key, index) => {
+                newParamKeys[index] = key
+              })
+              this.$store.state.equip.versionParamKeys = newParamKeys
+            }
+            this.localItemsSorted[0].detailArray[versionIndex].paramValues =
+              newParamValues
+          }
+        }
       } catch (error) {
         this.$store.commit('error', error)
       } finally {
@@ -300,6 +321,8 @@ export default {
   background-color: #ecf0f6;
 
   width: 100%;
+  position: absolute;
+  bottom: 0;
 }
 .container,
 .item-1,

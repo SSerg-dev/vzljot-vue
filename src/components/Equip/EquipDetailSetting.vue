@@ -46,6 +46,7 @@ export default {
         serialNumber: newValue.serialNumber,
         equipTypeName: newValue.equipTypes[0].name,
       }
+
       this.$store.commit('setEquip', options) 
       this.isVisible = true
     },

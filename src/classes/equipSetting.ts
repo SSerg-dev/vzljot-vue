@@ -36,8 +36,10 @@ export default class EquipSetting extends BaseObject {
     id = undefined,
     name = '',
 
-    equipSettingTable = null, 
+    equipSettingTable = null,
     equipSettings = [],
+    
+
   }: IEquipSetting) {
     super(uuid)
 
@@ -46,6 +48,7 @@ export default class EquipSetting extends BaseObject {
 
     this.equipSettingTable = equipSettingTable
     this.equipSettings = equipSettings
+    EquipSetting.store.state.equip.equipSettingSave = []
   }
 
   async init(id: number) {}
@@ -64,18 +67,45 @@ export default class EquipSetting extends BaseObject {
       if (!props.equipSettingTable.equipSettingId)
         props.equipSettingTable.equipSettingId = this.equipSettingTable.id
     }
-
     this.equipSettings = EquipSetting.store.state.equip.equipSettingSave
     if (this.equipSettings) {
       props.equipSettings = this.equipSettings
     }
-    
-    const { data } = await this.http.post('equip/updateEquipSettings', props, {
+
+    const versionParamKeys: any =
+      EquipSetting.store.state.equip.versionParamKeys
+
+    const versionIndex = props.equipSettings?.findIndex(
+      (item) => item.name === 'Version'
+    )
+
+    if (versionIndex !== -1) {
+      const versionItem = props.equipSettings?.find(
+        (item) => item.name === 'Version'
+      )
+
+      const versionSetting: any = props.equipSettings?.find(
+        (setting) => setting.name === 'Version'
+      )
+
+      if (versionSetting) {
+        const keyIndex = versionSetting.id.toString()
+
+        versionSetting.value =
+          versionParamKeys[keyIndex?.toString() ?? '0'] ?? '0'
+      }
+    } 
+
+    const { data, status } = await this.http.post('equip/updateEquipSettings', props, {
       headers: {
         'Content-Type': 'application/json',
       },
     })
-  }
+
+    if (status === 200) {
+      EquipSetting.store.state.equip.equipSettingSave = []
+    }
+  } 
 
   addEquipSetting() {}
   removeEquipSetting() {}

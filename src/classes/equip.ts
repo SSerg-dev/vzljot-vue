@@ -356,7 +356,10 @@ export class Equip extends BaseObject {
   }
 
   async init(id: number): Promise<void> {
-    const { data } = await this.http.get('equip/equip', { params: { id } })
+    
+    const { data, status } = await this.http.get('equip/equip', {
+      params: { id },
+    })
 
     this.id = data.id
     this.name = data.name

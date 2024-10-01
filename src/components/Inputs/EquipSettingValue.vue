@@ -61,6 +61,8 @@ export default {
     items: {},
     values: '',
     inputValue: '',
+    inputId: -1,
+    inputName: '',
     hasTextType: null,
   }),
   computed: {
@@ -91,12 +93,12 @@ export default {
           break
       }
 
-      return result 
+      return result
     },
   },
   watch: {
     editName(newVal) {
-      this.edit(newVal) 
+      this.edit(newVal)
     },
   },
   created() {},
@@ -104,6 +106,8 @@ export default {
     this.items = this.param.paramValues
     this.values = this.param.value
     this.inputValue = this.param.value
+    this.inputId = this.param.id
+    this.inputName = this.param.name
   },
   beforeUnmount() {},
 
@@ -117,6 +121,14 @@ export default {
 
     handleInputValue(event) {
       this.inputValue = event.target.value
+      const changedValues = {
+        id: this.inputId,
+        caption: this.inputValue,
+        name: this.inputName,
+        value: this.inputValue,
+      }
+
+      this.$emitter.emit('equip-setting-value:update', changedValues)
     },
     handleOptionChange(event) {
       const selectedId =
@@ -128,7 +140,7 @@ export default {
         id: selectedId,
         caption: selectedValue,
         name: this.param.name,
-        value: selectedId,
+        value: selectedId.toString(),
       }
 
       this.$emitter.emit('equip-setting-value:update', changedValues)
@@ -136,6 +148,7 @@ export default {
     hasSelected(item) {
       let result
       const selectElement = this.$refs.selectElement
+
       if (item === this.values) {
         selectElement.style.color = 'black'
         result = true

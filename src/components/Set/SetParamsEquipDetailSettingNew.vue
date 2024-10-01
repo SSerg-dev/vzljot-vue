@@ -41,24 +41,7 @@
         <header class="header header-date">Наименование</header>
         <header class="header header-date">Значение</header>
 
-        <div
-          v-for="(r, i) in getEquip.equipSetting[getEquip.equipSettingIndex]
-            .detailArray"
-          :key="i"
-          class="table-row"
-          :ref="(el) => (rowsElement[r.id] = el)"
-        >
-          <span class="cell icon clickable-icon" title="Редактирование...">
-            <div :class="['fas', 'fa-cog', 'cog']" />
-          </span>
-
-          <span class="cell" style="justify-content: start">{{
-            r.caption
-          }}</span>
-          <span class="cell" style="justify-content: end"
-            ><EquipSettingValue :param="r" :editName="editName" :mode="mode"/>
-          </span>
-        </div>
+        
       </div>
 
       <pager-component v-bind="this.pageInfo" @go="onChangePage" />
@@ -141,29 +124,15 @@ export default {
       localEquipSettingId: null,
 
       equipSetting: new EquipSetting({}),
-      mode: 'create'
+      mode: 'create',
     }
   },
 
   created() {
     this.$emitter.on('equip-setting-value:update', this.change)
-
-    this.pageInfo.Items =
-      this.getEquip.equipSetting[
-        this.getEquip.equipSettingIndex
-      ].detailArray.length
-
-    this.$store.getters.pageInfo.Items = this.pageInfo.Items
   },
 
   async mounted() {
-    const options = {
-      equipSettingHeight:
-        this.getEquip.equipSetting[this.getEquip.equipSettingIndex].detailArray
-          .length,
-    }
-
-    this.$store.commit('setEquip', options)
     this.hasChanges = false
 
     this.localSettingEquipId =

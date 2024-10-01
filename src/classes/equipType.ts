@@ -25,6 +25,7 @@ export default class EquipType extends BaseObject {
   isWeight: boolean
   isSystem: boolean
   modifications: Array<Modification>
+  error: any
 
   static instance: any
   static exists: boolean
@@ -72,27 +73,43 @@ export default class EquipType extends BaseObject {
         id = store.state.card.nodeCreate.equipType
       }
 
-      const { data } = await this.http.get<EquipType>(url, {
-        params: { id }, 
-      })
+      try {
+        const { data, status } = await this.http.get<EquipType>(url, {
+          params: { id },
+        })
 
-      this.id = data.id
-      this.name = data.name
-      this.interval = data.interval
-      this.isTemperature = data.isTemperature
-      this.isPressure = data.isPressure
-      this.isVolume = data.isVolume
-      this.isWeight = data.isWeight
-      this.isSystem = data.isSystem
-
-      data.modifications.forEach((r) => {
-        r.isTemperature = data.isTemperature
-        r.isPressure = data.isPressure
-        r.isVolume = data.isVolume
-        r.isWeight = data.isWeight
-      })
-
-      this.modifications = data.modifications
+        if (status === 200) {
+          this.id = data.id
+          this.name = data.name
+          this.interval = data.interval
+          this.isTemperature = data.isTemperature
+          this.isPressure = data.isPressure
+          this.isVolume = data.isVolume
+          this.isWeight = data.isWeight
+          this.isSystem = data.isSystem
+          
+          if (data.modifications) {
+            data.modifications.forEach((r) => {
+              r.isTemperature = data.isTemperature
+              r.isPressure = data.isPressure
+              r.isVolume = data.isVolume
+              r.isWeight = data.isWeight
+            })
+  
+            this.modifications = data.modifications
+          } else {
+            console.warn(
+              `response: `, url,
+              JSON.stringify(data.error)
+            )
+          }
+          
+        } else {
+          console.warn(`Unexpected status code: ${status}`)
+        }
+      } catch (error) {
+        // console.error(`Error fetching data: ${error}`)
+      }
     }
   }
 

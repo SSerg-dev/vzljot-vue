@@ -218,8 +218,6 @@ export const store = createStore<State>({
 
       if (payload.equipSettingIndex > -1)
         state.equip.equipSettingIndex = payload.equipSettingIndex
-      if (payload.equipSettingHeight > 0)
-        state.equip.equipSettingHeight = payload.equipSettingHeight
       if (payload.hasNotSave) state.equip.hasNotSave = payload.hasNotSave
       if (typeof payload.hasEquipSettingEdit === 'boolean') {
         state.equip.hasEquipSettingEdit = payload.hasEquipSettingEdit
@@ -269,7 +267,6 @@ export const store = createStore<State>({
         equipSetting: state.equip.equipSetting,
         equipSettingSave: state.equip.equipSettingSave,
         equipSettingIndex: state.equip.equipSettingIndex,
-        equipSettingHeight: state.equip.equipSettingHeight,
         hasNotSave: state.equip.hasNotSave,
         hasEquipSettingEdit: state.equip.hasEquipSettingEdit,  
         hasVegaEquip: state.equip.hasVegaEquip,

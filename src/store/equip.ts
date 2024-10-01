@@ -10,7 +10,6 @@ export interface Equip {
   equipSetting: any[] | null
   equipSettingSave: any[] | null
   equipSettingIndex: number | null
-  equipSettingHeight: number | null
   equipSettingTable: EquipSettingTable | null
   equipSettingTableArray: EquipSettingTable[] | null
   hasNotSave: boolean | null
@@ -24,6 +23,7 @@ export interface Equip {
   hasVegaEquipArray: any[]
   groupType: number | null
   connectionGroup: object | null
+  versionParamKeys: object | null 
 }
 
 export interface EquipSettingTable {
@@ -63,7 +63,6 @@ export const equip: Equip = {
   equipSetting: null,
   equipSettingSave: null,
   equipSettingIndex: -1,
-  equipSettingHeight: 0,
   equipSettingTable: null,
   equipSettingTableArray: null,
   hasNotSave: false,
@@ -76,5 +75,6 @@ export const equip: Equip = {
   hasVegaEquip: false,
   hasVegaEquipArray: [null],
   groupType: null,
-  connectionGroup: {}
+  connectionGroup: {},
+  versionParamKeys: {}
 }
