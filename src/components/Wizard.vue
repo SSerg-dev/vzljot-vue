@@ -24,7 +24,7 @@
       </div>
     </template>
     <template v-slot:footer>
-      <button :disabled="nextDisabled" @click="next()">
+      <button :disabled="nextDisabled" @click="handleOkClick">
         {{ hasNext ? 'Далее' : 'Ok' }}
       </button>
       <button v-if="isCancellable" @click="onCancel()">Отмена</button>
@@ -207,6 +207,16 @@ export default {
     },
   },
   methods: {
+    handleOkClick() {
+      this.next()
+      this.sendOk()
+    },
+    sendOk() {
+      const options = {
+      hasEquipSettingSave: true,
+    }
+      this.$emitter.emit('equip-setting-node:save', options)
+    },
     initComponent(value) {
       return Object.assign(
         { cancellable: true, event: null, key: new Date().getTime() },
@@ -263,6 +273,6 @@ export default {
 
       this.currentValue = null
     },
-  },
+  }, // end methods
 }
 </script>

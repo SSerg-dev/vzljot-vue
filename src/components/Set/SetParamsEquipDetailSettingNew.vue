@@ -185,7 +185,6 @@ export default {
       }
 
       this.$store.commit('setEquip', options)
-      this.hasChanges = true
     },
 
     async save() {
@@ -206,9 +205,7 @@ export default {
         this.saving = false
       }
     },
-    change(changedValues) {
-      if (changedValues) this.hasChanges = true
-    },
+    
   }, // end methods
 }
 </script>

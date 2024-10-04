@@ -15,7 +15,6 @@
           <date-picker
             v-model="localTimeStart"
             :format="dateFormat"
-            
             @update:modelValue="
               handleEquipSettingDate($event, this.getEquip.equipSettingIndex)
             "
@@ -134,20 +133,21 @@ export default {
       busy: false,
       rowsElement: {},
       localEditName: '',
-      dateFormat: 'DD.MM.YYYY HH', 
+      dateFormat: 'DD.MM.YYYY HH',
 
       localTimeStart: null,
       localProperties: null,
       localEquipSettingId: null,
       localEquipSettingSorted: [],
 
-      equipSetting: new EquipSetting({}), 
+      equipSetting: new EquipSetting({}),
       mode: 'change',
     }
   },
 
   created() {
     this.$emitter.on('equip-setting-value:update', this.change)
+    this.$emitter.on('equip-setting-node:save', this.onSaveClick)
 
     this.pageInfo.Items =
       this.getEquip.equipSetting[
@@ -216,7 +216,11 @@ export default {
       this.localTimeStart = new Date(event)
       this.localTimeStart.setMinutes(0, 0, 0)
 
-      this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
+      let timezoneTimeStart = this.localTimeStart
+      const timezoneOffset = this.localTimeStart.getTimezoneOffset()
+      timezoneTimeStart = new Date(timezoneTimeStart.getTime() - timezoneOffset * 60 * 1000)
+      
+      this.setEquipSettingTable(i, timezoneTimeStart, this.localProperties)
 
       const changedValues = this.localTimeStart
       this.$emitter.emit('set-params-equip-setting:update', changedValues)
@@ -244,6 +248,7 @@ export default {
     },
 
     async save() {
+      
       try {
         this.saving = true
         this.error = {}
@@ -251,6 +256,8 @@ export default {
         await this.equipSetting.save()
 
         this.hasChanges = false
+        this.$emitter.emit('set-params-equip-setting:hasChanges', this.hasChanges)
+
       } catch (error) {
         if (error.response.status === 551) {
           this.error = error.response.data
@@ -259,15 +266,12 @@ export default {
         }
       } finally {
         this.saving = false
-
-        const options = {
-          hasNotSave: true,
-        }
-        this.$store.commit('setEquip', options)
       }
     },
     change(changedValues) {
-      if (changedValues) this.hasChanges = true
+      if (changedValues) {
+        this.hasChanges = true
+      } 
     },
   }, // end methods
 }
@@ -323,9 +327,6 @@ export default {
   margin-right: 0px;
   margin-left: 5px;
 }
-/* .date-picker {
-  width: 100px;
-} */
 .check-box {
   display: flex;
   align-items: center;

@@ -2,26 +2,73 @@
   <expantion-panel caption="Основные параметры" :resizable="false" class="fit">
     <form class="grid" autocomplete="off">
       <label>Наименование:</label>
-      <input v-focus v-model.trim="localModem.name" @input="onChange('name', localModem.name)" type="text" maxlength="80" :class="{ 'validation-error': localError.name }" :title="localError.name" />
+      <input
+        v-focus
+        v-model.trim="localModem.name"
+        @input="onChange('name', localModem.name)"
+        type="text"
+        maxlength="80"
+        :class="{ 'validation-error': localError.name }"
+        :title="localError.name"
+      />
       <label>Порт:</label>
-      <select v-model="localModem.comPort" @change="onChange('comPort', localModem.comPort)" :class="{ 'validation-error': localError.port }" :title="localError.port">
-        <option v-for="port in localPorts" :key="port.number" :value="port.number">{{ port.name }}</option>
+      <select
+        v-model="localModem.comPort"
+        @change="onChange('comPort', localModem.comPort)"
+        :class="{ 'validation-error': localError.port }"
+        :title="localError.port"
+      >
+        <option
+          v-for="port in localPorts"
+          :key="port.number"
+          :value="port.number"
+        >
+          {{ port.name }}
+        </option>
       </select>
       <label>Скорости обмена:</label>
       <div style="display: grid; gap: 3px">
         <div style="display: grid; grid-template-columns: auto auto; gap: 10px">
-          <radio :label="true" v-model="allSpeeds" @update:modelValue="onAllSpeedsChange">все</radio>
-          <radio :label="false" v-model="allSpeeds" @update:modelValue="onAllSpeedsChange">выделенные</radio>
+          <radio
+            :label="true"
+            v-model="allSpeeds"
+            @update:modelValue="onAllSpeedsChange"
+            >все</radio
+          >
+          <radio
+            :label="false"
+            v-model="allSpeeds"
+            @update:modelValue="onAllSpeedsChange"
+            >выделенные</radio
+          >
         </div>
         <div :class="{ 'grid-speed': true, error: localError.speed }">
-          <div class="grid-speed-row" v-for="(r, i) in comPortSpeeds" :key="i" :title="localError.speed">
-            <input v-model="localModem.comSpeeds" @change="onSpeedsChange" :value="r" :disabled="allSpeeds" type="checkbox" />
+          <label 
+            class="grid-speed-row clickable-label"
+            v-for="(r, i) in comPortSpeeds"
+            :key="i"
+            :title="localError.speed"
+          >
+            <input
+              v-model="localModem.comSpeeds"
+              @change="onSpeedsChange"
+              :value="r"
+              :disabled="allSpeeds"
+              type="checkbox"
+            />
+
             <span class="speed-caption" :disabled="allSpeeds">{{ r }}</span>
-          </div>
+          </label>
+
         </div>
       </div>
       <label>Строка инициализации модема:</label>
-      <input v-model.trim="localModem.modemInitString" @input="onChange('modemInitString', localModem.modemInitString)" type="text" maxlength="255" />
+      <input
+        v-model.trim="localModem.modemInitString"
+        @input="onChange('modemInitString', localModem.modemInitString)"
+        type="text"
+        maxlength="255"
+      />
     </form>
   </expantion-panel>
 </template>
@@ -37,20 +84,20 @@ import Radio from '../Inputs/Radio.vue'
 export default defineComponent({
   components: {
     ExpantionPanel,
-    Radio
+    Radio,
   },
   props: {
     modem: {
       type: Object as PropType<Modem>,
-      required: true
+      required: true,
     },
     error: {
       type: Object as PropType<ModemError>,
-      required: true
+      required: true,
     },
     modems: {
-      type: Array as PropType<Array<Modem>>
-    }
+      type: Array as PropType<Array<Modem>>,
+    },
   },
   setup(props, { emit }) {
     const comPortSpeeds = inject<Ref<Array<number>>>('comPortSpeeds')
@@ -60,10 +107,15 @@ export default defineComponent({
     const localModem = ref(new Modem(props.modem))
     const localError = ref(new ModemError(props.error))
 
-    const localPorts: Array<Port> = JSON.parse(JSON.stringify(serialPorts?.value))
+    const localPorts: Array<Port> = JSON.parse(
+      JSON.stringify(serialPorts?.value)
+    )
 
-    if (!localPorts.some(r => r.number === localModem.value.comPort)) {
-      localPorts.push({ name: `COM${localModem.value.comPort} (н/д)`, number: localModem.value.comPort})
+    if (!localPorts.some((r) => r.number === localModem.value.comPort)) {
+      localPorts.push({
+        name: `COM${localModem.value.comPort} (н/д)`,
+        number: localModem.value.comPort,
+      })
       localPorts.sort((a, b) => {
         if (a.number < b.number) return -1
         if (a.number > b.number) return 1
@@ -79,13 +131,13 @@ export default defineComponent({
 
     watch(
       () => props.modem,
-      value => (localModem.value = new Modem(value)),
+      (value) => (localModem.value = new Modem(value)),
       { deep: true }
     )
 
     watch(
       () => props.error as ModemError,
-      value => (localError.value = new ModemError(value)),
+      (value) => (localError.value = new ModemError(value)),
       { deep: true }
     )
 
@@ -121,9 +173,9 @@ export default defineComponent({
       onAllSpeedsChange,
       onChange,
       onSpeedsChange,
-      save
+      save,
     }
-  }
+  },
 })
 </script>
 
@@ -135,7 +187,7 @@ export default defineComponent({
 }
 
 .grid label {
-  text-align: right;
+  text-align: left;
 }
 
 .grid select {
@@ -161,8 +213,22 @@ export default defineComponent({
 .grid-speed .speed-caption[disabled='true'] {
   opacity: 0.5;
 }
-
 .grid-speed input[type='checkbox'] {
+  cursor: pointer;
+}
+
+.grid-speed .speed-caption[disabled='true']:hover {
+  background-color: #ecf0f6; 
+  cursor: not-allowed; 
+}
+.clickable-label {
+  cursor: pointer;
+}
+.clickable-label:hover {
+  background-color: #ecf0f6;
+  cursor: pointer;
+}
+.check-box input {
   cursor: pointer;
 }
 </style>

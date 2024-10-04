@@ -73,23 +73,25 @@ export default {
         equipSettingSave: changedValues,
       }
       this.$store.commit('setEquip', options)
-      this.$emit('equip-setting-update', changedValues)
+      this.onChange('equip-setting-update', changedValues)
     },
     change(changedValues) {
-      this.$emit('equip-setting-update', changedValues)
+      this.onChange('equip-setting-update', changedValues)
     },
+    onChange(prop, value) {
+      this.$emit('changed', prop, value)
+    }
   }, // end methods
 }
 </script>
 
 <style scoped>
-.equip-grid {
+.equip-grid { 
   display: grid;
   gap: 5px 3px;
   min-width: 450px;
 }
 
-/* equip-setting */
 .equip-setting-container {
   display: flex;
   flex-direction: row;

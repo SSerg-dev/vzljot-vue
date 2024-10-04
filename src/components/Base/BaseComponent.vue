@@ -42,7 +42,6 @@ export default {
     })
   },
   methods: {
-    
     matchType(types) {
       return matchType(types)
     },

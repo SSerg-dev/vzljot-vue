@@ -21,6 +21,7 @@
       <tab v-if="$store.state.user?.userRights.equip" text="Настройки прибора">
         <equip-detail-setting
         v-bind="{ equip: localItem }" 
+        @changed="onChanged"
         />
       </tab>
 

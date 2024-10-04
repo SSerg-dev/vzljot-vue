@@ -155,6 +155,7 @@ export default {
       this.pageInfo.Page = page
     },
     setEquipSettingTable(i, timeStart, properties) {
+
       const equipSettingTable = {
         id: this.dataItems[i].id,
         equipId: this.$store.state.equip.id,
@@ -223,7 +224,6 @@ export default {
           .slice()
           .sort((a, b) => new Date(a.timeStart) - new Date(b.timeStart))
 
-        // $$
         if (typeof this.localItemsSorted[0]?.detailArray === 'object') {
           const versionIndex = this.localItemsSorted[0].detailArray?.findIndex(
             (item) => item.name === 'Version'

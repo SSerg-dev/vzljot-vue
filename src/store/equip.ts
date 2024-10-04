@@ -12,7 +12,7 @@ export interface Equip {
   equipSettingIndex: number | null
   equipSettingTable: EquipSettingTable | null
   equipSettingTableArray: EquipSettingTable[] | null
-  hasNotSave: boolean | null
+  hasSaved: boolean | null
   validateTypes: ValidateTypes | null 
   hasSetDataColdWater: boolean | null
   hasTimeSync: boolean | null
@@ -65,7 +65,7 @@ export const equip: Equip = {
   equipSettingIndex: -1,
   equipSettingTable: null,
   equipSettingTableArray: null,
-  hasNotSave: false,
+  hasSaved: false,
   validateTypes: validateTypes || null,
   hasSetDataColdWater: null, 
   hasTimeSync: null,

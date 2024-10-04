@@ -163,6 +163,7 @@ export function setupTreeComponent<
     Emitter<{
       beforeNodeChange: { uuid: string; node: any; target: any }
       afterNodeChange: { node: any; target: any }
+      'set-params-equip-setting:hasChanges': boolean
     }>
   >('emitter')
 
@@ -176,6 +177,12 @@ export function setupTreeComponent<
   const wizard = ref<any>()
 
   onMounted(async () => {
+    emitter?.on(
+      'set-params-equip-setting:hasChanges',
+      (newHasChanges: boolean) => {
+        hasChanges.value = newHasChanges
+      }
+    )
     try {
       await (localItem.value as any).init(id)
 
@@ -211,11 +218,13 @@ export function setupTreeComponent<
 
   onBeforeUnmount(() => {
     emitter?.off('beforeNodeChange', onBeforeChange)
+    emitter?.off('set-params-equip-setting:hasChanges')
   })
 
   function onBeforeChange(event: { uuid: string; node: any; target: any }) {
+
     if (event.uuid === uuid) {
-      if (hasChanges.value) {  
+      if (hasChanges.value) {
         wizard.value = {
           event,
           name: 'save',
@@ -227,7 +236,7 @@ export function setupTreeComponent<
             },
           },
         }
-      } else { 
+      } else {
         emitter?.emit('afterNodeChange', {
           node: event.node,
           target: event.target,
@@ -244,7 +253,7 @@ export function setupTreeComponent<
       save()
       emitter?.emit('afterNodeChange', {
         node: event.node,
-        target: event.target, 
+        target: event.target,
       })
     }
   }
