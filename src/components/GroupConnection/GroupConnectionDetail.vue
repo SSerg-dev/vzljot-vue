@@ -3,8 +3,20 @@
     <expantion-panel caption="Основные параметры" :resizable="false">
       <div class="group-connection-grid">
         <label>Наименование:</label>
-        <input v-model="localGroup.name" type="text" @input="onChange('name', localGroup.name)" maxlength="80" :class="{ 'validation-error': localError.name }" :title="localError.name" />
-        <connection-type v-bind="groupConnectionData" @typeChanged="onChange" @groupChanged="onGroupChanged" style="grid-column: span 2" />
+        <input
+          v-model="localGroup.name"
+          type="text"
+          @input="onChange('name', localGroup.name)"
+          maxlength="80"
+          :class="{ 'validation-error': localError.name }"
+          :title="localError.name"
+        />
+        <connection-type
+          v-bind="groupConnectionData"
+          @typeChanged="onChange"
+          @groupChanged="onGroupChanged"
+          style="grid-column: span 2"
+        />
       </div>
     </expantion-panel>
   </div>
@@ -19,34 +31,34 @@ import ExpantionPanel from '../ExpantionPanel.vue'
 export default {
   components: {
     ConnectionType,
-    ExpantionPanel
+    ExpantionPanel,
   },
   props: {
     group: {
       type: Object,
-      default: () => new GroupConnection({})
+      default: () => new GroupConnection({}),
     },
     error: {
       type: Object,
-      default: () => ({})
-    }
+      default: () => ({}),
+    },
   },
   data() {
     return {
       localGroup: new GroupConnection(this.group),
-      localError: JSON.parse(JSON.stringify(this.error))
+      localError: JSON.parse(JSON.stringify(this.error)),
     }
   },
   created() {
     this.$watch(
       () => this.group,
-      value => this.localGroup = new GroupConnection(value),
+      (value) => (this.localGroup = new GroupConnection(value)),
       { deep: true }
     )
 
     this.$watch(
       () => this.error,
-      value => (this.localError = value)
+      (value) => (this.localError = value)
     )
   },
   computed: {
@@ -54,9 +66,9 @@ export default {
       return {
         groupType: this.localGroup.groupType,
         connectionTypes: this.localGroup.connectionTypes,
-        error: this.localError.component
+        error: this.localError.component,
       }
-    }
+    },
   },
   mounted() {
     try {
@@ -89,8 +101,8 @@ export default {
           }
         }
       }
-    }
-  }
+    },
+  },
 }
 </script>
 

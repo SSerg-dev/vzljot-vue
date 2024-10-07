@@ -2,11 +2,26 @@
   <div class="component-detail">
     <tabs>
       <tab v-if="$store.state.user?.userRights.equip" text="Параметры">
-        <preserver-component v-bind="{ readOnly: !$store.state.user?.userRights.equipEdit, saving, disabled: !hasChanges || loading, loading }" @saveClick="save()">
-          <group-connection-detail v-bind="{ group: localItem, error: localError }" @changed="onChanged" @groupChanged="onGroupChanged" />
+        <preserver-component
+          v-bind="{
+            readOnly: !$store.state.user?.userRights.equipEdit,
+            saving,
+            disabled: !hasChanges || loading,
+            loading,
+          }"
+          @saveClick="save()"
+        >
+          <group-connection-detail
+            v-bind="{ group: localItem, error: localError }"
+            @changed="onChanged"
+            @groupChanged="onGroupChanged"
+          />
         </preserver-component>
       </tab>
-      <tab v-if="$store.state.user?.userRights.reportFile" text="Сформированные отчеты">
+      <tab
+        v-if="$store.state.user?.userRights.reportFile"
+        text="Сформированные отчеты"
+      >
         <report-file-list v-bind="{ id, type: 20 }" />
       </tab>
       <tab text="Состояние">
@@ -16,11 +31,38 @@
         <system-messages v-bind="{ objectId: id, objectType: DBTYPE }" />
       </tab>
       <tab text="Журнал">
-        <journal-list v-bind="{ id, type: DBTYPE, periodStart: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate() - 1, 0, 0, 0), periodEnd: new Date(new Date().getFullYear(), new Date().getMonth(), new Date().getDate(), 23, 59, 59) }" />
+        <journal-list
+          v-bind="{
+            id,
+            type: DBTYPE,
+            periodStart: new Date(
+              new Date().getFullYear(),
+              new Date().getMonth(),
+              new Date().getDate() - 1,
+              0,
+              0,
+              0
+            ),
+            periodEnd: new Date(
+              new Date().getFullYear(),
+              new Date().getMonth(),
+              new Date().getDate(),
+              23,
+              59,
+              59
+            ),
+          }"
+        />
       </tab>
     </tabs>
     <transition-group>
-      <wizard v-if="wizard" v-bind="wizard" @cancel="onWizardCancel" @end="onWizardEnd" key="0" />
+      <wizard
+        v-if="wizard"
+        v-bind="wizard"
+        @cancel="onWizardCancel"
+        @end="onWizardEnd"
+        key="0"
+      />
       <spinner :show="loading" :text="'Загрузка...'" key="1" />
     </transition-group>
   </div>
@@ -29,7 +71,10 @@
 <script lang="ts">
 import { defineComponent, PropType } from 'vue'
 
-import { GroupConnection, GroupConnectionError } from '@/classes/groupConnection'
+import {
+  GroupConnection,
+  GroupConnectionError,
+} from '@/classes/groupConnection'
 
 import GroupConnectionDetail from './GroupConnectionDetail.vue'
 import JournalList from '../Journal/JournalList.vue'
@@ -52,20 +97,31 @@ export default defineComponent({
     SystemMessages,
     Tab,
     Tabs,
-    Wizard
+    Wizard,
   },
   props: {
     uuid: {
       type: String as PropType<string>,
-      required: true
+      required: true,
     },
     id: {
       type: Number as PropType<number>,
-      required: true
-    }
+      required: true,
+    },
   },
   setup(props) {
-    const { hasChanges, loading, localError, localItem, onChanged, onWizardCancel, onWizardEnd, save, saving, wizard } = setupTreeComponent(
+    const {
+      hasChanges,
+      loading,
+      localError,
+      localItem,
+      onChanged,
+      onWizardCancel,
+      onWizardEnd,
+      save,
+      saving,
+      wizard,
+    } = setupTreeComponent(
       props.uuid,
       props.id,
       new GroupConnection({ uuid: props.uuid }),
@@ -90,8 +146,8 @@ export default defineComponent({
       onWizardCancel,
       onWizardEnd,
       save,
-      wizard
+      wizard,
     }
-  }
+  },
 })
 </script>

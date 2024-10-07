@@ -66,6 +66,12 @@ export default {
     Eldis1203_GPRS: asyncImport(() =>
       import('./Connections/Eldis1203GPRS.vue')
     ),
+    Eldis210x_GPRS: asyncImport(() =>
+      import('./Connections/Eldis210xGPRS.vue')
+    ),
+    Eldis310x_GPRS: asyncImport(() =>
+      import('./Connections/Eldis310xGPRS.vue')
+    ),
     ExpantionPanel,
   },
   props: {
