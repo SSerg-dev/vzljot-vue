@@ -35,9 +35,9 @@
         </div>
       </div>
 
-      <div class="container-2"> 
+      <div class="container-2">
         <div class="item-2-1">
-          <label>Телефон 2:</label> 
+          <label>Телефон 2:</label>
         </div>
         <div class="item-2-2">
           <input
@@ -108,7 +108,7 @@ export default {
       localError: {
         adapter: false,
         phone: null,
-        phone2: null
+        phone2: null,
       },
     }
   },
@@ -184,7 +184,7 @@ export default {
 .item-3-2 {
   align-self: center;
 }
-.item-4-1 { 
+.item-4-1 {
   justify-self: end;
   align-self: center;
   margin-right: 5px;

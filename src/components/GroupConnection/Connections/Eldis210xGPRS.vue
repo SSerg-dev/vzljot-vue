@@ -90,7 +90,7 @@ export default {
       localDontListenSocket: this.group.dontListenSocket,
       localError: {
         adapter: false,
-        phone: null
+        phone: null,
       },
     }
   },
@@ -166,7 +166,7 @@ export default {
 .item-3-2 {
   align-self: center;
 }
-.item-4-1 { 
+.item-4-1 {
   justify-self: end;
   align-self: center;
   margin-right: 5px;
