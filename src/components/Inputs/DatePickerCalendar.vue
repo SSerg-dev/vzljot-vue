@@ -165,6 +165,7 @@
         >
       </div>
     </div>
+
     <div :class="`${pre}-foot`" v-if="m === 'HH'">
       <div :class="`${pre}-hour`">
         <a
@@ -388,7 +389,7 @@ export default {
       this.m = 'Y'
       this.showYears = true
     }
-    if (this.format.includes('DD.MM.YYYY HH')) {
+    if (this.format === 'DD.MM.YYYY HH') {
       this.m = 'HH'
     }
   },

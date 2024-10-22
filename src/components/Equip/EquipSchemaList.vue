@@ -203,7 +203,6 @@ export default {
     },
     async remove(ids) {
       this.wait = true
-
       try {
         await this.$http.delete('equip/set', { params: { ids } })
       } catch (error) {

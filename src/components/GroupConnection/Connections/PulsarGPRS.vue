@@ -48,7 +48,7 @@
         </div>
       </div>
 
-      <div class="container-4">
+      <label class="container-4 clickable-label">
         <div class="item-4-1">
           <check-box
             @update:modelValue="onChange('forcedDisconnect', $event)"
@@ -56,9 +56,10 @@
           />
         </div>
         <div class="item-4-2">
-          <label>Принудительно разрывать соединение при отсутствии задач</label>
+          Принудительно разрывать соединение при отсутствии задач
         </div>
-      </div>
+      </label>
+
     </div>
   </div>
 </template>
@@ -169,6 +170,13 @@ export default {
 }
 .item-4-2 {
   align-self: start;
+}
+.clickable-label {
+  cursor: pointer;
+  z-index: 2;
+}
+.check-box input {
+  cursor: pointer; 
 }
 </style>
 

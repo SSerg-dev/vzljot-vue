@@ -38,8 +38,6 @@ export default class EquipSetting extends BaseObject {
 
     equipSettingTable = null,
     equipSettings = [],
-    
-
   }: IEquipSetting) {
     super(uuid)
 
@@ -61,11 +59,25 @@ export default class EquipSetting extends BaseObject {
 
     this.equipSettingTable = EquipSetting.store.state.equip.equipSettingTable
     if (this.equipSettingTable) {
-      this.equipSettingTable.equipId = this.equipSettingTable.id
+      this.equipSettingTable.equipId =
+        EquipSetting.store.state.card.selectedNodeId
+
       props.equipSettingTable = this.equipSettingTable
 
-      if (!props.equipSettingTable.equipSettingId)
+      if (!props.equipSettingTable.equipSettingId) {
         props.equipSettingTable.equipSettingId = this.equipSettingTable.id
+      }
+
+      if (EquipSetting.store.state.equip.equipSettingTable?.action) {
+        props.equipSettingTable.action =
+          EquipSetting.store.state.equip.equipSettingTable.action
+        if (
+          EquipSetting.store.state.equip.equipSettingTable.action === 'add' ||
+          EquipSetting.store.state.equip.equipSettingTable.action === 'create'
+        ) {
+          props.equipSettingTable.equipSettingId = 0
+        }
+      }
     }
     this.equipSettings = EquipSetting.store.state.equip.equipSettingSave
     if (this.equipSettings) {
@@ -94,19 +106,39 @@ export default class EquipSetting extends BaseObject {
         versionSetting.value =
           versionParamKeys[keyIndex?.toString() ?? '0'] ?? '0'
       }
-    } 
+    }
 
-    const { data, status } = await this.http.post('equip/updateEquipSettings', props, {
-      headers: {
-        'Content-Type': 'application/json',
-      },
-    })
+    const { data, status } = await this.http.post(
+      'equip/updateEquipSettings',
+      props,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      }
+    )
 
     if (status === 200) {
       EquipSetting.store.state.equip.equipSettingSave = []
-    }
-  } 
 
-  addEquipSetting() {}
-  removeEquipSetting() {}
+      if (
+        typeof EquipSetting.store.state.equip.equipSettingTable?.action ===
+          'string' &&
+        EquipSetting.store?.state?.equip?.equipSettingTable
+      ) {
+        EquipSetting.store.state.equip.equipSettingTable.action = null
+      }
+    }
+  }
+
+  async remove(ids: number[]) {
+    try {
+      const { data, status } = await this.http.delete(
+        'equip/removeEquipSetting',
+        { params: { ids } }
+      )
+    } catch (error) {
+      console.error(`Error fetching equip/removeEquipSetting: ${error}`)
+    }
+  }
 }

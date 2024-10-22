@@ -69,7 +69,7 @@
           @cancel="cancelWizard"
           @end="onWizardEnd"
         />
-        <props-component v-if="edit" v-bind="componentData" @close="close">
+        <props-component v-if="edit" v-bind="componentData">
           <component
             :is="componentData.component"
             v-bind="componentData.data"
@@ -218,8 +218,10 @@ export default {
 
       let timezoneTimeStart = this.localTimeStart
       const timezoneOffset = this.localTimeStart.getTimezoneOffset()
-      timezoneTimeStart = new Date(timezoneTimeStart.getTime() - timezoneOffset * 60 * 1000)
-      
+      timezoneTimeStart = new Date(
+        timezoneTimeStart.getTime() - timezoneOffset * 60 * 1000
+      )
+
       this.setEquipSettingTable(i, timezoneTimeStart, this.localProperties)
 
       const changedValues = this.localTimeStart
@@ -237,6 +239,7 @@ export default {
         equipSettingId: this.localEquipSettingId,
         timeStart,
         properties,
+        action: this.localAction,
       }
 
       const options = {
@@ -248,7 +251,6 @@ export default {
     },
 
     async save() {
-      
       try {
         this.saving = true
         this.error = {}
@@ -256,8 +258,10 @@ export default {
         await this.equipSetting.save()
 
         this.hasChanges = false
-        this.$emitter.emit('set-params-equip-setting:hasChanges', this.hasChanges)
-
+        this.$emitter.emit(
+          'set-params-equip-setting:hasChanges',
+          this.hasChanges
+        )
       } catch (error) {
         if (error.response.status === 551) {
           this.error = error.response.data
@@ -271,7 +275,7 @@ export default {
     change(changedValues) {
       if (changedValues) {
         this.hasChanges = true
-      } 
+      }
     },
   }, // end methods
 }

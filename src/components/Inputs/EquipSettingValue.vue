@@ -3,7 +3,7 @@
     <select
       v-if="enumValue === 'list'"
       ref="selectElement"
-      @change="handleOptionChange"
+      @click="handleOptionChange"
       @mousedown="enableSelect"
     >
       <option
@@ -98,7 +98,7 @@ export default {
   },
   watch: {
     editName(newVal) {
-      this.edit(newVal)
+      this.edit(newVal) 
     },
   },
   created() {},
@@ -149,10 +149,12 @@ export default {
       let result
       const selectElement = this.$refs.selectElement
 
-      if (item === this.values) {
+      if (item === this.values && this.mode !== 'new') {
         selectElement.style.color = 'black'
         result = true
       } else {
+        // $$
+        // selectElement.style.color = 'white'
         result = false
       }
       return result

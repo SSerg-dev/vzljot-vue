@@ -111,6 +111,7 @@ export default {
               if (this.uuid) {
                 this.$emitter.emit('beforeClose', { uuid: this.uuid })
               } else {
+                this.$emitter.emit('props-component:close')
                 this.$emit('close')
               }
             }

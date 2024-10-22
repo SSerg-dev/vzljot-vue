@@ -5,6 +5,7 @@
         readOnly: !$store.state.user?.userRights.equipEdit,
         saving,
         disabled: !hasChanges,
+        addition: true,
       }"
       @saveClick="onSaveClick()"
     >
@@ -15,25 +16,25 @@
           <date-picker
             v-model="localTimeStart"
             :format="dateFormat"
-            clearable
             @update:modelValue="
               handleEquipSettingDate($event, this.getEquip.equipSettingIndex)
             "
           />
         </span>
 
-        <span class="cell check-box setting-item-3">
+        <label class="cell check-box setting-item-3 clickable-label">
+
           <check-box
             v-model="localProperties"
             @update:modelValue="
               handlePassSettingCheck($event, this.getEquip.equipSettingIndex)
             "
           ></check-box>
-        </span>
 
-        <span class="setting-item-4"
-          >Разрешить пропускать проверку настроек</span
-        >
+          <span class="setting-item-4"
+            >Разрешить пропускать проверку настроек</span
+          >
+        </label>
       </div>
 
       <div class="table-grid">
@@ -41,7 +42,24 @@
         <header class="header header-date">Наименование</header>
         <header class="header header-date">Значение</header>
 
-        
+        <div
+          v-for="(r, i) in localEquipSettingSorted[getEquip.equipSettingIndex]
+            ?.detailArray"
+          :key="i"
+          class="table-row"
+          :ref="(el) => (rowsElement[r.id] = el)"
+        >
+          <span class="cell icon" title="Редактирование...">
+            <div :class="['fas', 'fa-cog', 'cog', 'clickable-icon']" />
+          </span>
+
+          <span class="cell" style="justify-content: start">{{
+            r.caption
+          }}</span>
+          <span class="cell" style="justify-content: end"
+            ><EquipSettingValue :param="r" :editName="editName" :mode="mode" />
+          </span>
+        </div>
       </div>
 
       <pager-component v-bind="this.pageInfo" @go="onChangePage" />
@@ -117,29 +135,38 @@ export default {
       busy: false,
       rowsElement: {},
       localEditName: '',
+      dateFormat: 'DD.MM.YYYY HH',
 
-      dateFormat: 'DD.MM.YYYY',
       localTimeStart: null,
       localProperties: null,
       localEquipSettingId: null,
+      localEquipSettingSorted: [],
 
       equipSetting: new EquipSetting({}),
-      mode: 'create',
+      mode: 'new',
+
+      localAction: null,
     }
   },
 
   created() {
+    this.$emitter.on('set-params-equip-setting:action', this.set)
+
     this.$emitter.on('equip-setting-value:update', this.change)
+    this.$emitter.on('equip-setting-node:save', this.onSaveClick)
+
+    this.pageInfo.Items =
+      this.getEquip.equipSetting[
+        this.getEquip.equipSettingIndex
+      ]?.detailArray?.length
+
+    this.$store.getters.pageInfo.Items = this.pageInfo.Items
+
+    this.init()
   },
 
   async mounted() {
     this.hasChanges = false
-
-    this.localSettingEquipId =
-      this.getEquip.equipSetting[this.getEquip.equipSettingIndex].id
-
-    this.localTimeStart = new Date()
-    this.localProperties = false
   },
 
   computed: {
@@ -151,16 +178,63 @@ export default {
     },
   },
 
-  beforeUnmount() {},
+  beforeUnmount() {
+    const options = {
+      hasEquipSettingEdit: false,
+    }
+    this.$store.commit('setEquip', options)
+    this.$emitter.off('set-params-equip-setting:action')
+  },
 
   methods: {
+    async set(action) {
+      this.$store.state.equip.equipSettingTable.action = action
+      this.localAction = action
+    },
+
+    init() {
+      this.localEquipSettingSorted = this.getEquip.equipSetting
+        .slice()
+        .sort((a, b) => new Date(a.timeStart) - new Date(b.timeStart))
+
+      this.localEquipSettingId =
+        this.localEquipSettingSorted[this.getEquip.equipSettingIndex].id
+
+      this.localTimeStart =
+        this.localEquipSettingSorted[this.getEquip.equipSettingIndex].timeStart
+
+      this.localProperties = this.localEquipSettingSorted[
+        this.getEquip.equipSettingIndex
+      ].properties
+        ? true
+        : false
+
+      const options = {
+        equipSettingTable: {
+          id: this.localEquipSettingId,
+          timeStart: this.localTimeStart,
+          properties: this.localProperties,
+        },
+      }
+
+      this.$store.commit('setEquip', options)
+    },
+
     onChangePage(page, size) {
       this.pageInfo.Size = size
       this.pageInfo.Page = page
     },
     handleEquipSettingDate(event, i) {
       this.localTimeStart = new Date(event)
-      this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
+      this.localTimeStart.setMinutes(0, 0, 0)
+
+      let timezoneTimeStart = this.localTimeStart
+      const timezoneOffset = this.localTimeStart.getTimezoneOffset()
+      timezoneTimeStart = new Date(
+        timezoneTimeStart.getTime() - timezoneOffset * 60 * 1000
+      )
+
+      this.setEquipSettingTable(i, timezoneTimeStart, this.localProperties)
 
       const changedValues = this.localTimeStart
       this.$emitter.emit('set-params-equip-setting:update', changedValues)
@@ -177,14 +251,15 @@ export default {
         equipSettingId: this.localEquipSettingId,
         timeStart,
         properties,
+        action: this.localAction,
       }
 
       const options = {
         equipSettingIndex: i,
         equipSettingTable,
       }
-
       this.$store.commit('setEquip', options)
+      this.hasChanges = true
     },
 
     async save() {
@@ -195,6 +270,10 @@ export default {
         await this.equipSetting.save()
 
         this.hasChanges = false
+        this.$emitter.emit(
+          'set-params-equip-setting:hasChanges',
+          this.hasChanges
+        )
       } catch (error) {
         if (error.response.status === 551) {
           this.error = error.response.data
@@ -205,7 +284,11 @@ export default {
         this.saving = false
       }
     },
-    
+    change(changedValues) {
+      if (changedValues) {
+        this.hasChanges = true
+      }
+    },
   }, // end methods
 }
 </script>
@@ -252,18 +335,23 @@ export default {
   align-self: center;
   justify-self: center;
   margin-right: 5px;
+  margin-left: 10px;
 }
 .setting-item-4 {
   align-self: center;
   justify-self: center;
   margin-right: 0px;
-}
-.date-picker {
-  width: 100px;
+  margin-left: 5px;
 }
 .check-box {
   display: flex;
   align-items: center;
   justify-content: end;
+}
+.clickable-label {
+  cursor: pointer;
+}
+.check-box input {
+  cursor: pointer;
 }
 </style>

@@ -33,18 +33,10 @@ export interface EquipSettingTable {
   timeStart?: Date | null
   properties: number | null
   index: number | null
+  action: string | null 
 }
 
-const equipSettingTable: EquipSettingTable = {
-  id: null,
-  equipId: null,
-  equipSettingId: null,
-  timeStart: null,
-  properties: null,
-  index: -1
-}
-
-interface ValidateTypes {
+interface ValidateTypes { 
   date: string | null
 }
 
