@@ -476,10 +476,18 @@ export default {
       oldColdWaterSource: null,
       localConnectionGroupAdapter:
         this.$store.state.equip.connectionGroup.adapter,
-      notConnectType: 10,
+      notConnectType: Object.freeze(10),
+      localConnectType: -1,
     }
   },
   created() {
+    this.$watch(
+      '$store.state.equip.groupType',
+      (value) => {
+        this.localConnectType = value
+      },
+      { deep: true }
+    )
     this.$watch(
       () => this.equip,
       (value) => (this.localEquip = new Equip(value)),
@@ -514,7 +522,8 @@ export default {
           this.action === 'create' &&
           this.localEquip.groupType === this.notConnectType) ||
         (this.action !== 'create' &&
-          this.localEquip.groupType === this.notConnectType)
+          this.localEquip.groupType === this.notConnectType &&
+          this.localConnectType !== this.notConnectType)
       )
     },
     isCreate() {

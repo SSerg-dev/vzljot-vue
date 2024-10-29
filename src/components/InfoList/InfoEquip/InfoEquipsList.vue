@@ -4,7 +4,7 @@
       <template v-if="$store.state?.user.userRights.equipList">
         <div
           :class="['button', 'fas', 'fa-plus-circle', { disabled: polling }]"
-          title="$$ InfoEquipList Добавить..."
+          title="InfoEquipList Добавить..."
           @click="onAddClick()"
         />
         <div
@@ -14,7 +14,7 @@
             'fa-times-circle',
             { disabled: !hasSelected || polling },
           ]"
-          title="$$ InfoEquipList Удалить"
+          title="InfoEquipList Удалить"
           @click="onRemoveClick()"
         />
       </template>

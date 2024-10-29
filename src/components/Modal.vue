@@ -60,6 +60,14 @@ export default {
       }
     },
   },
+
+  created() {
+    if (this.$store.state.equip.equipEvent.hasChangeNotSave) {
+      this.$store.state.equip.equipEvent.hasChangeNotSave = false
+      this.$emit('cancel')
+    }
+  },
+
   beforeUnmount() {
     const options = {
       isNodeCreate: false,
@@ -73,7 +81,6 @@ export default {
 .modal-wrapper {
   display: flex;
   flex-direction: column;
-  /* max-height: 100%; */
 }
 
 .modal-header,

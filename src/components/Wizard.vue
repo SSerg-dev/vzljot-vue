@@ -167,7 +167,7 @@ export default {
   },
   data() {
     return {
-      currentComponent: this.initComponent(this.component), 
+      currentComponent: this.initComponent(this.component),
       currentValue: null,
       loading: false,
     }
@@ -180,6 +180,12 @@ export default {
       },
       deep: true,
     },
+  },
+  created() {
+     if (this.$store.state.equip.equipEvent.hasCloseNotSave) {
+      this.onCancel()
+      this.$store.state.equip.equipEvent.hasCloseNotSave = false
+     }
   },
   computed: {
     hasNext() {
@@ -213,8 +219,8 @@ export default {
     },
     sendOk() {
       const options = {
-      hasEquipSettingSave: true,
-    }
+        hasEquipSettingSave: true,
+      }
       this.$emitter.emit('equip-setting-node:save', options)
     },
     initComponent(value) {

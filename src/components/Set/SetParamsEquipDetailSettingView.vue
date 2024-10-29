@@ -258,6 +258,8 @@ export default {
         await this.equipSetting.save()
 
         this.hasChanges = false
+        this.$store.state.equip.equipEvent.hasChangeNotSave = false
+
         this.$emitter.emit(
           'set-params-equip-setting:hasChanges',
           this.hasChanges
@@ -275,7 +277,8 @@ export default {
     change(changedValues) {
       if (changedValues) {
         this.hasChanges = true
-      }
+        this.$store.state.equip.equipEvent.hasChangeNotSave = true
+      } 
     },
   }, // end methods
 }

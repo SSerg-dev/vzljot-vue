@@ -24,6 +24,7 @@ export interface Equip {
   groupType: number | null
   connectionGroup: object | null
   versionParamKeys: object | null 
+  equipEvent: EquipEvent | null
 }
 
 export interface EquipSettingTable {
@@ -34,6 +35,11 @@ export interface EquipSettingTable {
   properties: number | null
   index: number | null
   action: string | null 
+}
+
+export interface EquipEvent {
+  hasCloseNotSave: boolean
+  hasChangeNotSave: boolean 
 }
 
 interface ValidateTypes { 
@@ -68,5 +74,9 @@ export const equip: Equip = {
   hasVegaEquipArray: [null],
   groupType: null,
   connectionGroup: {},
-  versionParamKeys: {}
+  versionParamKeys: {},
+  equipEvent: {
+    hasCloseNotSave: false,
+    hasChangeNotSave: false
+  }
 }

@@ -23,7 +23,6 @@
         </span>
 
         <label class="cell check-box setting-item-3 clickable-label">
-
           <check-box
             v-model="localProperties"
             @update:modelValue="
@@ -137,7 +136,7 @@ export default {
       localEditName: '',
       dateFormat: 'DD.MM.YYYY HH',
 
-      localTimeStart: null,
+      localTimeStart: null, 
       localProperties: null,
       localEquipSettingId: null,
       localEquipSettingSorted: [],
@@ -146,6 +145,10 @@ export default {
       mode: 'new',
 
       localAction: null,
+      hasExist: false,
+      localItemNames: [],
+      currentName: '',
+      delay: 1000,
     }
   },
 
@@ -187,9 +190,11 @@ export default {
   },
 
   methods: {
-    async set(action) {
-      this.$store.state.equip.equipSettingTable.action = action
-      this.localAction = action
+    async set(options) {
+      this.$store.state.equip.equipSettingTable.action = options.action
+      this.localAction = options.action
+      this.localItemNames = options.itemNames
+      
     },
 
     init() {
@@ -200,14 +205,13 @@ export default {
       this.localEquipSettingId =
         this.localEquipSettingSorted[this.getEquip.equipSettingIndex].id
 
-      this.localTimeStart =
-        this.localEquipSettingSorted[this.getEquip.equipSettingIndex].timeStart
+      this.localTimeStart = new Date()
+      this.localProperties = 0
 
-      this.localProperties = this.localEquipSettingSorted[
-        this.getEquip.equipSettingIndex
-      ].properties
-        ? true
-        : false
+      this.currentName = this.getCurrentDate(this.localTimeStart)
+      setTimeout(() => {
+        this.hasExist = this.localItemNames.includes(this.currentName) 
+      }, 200)
 
       const options = {
         equipSettingTable: {
@@ -226,15 +230,14 @@ export default {
     },
     handleEquipSettingDate(event, i) {
       this.localTimeStart = new Date(event)
-      this.localTimeStart.setMinutes(0, 0, 0)
+      this.localTimeStart.setMinutes(0, 0, 0) 
 
-      let timezoneTimeStart = this.localTimeStart
-      const timezoneOffset = this.localTimeStart.getTimezoneOffset()
-      timezoneTimeStart = new Date(
-        timezoneTimeStart.getTime() - timezoneOffset * 60 * 1000
-      )
+      this.currentName = this.getCurrentDate(this.localTimeStart)
+      setTimeout(() => {
+        this.hasExist = this.localItemNames.includes(this.currentName) 
+      }, 200)
 
-      this.setEquipSettingTable(i, timezoneTimeStart, this.localProperties)
+      this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
 
       const changedValues = this.localTimeStart
       this.$emitter.emit('set-params-equip-setting:update', changedValues)
@@ -263,6 +266,11 @@ export default {
     },
 
     async save() {
+      if (this.hasExist) {
+        this.message()
+        return 
+      }
+
       try {
         this.saving = true
         this.error = {}
@@ -288,6 +296,26 @@ export default {
       if (changedValues) {
         this.hasChanges = true
       }
+    },
+    getCurrentDate(now) {
+      // const now = new Date()
+      const day = String(now.getDate()).padStart(2, '0')
+      const month = String(now.getMonth() + 1).padStart(2, '0')
+      const year = now.getFullYear()
+      const hours = String(now.getHours()).padStart(2, '0')
+
+      return `${day}-${month}-${year} ${hours}`
+    },
+    message() {
+      this.$emitter.emit('preserver-component:display', 'block')
+
+      this.$toast.show(
+        `⚠️  Период с заданной датой начала уже существует.`,
+        (this.delay = 3000)
+      )
+      setTimeout(() => {
+        this.$emitter.emit('preserver-component:display', 'none')
+      }, (this.delay = 3000)) 
     },
   }, // end methods
 }

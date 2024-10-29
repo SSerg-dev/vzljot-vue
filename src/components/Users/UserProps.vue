@@ -500,7 +500,6 @@
             >
           </div>
         </fieldset>
-        <!-- $$ -->
         <fieldset
           v-if="
             $store.state.user?.userRights.isModerator ||

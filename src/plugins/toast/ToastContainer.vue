@@ -47,12 +47,12 @@ export default {
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  
+
   display: flex;
   flex-direction: column;
   align-items: center;
   pointer-events: none;
-  z-index: 99;
+  z-index: 9999;
 }
 
 .toast-items {
@@ -77,10 +77,15 @@ export default {
   opacity: 1;
 
   transform: translateY(-20px);
-  transition: opacity .3s ease, transform .3s ease;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 
   pointer-events: auto;
   position: relative;
+}
+
+* {
+  box-sizing: border-box;
+  z-index: 9999;
 }
 
 .item-1 {
@@ -111,6 +116,4 @@ export default {
 button {
   min-width: 42px;
 }
-
 </style>
-

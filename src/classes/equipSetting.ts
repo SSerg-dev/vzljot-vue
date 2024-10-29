@@ -57,7 +57,32 @@ export default class EquipSetting extends BaseObject {
       equipSettings: this.equipSettings,
     }
 
+    if (
+      EquipSetting.store?.state?.equip?.equipSettingTable &&
+      (EquipSetting.store.state.equip.equipSettingTable.action === 'add' ||
+        EquipSetting.store.state.equip.equipSettingTable.action === 'create')
+    ) {
+      EquipSetting.store.state.equip.equipSettingTable.timeStart =
+        new Date(
+          EquipSetting.store.state.equip.equipSettingTable.timeStart as Date
+        ) ?? new Date()
+
+      EquipSetting.store.state.equip.equipSettingTable.timeStart.setMinutes(
+        0,
+        0,
+        0
+      )
+
+      const timezoneOffset =
+        EquipSetting.store.state.equip.equipSettingTable.timeStart.getTimezoneOffset()
+
+      EquipSetting.store.state.equip.equipSettingTable.timeStart = new Date(
+        EquipSetting.store.state.equip.equipSettingTable.timeStart.getTime() -
+          timezoneOffset * 60 * 1000
+      )
+    }
     this.equipSettingTable = EquipSetting.store.state.equip.equipSettingTable
+
     if (this.equipSettingTable) {
       this.equipSettingTable.equipId =
         EquipSetting.store.state.card.selectedNodeId

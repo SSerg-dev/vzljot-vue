@@ -25,8 +25,9 @@
     />
 
     <div class="none" v-if="enumValue === 'none'"></div>
+    <div class="text" v-if="enumValue === 'text' && !readOnly">{{ this.param.value }}</div>
+    <div class="read-only" v-if="readOnly">{{ this.param.value }}</div>  
 
-    <div class="text" v-if="enumValue === 'text'">{{ this.param.value }}</div>
   </div>
 </template>
 
@@ -63,6 +64,7 @@ export default {
     inputValue: '',
     inputId: -1,
     inputName: '',
+    readOnly: false,
     hasTextType: null,
   }),
   computed: {
@@ -98,7 +100,7 @@ export default {
   },
   watch: {
     editName(newVal) {
-      this.edit(newVal) 
+      this.edit(newVal)
     },
   },
   created() {},
@@ -108,6 +110,7 @@ export default {
     this.inputValue = this.param.value
     this.inputId = this.param.id
     this.inputName = this.param.name
+    this.readOnly = this.param?.readOnly ?? false
   },
   beforeUnmount() {},
 
@@ -189,6 +192,15 @@ input {
   min-height: 22px;
   padding: 1px 4px;
   color: #ddd;
+  border: solid 1px;
+  border-radius: 3px;
+  border-color: #ddd;
+}
+.read-only {
+  min-width: 190px;
+  min-height: 22px;
+  padding: 1px 4px;
+  color: rgb(111, 111, 111);
   border: solid 1px;
   border-radius: 3px;
   border-color: #ddd;

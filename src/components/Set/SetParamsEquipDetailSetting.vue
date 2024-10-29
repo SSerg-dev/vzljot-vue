@@ -18,7 +18,7 @@
       />
     </tool-bar>
 
-    <div class="table-grid">
+    <div class="table-grid" :key="deltaFetch">
       <header class="header"></header>
       <header class="header"></header>
       <header class="header header-date">Наименование</header>
@@ -136,8 +136,14 @@ export default {
 
       action: null,
       equipSetting: new EquipSetting({}),
-
       remove: new Set(),
+
+      localItemNames: [],
+      delay: Object.freeze(200),
+      deltaDebounce: Object.freeze(200), 
+
+      fetchStart: 0,
+      fetchEnd: 200,
     }
   },
   created() {
@@ -147,6 +153,7 @@ export default {
     this.load()
   },
   mounted() {},
+
   computed: {
     ...mapGetters({
       getEquip: 'getEquip',
@@ -157,6 +164,9 @@ export default {
     },
     hasSelected() {
       return this.removeIds.length > 0 ? true : false
+    },
+    deltaFetch() {
+      return this.fetchEnd - this.fetchStart
     },
   },
   beforeUnmount() {
@@ -180,12 +190,14 @@ export default {
       this.pageInfo.Size = size
       this.pageInfo.Page = page
     },
+
     setEquipSettingTable(i, timeStart, properties) {
       const equipSettingTable = {
         id: this.dataItems[i]?.id ?? 0,
         equipId: this.$store.state.equip.id,
         timeStart,
         properties,
+        action: this.action,
       }
 
       const options = {
@@ -196,6 +208,7 @@ export default {
 
       this.$store.commit('setEquip', options)
     },
+
     async viewClick(r, i) {
       await this.load()
 
@@ -226,11 +239,18 @@ export default {
       this.edit = true
     },
     async onAddClick() {
-      // $$
-      this.localTimeStart = new Date() // this.getCurrentDate()
+      this.action = this.localItemsSorted[0].name ? 'add' : 'create'
+
+      if (this.action === 'add' || this.action === 'create') {
+        this.localItemNames = this.localItems.map((item) => item.name)
+      }
+
+      this.localTimeStart = new Date()
       this.localProperties = 0
+      this.localTimeStart.setMinutes(0, 0, 0)
 
       this.setEquipSettingTable(0, this.localTimeStart, this.localProperties)
+
       const detailArray = this.localItemsSorted[0].detailArray.map((item) => {
         if (item.value !== '') {
           item.value = ''
@@ -238,39 +258,19 @@ export default {
         return item
       })
 
-      this.action = this.localItemsSorted[0].name ? 'add' : 'create'
-
-      // $$
-      /*
-      if (this.action === 'add') {
-        const settingNewName = this.getCurrentDate()
-        console.log('$$ settingNewName', settingNewName)
-        
-        this.localItemsSorted.forEach( item => {
-          console.log('$$ this.item.name:', typeof item.name, item.name)
-          console.log('$$ settingNewName', typeof settingNewName, settingNewName)
-
-          if (item.name === settingNewName) {
-            console.log('$$ not add setting, this name exist: ', settingNewName) 
-          }
-        })
-      }
-      */
-
       this.localItemsSorted[0].timeStart = this.localTimeStart
       this.localItemsSorted[0].properties = this.localProperties
       this.localItemsSorted[0].name = ''
       this.localItemsSorted[0].detailArray = detailArray
-      const newEquipSetting = { ...this.localItemsSorted[0] } 
+      const newEquipSetting = { ...this.localItemsSorted[0] }
 
       const obj = new _Set(newEquipSetting)
       this.componentData = {
         component: 'set-component-new',
         uuid: null,
         image: obj.image,
-        // $$
         text: `Настройки: ${this.currentDate}`,
-        
+
         data: {
           uuid: obj.uuid,
           id: newEquipSetting.id,
@@ -280,13 +280,16 @@ export default {
         },
       }
       setTimeout(() => {
-        this.$emitter.emit('set-params-equip-setting:action', this.action)
+        const options = {
+          action: this.action,
+          itemNames: this.localItemNames,
+        }
+        this.$emitter.emit('set-params-equip-setting:action', options)
       }, 200)
 
       this.edit = true
     },
     async onRemoveClick() {
-      // $$
       await this.equipSetting.remove(this.removeIds)
       this.load()
     },
@@ -299,11 +302,16 @@ export default {
     },
     async load() {
       this.wait = true
-
       try {
+        this.fetchStart = new Date()
+
+        if (this.deltaFetch > 0 && this.deltaFetch < this.deltaDebounce) {
+          return
+        }
         const { data } = await this.$http.get('equip/equipSettings', {
           params: { equipId: this.getCard.selectedNodeId },
         })
+        this.fetchEnd = new Date()
 
         this.dataItems = data.data.values.map((r) => {
           return Object.assign(r, {

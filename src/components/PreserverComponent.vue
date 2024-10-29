@@ -7,7 +7,7 @@
       <v-button
         caption="Сохранить"
         @click="onSaveClick"
-        :disabled="saving || disabled"
+        :disabled="saving || disabled" 
       />
     </div>
   </div>
@@ -37,7 +37,7 @@ export default {
   },
   data() {
     return {
-      delay: 3000,
+      delay: 200,
     }
   },
   computed: {

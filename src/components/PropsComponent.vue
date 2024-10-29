@@ -112,6 +112,9 @@ export default {
                 this.$emitter.emit('beforeClose', { uuid: this.uuid })
               } else {
                 this.$emitter.emit('props-component:close')
+                this.$store.state.equip.equipEvent.hasCloseNotSave = true
+                this.$store.state.equip.equipEvent.hasChangeNotSave = false
+
                 this.$emit('close')
               }
             }
