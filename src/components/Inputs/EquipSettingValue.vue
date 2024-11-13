@@ -25,9 +25,10 @@
     />
 
     <div class="none" v-if="enumValue === 'none'"></div>
-    <div class="text" v-if="enumValue === 'text' && !readOnly">{{ this.param.value }}</div>
-    <div class="read-only" v-if="readOnly">{{ this.param.value }}</div>  
-
+    <div class="text" v-if="enumValue === 'text' && !readOnly">
+      {{ this.param.value }}
+    </div>
+    <div class="read-only" v-if="readOnly">{{ this.param.value }}</div>
   </div>
 </template>
 
@@ -135,10 +136,14 @@ export default {
     },
     handleOptionChange(event) {
       const selectedId =
-        +event.target.options[event.target.selectedIndex].getAttribute(
-          'data-id'
-        )
+        this.param.name !== 'Version'
+          ? +event.target.options[event.target.selectedIndex].getAttribute(
+              'data-id'
+            )
+          : event.target.selectedIndex
+
       const selectedValue = event.target.value
+
       const changedValues = {
         id: selectedId,
         caption: selectedValue,
@@ -150,16 +155,27 @@ export default {
     },
     hasSelected(item) {
       let result
+      const type = this.mode
       const selectElement = this.$refs.selectElement
 
-      if (item === this.values && this.mode !== 'new') {
-        selectElement.style.color = 'black'
-        result = true
-      } else {
-        // $$
-        // selectElement.style.color = 'white'
-        result = false
+      switch (type) {
+        case 'new':
+          selectElement.style.color = 'white'
+          result = true
+          break
+
+        case 'change':
+          if (item === this.values) {
+            selectElement.style.color = 'black'
+            result = true
+          }
+          break
+
+        default:
+          result = false
+          break
       }
+
       return result
     },
     hasDisabled(item) {
@@ -178,7 +194,7 @@ export default {
 <style scoped>
 select {
   min-width: 190px;
-  color: #ddd;
+  color: #fff;
   border-color: #ddd;
 }
 input {

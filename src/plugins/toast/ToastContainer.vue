@@ -52,7 +52,7 @@ export default {
   flex-direction: column;
   align-items: center;
   pointer-events: none;
-  z-index: 9999;
+  z-index: 99999;
 }
 
 .toast-items {
@@ -83,10 +83,7 @@ export default {
   position: relative;
 }
 
-* {
-  box-sizing: border-box;
-  z-index: 9999;
-}
+
 
 .item-1 {
   display: flex;

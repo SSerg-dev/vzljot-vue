@@ -81,7 +81,6 @@ export default {
       if (page === this.localPage && force === undefined) {
         return
       }
-
       this.$emit('go', parseInt(page), parseInt(this.localSize))
     }
   }

@@ -80,6 +80,16 @@ export default {
     this.$emitter.on('close', this.onCloseEvent)
     this.$emitter.on('endComponentWizard', this.onCloseEvent)
     this.$emitter.on('cancelComponentWizard', this.onCloseEvent)
+
+    this.$watch(
+      '$store.state.equip.equipEvent.hasChangeSave',
+      (value) => {
+        if (value) {
+          this.onClose()
+        }
+      },
+      { deep: true }
+    )
   },
   beforeUnmount() {
     this.$emitter.off('close', this.onCloseEvent)

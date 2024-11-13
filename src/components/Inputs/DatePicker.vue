@@ -302,7 +302,11 @@ export default {
       this.$emit('input', null)
     },
     vi(val) {
-      return val ? new Date(val) : new Date()
+      let date = val ? new Date(val) : new Date()
+      if (date.getFullYear() < 1970) {
+        date.setFullYear(1970)
+      }
+      return date
     },
     ok(date) {
       this.$emit('update:modelValue', date)

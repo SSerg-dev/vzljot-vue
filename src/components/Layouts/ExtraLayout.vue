@@ -78,17 +78,6 @@ export default {
       }
     },
     clickNavItem(item) {
-      // const itemTypes = ['address', 'balanceGroup', 'groupConnection', 'equip', 'equipList', 'node', 'point', 'pointGroup', 'pointList']
-      // if (itemTypes.includes(this.$store.state.env.itemTypes[this.selectedNode.type].type) && 
-      //   this.nodeTypes.includes(this.selectedNode.type)) {
-      //   this.$emitter.emit('beforeNodeChange', { node, target })
-      // } else {
-      //   node.$el = target.parentNode
-      //   this.select(node)
-      //   this.$el.focus() // for ie
-      // }
-
-
       this.items.forEach(r => (r.active = item === r))
       let component = null
       if (this.$store.state.env && this.$store.state.env.itemTypes[item.type]) {

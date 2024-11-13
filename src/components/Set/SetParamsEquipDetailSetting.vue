@@ -1,5 +1,5 @@
 <template>
-  <div>
+  <div class="component-detail">
     <tool-bar v-if="$store.state.user?.userRights.setEdit">
       <div
         :class="['button', 'fas', 'fa-plus-circle', { disabled: false }]"
@@ -11,27 +11,30 @@
           'button',
           'fas',
           'fa-times-circle',
-          { disabled: !hasSelected },
+          { disabled: !hasSelected || !hasRemoved },
         ]"
         title="Удалить"
         @click="onRemoveClick()"
       />
     </tool-bar>
 
-    <div class="table-grid" :key="deltaFetch">
+    <div
+      class="table-grid"
+      :style="{ 'grid-template-columns': `repeat(2, 38px) 240px` }"
+    >
       <header class="header"></header>
       <header class="header"></header>
       <header class="header header-date">Наименование</header>
 
       <div
-        v-for="(r, i) in localItemsSorted"
+        v-show="this.localItemsSorted[0]?.name"
+        v-for="(r, i) in localItems"
         :key="i"
         class="table-row"
         :ref="(el) => (rowsElement[r.id] = el)"
       >
         <span class="cell icon">
           <div
-            v-show="r.name !== ''"
             :class="`fas fa-tasks-alt clickable-icon`"
             @click="viewClick(r, i)"
             title="Просмотр..."
@@ -40,7 +43,6 @@
 
         <span class="cell box">
           <check-box
-            v-show="r.name !== ''"
             type="checkbox"
             v-model="r.checked"
             :disabled="false"
@@ -51,13 +53,17 @@
 
         <span class="cell caption">{{ `${r.name}` }}</span>
       </div>
-
-      <div class="pager-component-position">
-        <pager-component v-bind="pageInfo" @go="onChangePage" />
-      </div>
     </div>
 
+    <pager-component v-bind="pageInfo" @go="onChangePage" />
+
     <transition-group>
+      <wizard-remove
+        v-if="wizard"
+        v-bind="wizard"
+        @cancel="cancelWizard"
+        @end="onWizardEnd"
+      />
       <props-component v-if="edit" v-bind="componentData" @close="close">
         <component
           :is="componentData.component"
@@ -70,8 +76,6 @@
 </template>
 
 <script>
-let cancel = null
-
 import { asyncImport } from '@/plugins/api.js'
 import { Set as _Set } from '@/classes/set'
 import EquipSetting from '@/classes/equipSetting'
@@ -81,12 +85,26 @@ import PagerComponent from '@/components/PagerComponent.vue'
 import PropsComponent from '@/components/PropsComponent.vue'
 
 import ToolBar from '@/components/ToolBar.vue'
-import Wizard from '@/components/Wizard.vue'
+
+import WizardRemove from '@/plugins/wizardComponents/wizardConfirm/WizardRemove.vue'
 
 import DatePicker from '@/components/Inputs/DatePicker.vue'
 import CheckBox from '@/components/Inputs/CheckBox.vue'
 
 import { mapGetters } from 'vuex'
+
+const wizardRemove = () => {
+  return {
+    name: 'remove',
+    component: {
+      text: 'Удаление настроек прибора:',
+      component: 'message',
+      data: {
+        text: 'Вы действительно хотите удалить выбранные настройки прибора?',
+      },
+    },
+  }
+}
 
 export default {
   name: 'SetParamsEquipDetailSetting',
@@ -101,7 +119,7 @@ export default {
 
     PropsComponent,
     ToolBar,
-    Wizard,
+    WizardRemove,
     DatePicker,
     CheckBox,
   },
@@ -132,22 +150,34 @@ export default {
       localTimeStart: null,
       localProperties: null,
 
-      wizardEquipSetting: null,
-
       action: null,
       equipSetting: new EquipSetting({}),
       remove: new Set(),
 
       localItemNames: [],
       delay: Object.freeze(200),
-      deltaDebounce: Object.freeze(200), 
+      deltaDebounce: Object.freeze(200),
 
       fetchStart: 0,
       fetchEnd: 200,
+
+      removed: false,
     }
   },
   created() {
     this.$emitter.on('props-component:close', this.load)
+    this.$store.state.equip.equipEvent.hasConfirmSave = false
+
+    this.$watch(
+      '$store.state.equip.equipEvent.hasConfirmSave',
+      (value) => {
+        if (value) {
+          this.removeLocal()
+          this.$store.state.equip.equipEvent.hasConfirmSave = false
+        }
+      },
+      { deep: true }
+    )
 
     this.currentDate = this.getCurrentDate()
     this.load()
@@ -165,15 +195,18 @@ export default {
     hasSelected() {
       return this.removeIds.length > 0 ? true : false
     },
+    hasRemoved() {
+      return this.removed
+    },
     deltaFetch() {
       return this.fetchEnd - this.fetchStart
     },
   },
-  beforeUnmount() {
-    if (cancel) this.cancel()
-  },
+  beforeUnmount() {},
   methods: {
     handleCheckBox(index, event) {
+      this.removed = event
+
       const id = this.localItemsSorted[index].id
 
       if (this.remove.has(id)) {
@@ -186,11 +219,6 @@ export default {
         }
       }
     },
-    onChangePage(page, size) {
-      this.pageInfo.Size = size
-      this.pageInfo.Page = page
-    },
-
     setEquipSettingTable(i, timeStart, properties) {
       const equipSettingTable = {
         id: this.dataItems[i]?.id ?? 0,
@@ -289,9 +317,24 @@ export default {
 
       this.edit = true
     },
-    async onRemoveClick() {
-      await this.equipSetting.remove(this.removeIds)
-      this.load()
+    onRemoveClick() {
+      this.wizard = wizardRemove()
+    },
+    cancelWizard() {
+      this.wizard = null
+    },
+    onWizardEnd(data, name) {
+      this.wizard = null
+      if (name === 'remove' && !data) {
+        this.$store.state.equip.equipEvent.hasConfirmSave = true
+      }
+    },
+    async removeLocal() {
+      this.removed = await this.equipSetting.remove(this.removeIds)
+      this.removed = this.removed ? !this.removed : this.removed
+      await this.load()
+
+      this.$store.state.equip.equipEvent.hasConfirmSave = false
     },
 
     onSaved(data) {
@@ -325,7 +368,7 @@ export default {
           }
         })
 
-        this.localItemsSorted = this.localItems
+        this.localItemsSorted = [...this.localItems]
           .slice()
           .sort((a, b) => new Date(a.timeStart) - new Date(b.timeStart))
 
@@ -341,7 +384,7 @@ export default {
             const newParamValues = {}
             const newParamKeys = {}
 
-            if (versionItem && versionItem.paramValues) {
+            if (versionItem.paramValues) {
               const paramValues = versionItem.paramValues
 
               Object.keys(paramValues).forEach((key, index) => {
@@ -354,6 +397,7 @@ export default {
               })
               this.$store.state.equip.versionParamKeys = newParamKeys
             }
+
             this.localItemsSorted[0].detailArray[versionIndex].paramValues =
               newParamValues
           }
@@ -382,31 +426,11 @@ export default {
 </script>
 
 <style scoped>
-.table-grid {
-  grid-template-columns: repeat(2, 38px) 240px;
-}
 .header-date,
-.header-name,
-.header-value,
-.header-pass-check {
-  justify-content: center;
-}
-
 .box {
   justify-content: center;
 }
 .caption {
   justify-content: end;
-}
-
-.pager-component-position {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  background-color: #ecf0f6;
-
-  width: 100%;
-  position: absolute;
-  bottom: 0;
 }
 </style>

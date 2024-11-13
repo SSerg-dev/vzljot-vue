@@ -20,8 +20,8 @@
       </tabx>
       <tab v-if="$store.state.user?.userRights.equip" text="Настройки прибора">
         <equip-detail-setting
-        v-bind="{ equip: localItem }" 
-        @changed="onChanged"
+          v-bind="{ equip: localItem }"
+          @changed="onChanged"
         />
       </tab>
 
@@ -40,6 +40,7 @@
       <tab text="Архивы" v-if="$store.state.user?.userRights.pollDataView">
         <archive-component v-bind="{ id, type: 0 }" />
       </tab>
+
       <tab
         v-if="$store.state.user?.userRights.pollDataView && hasSet"
         text="Текущие данные"
@@ -66,15 +67,19 @@
       >
         <report-file-list v-bind="{ id, type: 21 }" />
       </tab>
+
       <tab v-if="$store.state.user?.userRights.equip" text="Файлы">
         <file-list v-bind="{ id, type: DBTYPE }" />
       </tab>
+
       <tab text="Состояние">
         <state-list v-bind="{ id, type: DBTYPE }" />
       </tab>
+
       <tab text="Уведомления">
         <system-messages v-bind="{ objectId: id, objectType: DBTYPE }" />
       </tab>
+
       <tab text="Журнал">
         <journal-list
           v-bind="{
@@ -222,6 +227,21 @@ export default defineComponent({
     const hasEquipSettingEdit = computed(
       () => store.state.equip.hasEquipSettingEdit
     )
+    const hasParam = computed(() => store.state.equip.equipTopNav?.hasParam)
+    const hasSetting = computed(() => store.state.equip.equipTopNav?.hasSetting)
+    const hasReport = computed(() => store.state.equip.equipTopNav?.hasReport)
+    const hasArchive = computed(() => store.state.equip.equipTopNav?.hasArchive)
+    const hasData = computed(() => store.state.equip.equipTopNav?.hasData)
+    const hasForm = computed(() => store.state.equip.equipTopNav?.hasForm)
+    const hasScheme = computed(() => store.state.equip.equipTopNav?.hasScheme)
+    const hasReadyReport = computed(
+      () => store.state.equip.equipTopNav?.hasReadyReport
+    )
+    const hasFile = computed(() => store.state.equip.equipTopNav?.hasFile)
+    const hasState = computed(() => store.state.equip.equipTopNav?.hasState)
+    const hasNotify = computed(() => store.state.equip.equipTopNav?.hasNotify)
+    const hasLog = computed(() => store.state.equip.equipTopNav?.hasLog)
+    // --
 
     onBeforeMount(() => {
       if (instance) {
@@ -230,7 +250,6 @@ export default defineComponent({
 
         emitter.on('equip-detail:equip', (equip: Equip) => {
           Object.assign(localEquip, equip)
-
         })
       }
     })
@@ -262,6 +281,18 @@ export default defineComponent({
 
       localEquip,
       hasEquipSettingEdit,
+      hasParam,
+      hasSetting,
+      hasReport,
+      hasArchive,
+      hasData,
+      hasForm,
+      hasScheme,
+      hasReadyReport,
+      hasFile,
+      hasState,
+      hasNotify,
+      hasLog,
     }
   },
 })

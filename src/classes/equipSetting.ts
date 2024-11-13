@@ -109,27 +109,24 @@ export default class EquipSetting extends BaseObject {
       props.equipSettings = this.equipSettings
     }
 
-    const versionParamKeys: any =
-      EquipSetting.store.state.equip.versionParamKeys
-
     const versionIndex = props.equipSettings?.findIndex(
       (item) => item.name === 'Version'
     )
 
     if (versionIndex !== -1) {
-      const versionItem = props.equipSettings?.find(
-        (item) => item.name === 'Version'
-      )
+      const versionParamKeys: any = {
+        ...EquipSetting.store.state.equip.versionParamKeys,
+      }
 
-      const versionSetting: any = props.equipSettings?.find(
-        (setting) => setting.name === 'Version'
-      )
+      const values: any = Object.values(versionParamKeys)
 
-      if (versionSetting) {
-        const keyIndex = versionSetting.id.toString()
+      let id
+      if (Array.isArray(EquipSetting.store.state.equip?.equipSettingSave)) {
+        id = EquipSetting.store.state.equip?.equipSettingSave[0]?.id
+      }
 
-        versionSetting.value =
-          versionParamKeys[keyIndex?.toString() ?? '0'] ?? '0'
+      if (Array.isArray(props?.equipSettings)) {
+        props.equipSettings[0].value = values[id] ?? '0'
       }
     }
 
@@ -162,6 +159,7 @@ export default class EquipSetting extends BaseObject {
         'equip/removeEquipSetting',
         { params: { ids } }
       )
+      return status === 200 ? true : false
     } catch (error) {
       console.error(`Error fetching equip/removeEquipSetting: ${error}`)
     }

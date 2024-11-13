@@ -1,7 +1,5 @@
 <template>
-  <div>
     <set-params-equip-detail-setting />
-  </div>
 </template>
 
 <script>
@@ -26,6 +24,8 @@ export default {
     return {
       localEquip: new Equip(this.equip),
       isVisible: false,
+
+      localEquipTopNav: {},
     }
   },
 
@@ -47,7 +47,7 @@ export default {
         equipTypeName: newValue.equipTypes[0].name,
       }
 
-      this.$store.commit('setEquip', options) 
+      this.$store.commit('setEquip', options)
       this.isVisible = true
     },
   },
@@ -70,7 +70,7 @@ export default {
   methods: {
     update(changedValues) {
       const options = {
-        equipSettingSave: changedValues,
+        equipSettingSave: changedValues, 
       }
       this.$store.commit('setEquip', options)
       this.onChange('equip-setting-update', changedValues)
@@ -80,13 +80,27 @@ export default {
     },
     onChange(prop, value) {
       this.$emit('changed', prop, value)
-    }
+      this.setEquipTopNav()
+    },
+    setEquipTopNav() {
+      /*
+      this.localEquipTopNav = {...this.$store.state.equip.equipTopNav }
+      
+      this.localEquipTopNav = Object.fromEntries(
+        // eslint-disable-next-line no-unused-vars
+        Object.entries(this.localEquipTopNav).map(([key, value]) => [key, false])
+      )
+      this.localEquipTopNav.hasSetting = true
+      this.$store.state.equip.equipTopNav = this.localEquipTopNav
+      */
+    },
+    
   }, // end methods
 }
 </script>
 
 <style scoped>
-.equip-grid { 
+.equip-grid {
   display: grid;
   gap: 5px 3px;
   min-width: 450px;

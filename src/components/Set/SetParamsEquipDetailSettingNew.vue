@@ -136,7 +136,7 @@ export default {
       localEditName: '',
       dateFormat: 'DD.MM.YYYY HH',
 
-      localTimeStart: null, 
+      localTimeStart: null,
       localProperties: null,
       localEquipSettingId: null,
       localEquipSettingSorted: [],
@@ -148,7 +148,8 @@ export default {
       hasExist: false,
       localItemNames: [],
       currentName: '',
-      delay: 1000,
+      delay: Object.freeze(2000),
+      isMessage: true,
     }
   },
 
@@ -157,6 +158,8 @@ export default {
 
     this.$emitter.on('equip-setting-value:update', this.change)
     this.$emitter.on('equip-setting-node:save', this.onSaveClick)
+
+    this.$store.state.equip.equipEvent.hasChangeSave = false
 
     this.pageInfo.Items =
       this.getEquip.equipSetting[
@@ -169,7 +172,7 @@ export default {
   },
 
   async mounted() {
-    this.hasChanges = false
+    this.hasChanges = true
   },
 
   computed: {
@@ -179,6 +182,9 @@ export default {
     editName() {
       return this.localEditName
     },
+    deltaSave() {
+      return this.saveEnd - this.saveStart
+    },
   },
 
   beforeUnmount() {
@@ -187,6 +193,8 @@ export default {
     }
     this.$store.commit('setEquip', options)
     this.$emitter.off('set-params-equip-setting:action')
+
+    this.$store.state.equip.equipEvent.hasChangeSave = false
   },
 
   methods: {
@@ -194,7 +202,6 @@ export default {
       this.$store.state.equip.equipSettingTable.action = options.action
       this.localAction = options.action
       this.localItemNames = options.itemNames
-      
     },
 
     init() {
@@ -210,7 +217,7 @@ export default {
 
       this.currentName = this.getCurrentDate(this.localTimeStart)
       setTimeout(() => {
-        this.hasExist = this.localItemNames.includes(this.currentName) 
+        this.hasExist = this.localItemNames.includes(this.currentName)
       }, 200)
 
       const options = {
@@ -230,11 +237,11 @@ export default {
     },
     handleEquipSettingDate(event, i) {
       this.localTimeStart = new Date(event)
-      this.localTimeStart.setMinutes(0, 0, 0) 
+      this.localTimeStart.setMinutes(0, 0, 0)
 
       this.currentName = this.getCurrentDate(this.localTimeStart)
       setTimeout(() => {
-        this.hasExist = this.localItemNames.includes(this.currentName) 
+        this.hasExist = this.localItemNames.includes(this.currentName)
       }, 200)
 
       this.setEquipSettingTable(i, this.localTimeStart, this.localProperties)
@@ -267,8 +274,11 @@ export default {
 
     async save() {
       if (this.hasExist) {
-        this.message()
-        return 
+        if (this.isMessage) {
+          this.message()
+        }
+        this.isMessage = !this.isMessage
+        return
       }
 
       try {
@@ -282,6 +292,7 @@ export default {
           'set-params-equip-setting:hasChanges',
           this.hasChanges
         )
+        this.$store.state.equip.equipEvent.hasChangeSave = true
       } catch (error) {
         if (error.response.status === 551) {
           this.error = error.response.data
@@ -310,12 +321,12 @@ export default {
       this.$emitter.emit('preserver-component:display', 'block')
 
       this.$toast.show(
-        `⚠️  Период с заданной датой начала уже существует.`,
-        (this.delay = 3000)
+        `⚠️  Настройки прибора с заданной датой начала уже существуют.`,
+        this.delay
       )
       setTimeout(() => {
         this.$emitter.emit('preserver-component:display', 'none')
-      }, (this.delay = 3000)) 
+      }, this.delay)
     },
   }, // end methods
 }

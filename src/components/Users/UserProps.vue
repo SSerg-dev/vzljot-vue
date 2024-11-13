@@ -515,7 +515,6 @@
               align-items: baseline;
             "
           >
-            <!-- $$ -->
             <!-- <info-list /> -->
           </div>
         </fieldset>

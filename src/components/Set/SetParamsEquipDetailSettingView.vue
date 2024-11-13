@@ -1,4 +1,5 @@
 <template>
+  <!-- <dialog ref="modal"> -->
   <div class="component-detail">
     <preserver-component
       v-bind="{
@@ -79,6 +80,7 @@
       </transition-group>
     </preserver-component>
   </div>
+  <!-- </dialog> -->
 </template>
 
 <script>
@@ -161,6 +163,7 @@ export default {
 
   async mounted() {
     this.hasChanges = false
+    this.showModal()
   },
 
   computed: {
@@ -278,7 +281,19 @@ export default {
       if (changedValues) {
         this.hasChanges = true
         this.$store.state.equip.equipEvent.hasChangeNotSave = true
-      } 
+      }
+    },
+    showModal() {
+      const modal = this.$refs.modal
+      if (modal) {
+        modal.showModal()
+      }
+    },
+    closeModal() {
+      const modal = this.$refs.modal
+      if (modal) {
+        modal.close()
+      }
     },
   }, // end methods
 }
@@ -345,4 +360,24 @@ export default {
 .check-box input {
   cursor: pointer;
 }
+/* modal */
+/* dialog {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+
+  width: 100%;
+  max-width: 100%;
+  height: 100%;
+  max-height: 100%;
+
+  border: 1px solid #ccc;
+  border-radius: 1px;
+  padding: 20px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+  
+}
+dialog::backdrop {
+  background: rgba(0, 0, 0, 0.5); 
+} */
 </style>
