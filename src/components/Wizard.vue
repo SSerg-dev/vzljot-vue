@@ -181,12 +181,15 @@ export default {
       deep: true,
     },
   },
+  // $$
+  /*
   created() {
      if (this.$store.state.equip.equipEvent.hasCloseNotSave) {
       this.onCancel()
       this.$store.state.equip.equipEvent.hasCloseNotSave = false
      }
   },
+  */
   computed: {
     hasNext() {
       return typeof this.currentComponent.next === 'function'

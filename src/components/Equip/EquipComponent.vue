@@ -51,7 +51,7 @@
             hasEquipEvents: hasEquipEvents,
             hasSetDataColdWater: hasSetDataColdWater,
             hasColdWater: hasColdWater,
-            hasTimeSync: hasTimeSync,
+            hasTimeSync: hasTimeSync, 
           }"
         />
       </tab>

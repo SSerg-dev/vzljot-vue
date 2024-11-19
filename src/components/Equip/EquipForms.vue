@@ -1,12 +1,35 @@
 <template>
   <div class="component-detail">
     <tool-bar>
-      <div v-if="$store.state.env.dbTypes.dbEquip" :class="['button', 'fas', 'fa-plus-circle', { disabled: wait }]" title="Добавить..." @click="onAddClick" />
-      <div v-if="$store.state.env.dbTypes.dbEquip" :class="['button', 'fas', 'fa-times-circle', { disabled: !hasSelected || wait }]" title="Удалить" @click="onRemoveClick()" />
+      <div
+        v-if="$store.state.env.dbTypes.dbEquip"
+        :class="['button', 'fas', 'fa-plus-circle', { disabled: wait }]"
+        title="Добавить..."
+        @click="onAddClick"
+      />
+      <div
+        v-if="$store.state.env.dbTypes.dbEquip"
+        :class="[
+          'button',
+          'fas',
+          'fa-times-circle',
+          { disabled: !hasSelected || wait },
+        ]"
+        title="Удалить"
+        @click="onRemoveClick()"
+      />
     </tool-bar>
-    <div class="table-grid" :style="{ 'grid-template-columns': `repeat(${columnsCount}, max-content)` }">
+    <div
+      class="table-grid"
+      :style="{
+        'grid-template-columns': `repeat(${columnsCount}, max-content)`,
+      }"
+    >
       <header class="header" />
-      <header class="header" v-if="$store.state.user?.userRights.measureSchemeGroupEdit" />
+      <header
+        class="header"
+        v-if="$store.state.user?.userRights.measureSchemeGroupEdit"
+      />
       <header class="header">Наименование</header>
       <header class="header">Данные</header>
       <div v-for="(r, index) in localItems" :key="index" class="table-row">
@@ -23,16 +46,25 @@
     <pager-component v-bind="pageInfo" @go="onChangePage" />
     <spinner :show="wait" :text="'Загрузка...'" />
     <transition-group>
-      <wizard v-if="wizard" v-bind="wizard" @cancel="cancelWizard" @end="onWizardEnd" />
-      <props-component v-if="formData" :text="`Отчетная форма: ${getText(currentForm)}`" @close="close">
+      <wizard
+        v-if="wizard"
+        v-bind="wizard"
+        @cancel="cancelWizard"
+        @end="onWizardEnd"
+      />
+      <props-component
+        v-if="formData"
+        :text="`Отчетная форма: ${getText(currentForm)}`"
+        @close="close"
+      >
         <form-component v-bind="formData" @loaded="onFormLoaded($event)" />
-      </props-component>
-    </transition-group>
+      </props-component> 
+    </transition-group> 
   </div>
 </template>
 
 <script>
-let wizardAdd = value => {
+let wizardAdd = (value) => {
   return {
     name: 'add',
     component: {
@@ -40,8 +72,8 @@ let wizardAdd = value => {
       component: 'form-params',
       event: 'changed',
       isLast: true,
-      data: value
-    }
+      data: value,
+    },
   }
 }
 
@@ -52,9 +84,9 @@ const wizardRemove = () => {
       text: 'Удаление отчетных форм:',
       component: 'message',
       data: {
-        text: 'Вы действительно хотите удалить отчетные формы?'
-      }
-    }
+        text: 'Вы действительно хотите удалить отчетные формы?',
+      },
+    },
   }
 }
 
@@ -73,11 +105,11 @@ export default {
     PagerComponent,
     PropsComponent,
     ToolBar,
-    Wizard
+    Wizard,
   },
   extends: ListComponent,
   props: {
-    id: Number
+    id: Number,
   },
   data() {
     return {
@@ -85,7 +117,7 @@ export default {
       wait: false,
       formData: null,
       wizard: null,
-      currentForm: null
+      currentForm: null,
     }
   },
   computed: {
@@ -103,7 +135,7 @@ export default {
         if (this.getText(a.name) < this.getText(b.name)) return -1
         if (this.getText(a.name) > this.getText(b.name)) return 1
       })
-    }
+    },
   },
   async mounted() {
     await this.load(this.id)
@@ -113,13 +145,18 @@ export default {
       this.wait = true
       try {
         let {
-          data: { forms, reports }
+          data: { forms, reports },
         } = await this.$http.get('equipReport/reports', { params: { id } })
 
         this.forms = forms
 
-        if (this.$store.state.user?.userRights && this.$store.state.user?.userRights.equipEdit) {
-          this.dataItems = reports.map(r => Object.assign(r, { checked: false }))
+        if (
+          this.$store.state.user?.userRights &&
+          this.$store.state.user?.userRights.equipEdit
+        ) {
+          this.dataItems = reports.map((r) =>
+            Object.assign(r, { checked: false })
+          )
         } else {
           this.dataItems = reports
         }
@@ -131,7 +168,7 @@ export default {
     },
     onUpdate(item) {
       if (this.$store.state.env.itemTypes[item.type].type === 'equipForm') {
-        let prop = this.dataItems.find(r => r.id === item.id)
+        let prop = this.dataItems.find((r) => r.id === item.id)
 
         if (prop) {
           prop.report = item.report
@@ -151,14 +188,14 @@ export default {
             winter: item.winter,
             summer: item.summer,
             landscape: item.landscape,
-            checked: false
+            checked: false,
           })
         }
       }
     },
     onDelete(obj) {
       if (this.$store.state.env.itemTypes[obj.type].type === 'equipForm') {
-        const index = this.dataItems.findIndex(r => r.id === obj.id)
+        const index = this.dataItems.findIndex((r) => r.id === obj.id)
 
         if (index >= 0) {
           this.dataItems.splice(index, 1)
@@ -175,25 +212,29 @@ export default {
       const model = {
         reportForm: new form({
           objectId: this.id,
-          type: this.$store.state.env.dbTypes.dbEquip
+          type: this.$store.state.env.dbTypes.dbEquip,
         }),
-        forms: this.forms
+        forms: this.forms,
       }
-
       if (Object.values(this.forms).length > 0) {
         model.reportForm.report = Object.values(this.forms)[0].id
-        model.reportForm.source = Object.values(this.forms)[0].sources.reduce((acc, current) => acc + current)
-        model.reportForm.pattern = Object.values(this.forms)[0].patterns.length > 0 ? Object.values(this.forms)[0].patterns[0].name : null
+        model.reportForm.source = Object.values(this.forms)[0].sources.reduce(
+          (acc, current) => acc + current
+        )
+        model.reportForm.pattern =
+          Object.values(this.forms)[0].patterns.length > 0
+            ? Object.values(this.forms)[0].patterns[0].name
+            : null
       }
 
-      this.wizard = wizardAdd(model)
+      this.wizard = wizardAdd(model) 
     },
     viewClick(row) {
       this.formData = {
         id: row.id,
         type: this.matchType(this.$store.state.env.itemTypes).equipForm,
         formType: this.$store.state.env.dbTypes.dbEquip,
-        forms: this.forms
+        forms: this.forms,
       }
     },
     onRemoveClick() {
@@ -212,7 +253,7 @@ export default {
     async remove() {
       this.wait = true
       try {
-        let values = this.dataItems.filter(r => r.checked).map(r => r.id)
+        let values = this.dataItems.filter((r) => r.checked).map((r) => r.id)
         await this.$http.delete('equipReport/reports', { params: { values } })
       } catch (error) {
         this.$store.commit('error', error)
@@ -224,20 +265,27 @@ export default {
       let text = ''
 
       if (value && value.report !== null) {
-        text = `${this.forms[value.report].name}${value.pattern ? `, ${value.pattern}` : ''}`
+        text = `${this.forms[value.report].name}${
+          value.pattern ? `, ${value.pattern}` : ''
+        }`
       }
 
       return text
     },
     getSourceText(source) {
       let text = ''
-      Object.keys(this.$store.state.env.reportDataSource).forEach(value => {
-        if (source & value && value != this.$store.getters.reversedReportDataSource.all) {
-          text += `${text ? ', ' : ''}${this.$store.state.env.reportDataSource[value].text}`
+      Object.keys(this.$store.state.env.reportDataSource).forEach((value) => {
+        if (
+          source & value &&
+          value != this.$store.getters.reversedReportDataSource.all
+        ) {
+          text += `${text ? ', ' : ''}${
+            this.$store.state.env.reportDataSource[value].text
+          }`
         }
       })
       return text
-    }
-  }
+    },
+  },
 }
 </script>

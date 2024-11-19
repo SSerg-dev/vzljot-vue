@@ -291,7 +291,7 @@ export default {
     getCursorPosition(element) {
       let position = 0
 
-      if (element.selectionStart || element.selectionStart === 0) {
+      if (element.selectionStart || element.selectionStart === 0) { 
         position = element.selectionStart
       }
 

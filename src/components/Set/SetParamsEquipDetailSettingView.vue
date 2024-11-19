@@ -254,6 +254,9 @@ export default {
     },
 
     async save() {
+      if (!this.$store.state.equip.equipTopNav.hasSetting) {
+        return
+      }
       try {
         this.saving = true
         this.error = {}

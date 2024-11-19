@@ -72,8 +72,7 @@ export default class EquipSetting extends BaseObject {
         0,
         0
       )
-
-      const timezoneOffset =
+      const timezoneOffset = 
         EquipSetting.store.state.equip.equipSettingTable.timeStart.getTimezoneOffset()
 
       EquipSetting.store.state.equip.equipSettingTable.timeStart = new Date(
@@ -81,6 +80,17 @@ export default class EquipSetting extends BaseObject {
           timezoneOffset * 60 * 1000
       )
     }
+ 
+    if (EquipSetting.store?.state?.equip?.equipSettingTable) {
+
+      const checkYear =
+        EquipSetting.store.state.equip.equipSettingTable.timeStart
+      if (checkYear instanceof Date && checkYear.getFullYear() < 1970) {
+        checkYear.setFullYear(1970)
+        EquipSetting.store.state.equip.equipSettingTable.timeStart = checkYear
+      }
+    }
+
     this.equipSettingTable = EquipSetting.store.state.equip.equipSettingTable
 
     if (this.equipSettingTable) {
@@ -105,6 +115,7 @@ export default class EquipSetting extends BaseObject {
       }
     }
     this.equipSettings = EquipSetting.store.state.equip.equipSettingSave
+
     if (this.equipSettings) {
       props.equipSettings = this.equipSettings
     }

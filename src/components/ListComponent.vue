@@ -6,7 +6,7 @@ export default {
   props: {
     items: {
       type: Array,
-      default: () => [],
+      default: () => [], 
     },
   },
   data() {
@@ -45,6 +45,16 @@ export default {
           this.pageInfo.Items = value
         }
       }
+    )
+
+    this.$watch(
+      '$store.state.equip.equipEvent.hasEmptyDateSet',
+      (value) => {
+        value
+          ? (this.pageInfo.Items = 0)
+          : (this.pageInfo.Items = this.filteredItems.length)
+      },
+      { deep: true }
     )
 
     this.pageInfo.Items = this.filteredItems.length

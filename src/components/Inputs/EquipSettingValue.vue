@@ -112,6 +112,7 @@ export default {
     this.inputId = this.param.id
     this.inputName = this.param.name
     this.readOnly = this.param?.readOnly ?? false
+
   },
   beforeUnmount() {},
 
@@ -150,7 +151,7 @@ export default {
         name: this.param.name,
         value: selectedId.toString(),
       }
-
+      
       this.$emitter.emit('equip-setting-value:update', changedValues)
     },
     hasSelected(item) {

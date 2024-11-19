@@ -1,6 +1,6 @@
 <template>
   <div class="component-detail">
-    <tool-bar v-if="$store.state.user?.userRights.setEdit">
+    <tool-bar v-if="$store.state.user?.userRights.equipEdit">
       <div
         :class="['button', 'fas', 'fa-plus-circle', { disabled: false }]"
         title="Добавить..."
@@ -11,7 +11,7 @@
           'button',
           'fas',
           'fa-times-circle',
-          { disabled: !hasSelected || !hasRemoved },
+          { disabled: !hasSelected || hasRemoved },
         ]"
         title="Удалить"
         @click="onRemoveClick()"
@@ -27,7 +27,7 @@
       <header class="header header-date">Наименование</header>
 
       <div
-        v-show="this.localItemsSorted[0]?.name"
+        v-show="localItemsSorted[0]?.name"
         v-for="(r, i) in localItems"
         :key="i"
         class="table-row"
@@ -58,7 +58,7 @@
     <pager-component v-bind="pageInfo" @go="onChangePage" />
 
     <transition-group>
-      <wizard-remove
+      <wizard-message
         v-if="wizard"
         v-bind="wizard"
         @cancel="cancelWizard"
@@ -86,25 +86,13 @@ import PropsComponent from '@/components/PropsComponent.vue'
 
 import ToolBar from '@/components/ToolBar.vue'
 
-import WizardRemove from '@/plugins/wizardComponents/wizardConfirm/WizardRemove.vue'
+import WizardMessage from '@/plugins/wizardComponents/wizardConfirm/WizardMessage.vue'
+import { wizardMessage } from '@/plugins/wizardComponents/wizardConfirm/wizardMessage'
 
 import DatePicker from '@/components/Inputs/DatePicker.vue'
 import CheckBox from '@/components/Inputs/CheckBox.vue'
 
 import { mapGetters } from 'vuex'
-
-const wizardRemove = () => {
-  return {
-    name: 'remove',
-    component: {
-      text: 'Удаление настроек прибора:',
-      component: 'message',
-      data: {
-        text: 'Вы действительно хотите удалить выбранные настройки прибора?',
-      },
-    },
-  }
-}
 
 export default {
   name: 'SetParamsEquipDetailSetting',
@@ -119,7 +107,7 @@ export default {
 
     PropsComponent,
     ToolBar,
-    WizardRemove,
+    WizardMessage,
     DatePicker,
     CheckBox,
   },
@@ -162,6 +150,7 @@ export default {
       fetchEnd: 200,
 
       removed: false,
+      localRemoved: false,
     }
   },
   created() {
@@ -179,10 +168,24 @@ export default {
       { deep: true }
     )
 
+    this.$watch(
+      'localItems',
+      (value) => {
+        if (value) {
+          this.localItems[0]?.name === ''
+            ? (this.$store.state.equip.equipEvent.hasEmptyDateSet = true)
+            : (this.$store.state.equip.equipEvent.hasEmptyDateSet = false)
+        }
+      },
+      { deep: true }
+    )
+
     this.currentDate = this.getCurrentDate()
     this.load()
   },
-  mounted() {},
+  mounted() {
+    this.$store.state.equip.equipTopNav.hasSetting = true
+  },
 
   computed: {
     ...mapGetters({
@@ -196,13 +199,16 @@ export default {
       return this.removeIds.length > 0 ? true : false
     },
     hasRemoved() {
-      return this.removed
+      return this.localRemoved
     },
     deltaFetch() {
       return this.fetchEnd - this.fetchStart
     },
   },
-  beforeUnmount() {},
+  beforeUnmount() {
+    this.$store.state.equip.equipEvent.hasEmptyDateSet = false
+    this.$store.state.equip.equipTopNav.hasSetting = false
+  },
   methods: {
     handleCheckBox(index, event) {
       this.removed = event
@@ -318,8 +324,19 @@ export default {
       this.edit = true
     },
     onRemoveClick() {
-      this.wizard = wizardRemove()
+      const options = {
+        name: 'remove',
+        component: {
+          text: 'Удаление настроек прибора:',
+          component: 'message',
+          data: {
+            text: 'Вы действительно хотите удалить выбранные настройки прибора?',
+          },
+        },
+      }
+      this.wizard = wizardMessage(options)
     },
+
     cancelWizard() {
       this.wizard = null
     },
@@ -330,10 +347,15 @@ export default {
       }
     },
     async removeLocal() {
-      this.removed = await this.equipSetting.remove(this.removeIds)
-      this.removed = this.removed ? !this.removed : this.removed
-      await this.load()
+      this.localRemoved = await this.equipSetting.remove(this.removeIds)
 
+      this.localRemoved = this.localRemoved
+        ? !this.localRemoved
+        : this.localRemoved
+        
+      this.remove.clear()
+
+      await this.load()
       this.$store.state.equip.equipEvent.hasConfirmSave = false
     },
 
@@ -403,7 +425,7 @@ export default {
           }
         }
       } catch (error) {
-        this.$store.commit('error', error)
+        this.$store.commit('error', error) 
       } finally {
         this.wait = false
       }

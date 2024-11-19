@@ -72,6 +72,7 @@ export default {
       const options = {
         equipSettingSave: changedValues, 
       }
+
       this.$store.commit('setEquip', options)
       this.onChange('equip-setting-update', changedValues)
     },

@@ -64,12 +64,6 @@
       <pager-component v-bind="this.pageInfo" @go="onChangePage" />
 
       <transition-group>
-        <wizard
-          v-if="wizard"
-          v-bind="wizard"
-          @cancel="cancelWizard"
-          @end="onWizardEnd"
-        />
         <props-component v-if="edit" v-bind="componentData" @close="close">
           <component
             :is="componentData.component"
@@ -95,6 +89,8 @@ import PreserverComponent from '@/components/PreserverComponent.vue'
 import DatePicker from '@/components/Inputs/DatePicker.vue'
 import CheckBox from '@/components/Inputs/CheckBox.vue'
 import EquipSettingValue from '@/components/Inputs/EquipSettingValue.vue'
+
+import { wizardMessage } from '@/plugins/wizardComponents/wizardConfirm/wizardMessage'
 
 import { mapGetters } from 'vuex'
 
@@ -149,7 +145,6 @@ export default {
       localItemNames: [],
       currentName: '',
       delay: Object.freeze(2000),
-      isMessage: true,
     }
   },
 
@@ -160,6 +155,7 @@ export default {
     this.$emitter.on('equip-setting-node:save', this.onSaveClick)
 
     this.$store.state.equip.equipEvent.hasChangeSave = false
+    this.$store.state.equip.equipEvent.hasExistDateSet = false
 
     this.pageInfo.Items =
       this.getEquip.equipSetting[
@@ -171,7 +167,7 @@ export default {
     this.init()
   },
 
-  async mounted() {
+  mounted() {
     this.hasChanges = true
   },
 
@@ -195,6 +191,7 @@ export default {
     this.$emitter.off('set-params-equip-setting:action')
 
     this.$store.state.equip.equipEvent.hasChangeSave = false
+    this.$store.state.equip.equipEvent.hasExistDateSet = false
   },
 
   methods: {
@@ -210,7 +207,7 @@ export default {
         .sort((a, b) => new Date(a.timeStart) - new Date(b.timeStart))
 
       this.localEquipSettingId =
-        this.localEquipSettingSorted[this.getEquip.equipSettingIndex].id
+        this.localEquipSettingSorted[this.getEquip.equipSettingIndex]?.id
 
       this.localTimeStart = new Date()
       this.localProperties = 0
@@ -273,11 +270,16 @@ export default {
     },
 
     async save() {
+      if (!this.$store.state.equip.equipTopNav.hasSetting) {
+        return
+      }
+
       if (this.hasExist) {
-        if (this.isMessage) {
-          this.message()
-        }
-        this.isMessage = !this.isMessage
+        this.$store.commit('notification', {
+          title: 'Настройки прибора',
+          type: 'error',
+          text: 'Настройки прибора с заданной датой начала уже существуют.',
+        })
         return
       }
 
@@ -309,7 +311,6 @@ export default {
       }
     },
     getCurrentDate(now) {
-      // const now = new Date()
       const day = String(now.getDate()).padStart(2, '0')
       const month = String(now.getMonth() + 1).padStart(2, '0')
       const year = now.getFullYear()
@@ -317,16 +318,26 @@ export default {
 
       return `${day}-${month}-${year} ${hours}`
     },
+    cancelWizard() {
+      this.wizard = null
+    },
+    onWizardEnd() {
+      this.wizard = null
+    },
     message() {
-      this.$emitter.emit('preserver-component:display', 'block')
+      this.$store.state.equip.equipEvent.hasExistDateSet = true
 
-      this.$toast.show(
-        `⚠️  Настройки прибора с заданной датой начала уже существуют.`,
-        this.delay
-      )
-      setTimeout(() => {
-        this.$emitter.emit('preserver-component:display', 'none')
-      }, this.delay)
+      const options = {
+        name: 'exist',
+        component: {
+          text: 'Настройки прибора:',
+          component: 'message',
+          data: {
+            text: 'Настройки прибора с заданной датой начала уже существуют.',
+          },
+        },
+      }
+      this.wizard = wizardMessage(options)
     },
   }, // end methods
 }

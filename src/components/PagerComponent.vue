@@ -1,10 +1,57 @@
 <template>
   <div class="pager">
-    <div v-if="totalPages > 1" :class="['link-fast', 'fas', 'fa-angle-double-left', { disabled: localPage == 1 }]" @click="go(1)" title="В начало"></div>
-    <div v-if="totalPages > 1" :class="['link-fast', 'fas', 'fa-angle-left', { disabled: localPage == 1 }]" @click="go(localPage - 1)" title="Назад"></div>
-    <div v-for="(button, index) in buttons" :key="index" :class="['link', { selected: localPage == button }]" @click="go(button)">{{ button }}</div>
-    <div v-if="totalPages > 1" :class="['link-fast', 'fas', 'fa-angle-right', { disabled: localPage == totalPages }]" @click="go(localPage + 1)" title="Вперед"></div>
-    <div v-if="totalPages > 1" :class="['link-fast', 'fas', 'fa-angle-double-right', { disabled: localPage == totalPages }]" @click="go(totalPages)" title="В конец"></div>
+    <div
+      v-if="totalPages > 1"
+      :class="[
+        'link-fast',
+        'fas',
+        'fa-angle-double-left',
+        { disabled: localPage == 1 },
+      ]"
+      @click="go(1)"
+      title="В начало"
+    ></div>
+    <div
+      v-if="totalPages > 1"
+      :class="[
+        'link-fast',
+        'fas',
+        'fa-angle-left',
+        { disabled: localPage == 1 },
+      ]"
+      @click="go(localPage - 1)"
+      title="Назад"
+    ></div>
+    <div
+      v-for="(button, index) in buttons"
+      :key="index"
+      :class="['link', { selected: localPage == button }]"
+      @click="go(button)"
+    >
+      {{ button }}
+    </div>
+    <div
+      v-if="totalPages > 1"
+      :class="[
+        'link-fast',
+        'fas',
+        'fa-angle-right',
+        { disabled: localPage == totalPages },
+      ]"
+      @click="go(localPage + 1)"
+      title="Вперед"
+    ></div>
+    <div
+      v-if="totalPages > 1"
+      :class="[
+        'link-fast',
+        'fas',
+        'fa-angle-double-right',
+        { disabled: localPage == totalPages },
+      ]"
+      @click="go(totalPages)"
+      title="В конец"
+    ></div>
     <div class="comment">
       Строк на странице:
       <select v-model="localSize" @change="go(1, true)">
@@ -26,14 +73,14 @@ export default {
     Items: Number,
     buttonsCount: {
       type: Number,
-      default: 8
-    }
+      default: 8,
+    },
   },
   data() {
     return {
       localItems: this.Items,
       localPage: this.Page,
-      localSize: this.Size
+      localSize: this.Size,
     }
   },
   computed: {
@@ -63,7 +110,7 @@ export default {
       }
 
       return arr
-    }
+    },
   },
   watch: {
     Items(value) {
@@ -74,7 +121,7 @@ export default {
     },
     Size(value) {
       this.localSize = value
-    }
+    },
   },
   methods: {
     go(page, force) {
@@ -82,8 +129,8 @@ export default {
         return
       }
       this.$emit('go', parseInt(page), parseInt(this.localSize))
-    }
-  }
+    },
+  },
 }
 </script>
 

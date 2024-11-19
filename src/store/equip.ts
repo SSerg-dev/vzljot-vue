@@ -40,9 +40,15 @@ export interface EquipSettingTable {
 export interface EquipEvent {
   hasCloseNotSave: boolean
   hasChangeNotSave: boolean
-  //hasCloseSave: boolean
   hasChangeSave: boolean
   hasConfirmSave: boolean
+  hasExistDateSet: boolean
+  hasEmptyDateSet: boolean
+}
+
+export interface EquipModalEvent {
+  hasOkVisible:  boolean
+  hasCancelVisible: boolean
 }
 
 export interface EquipTopNav {
@@ -96,22 +102,23 @@ export const equip: Equip = {
   equipEvent: {
     hasCloseNotSave: false,
     hasChangeNotSave: false,
-    // hasCloseSave: false,
     hasChangeSave: false,
-    hasConfirmSave: false
+    hasConfirmSave: false,
+    hasExistDateSet: false,
+    hasEmptyDateSet: false
   },
   equipTopNav: {
-    hasParam: true,
-    hasSetting: true,
-    hasReport: true,
-    hasArchive: true,
-    hasData: true,
-    hasForm: true,
-    hasScheme: true,
-    hasReadyReport: true,
-    hasFile: true,
-    hasState: true,
-    hasNotify: true,
-    hasLog: true,
+    hasParam: false,
+    hasSetting: false,
+    hasReport: false,
+    hasArchive: false,
+    hasData: false,
+    hasForm: false,
+    hasScheme: false,
+    hasReadyReport: false,
+    hasFile: false,
+    hasState: false,
+    hasNotify: false,
+    hasLog: false,
   },
 }
