@@ -28,7 +28,9 @@
 
       <div
         v-show="localItemsSorted[0]?.name"
-        v-for="(r, i) in localItems"
+        v-for="(r, i) in localItems.sort(
+          (a, b) => new Date(a.timeStart) - new Date(b.timeStart)
+        )"
         :key="i"
         class="table-row"
         :ref="(el) => (rowsElement[r.id] = el)"
@@ -352,7 +354,7 @@ export default {
       this.localRemoved = this.localRemoved
         ? !this.localRemoved
         : this.localRemoved
-        
+
       this.remove.clear()
 
       await this.load()
@@ -425,7 +427,7 @@ export default {
           }
         }
       } catch (error) {
-        this.$store.commit('error', error) 
+        this.$store.commit('error', error)
       } finally {
         this.wait = false
       }

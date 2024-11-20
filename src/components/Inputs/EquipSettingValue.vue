@@ -40,6 +40,7 @@ const EquipSettingParamValueTypeEnum = Object.freeze({
   string: 'string',
   list: 'list',
   text: 'text',
+  default: 'default'
 })
 
 export default {
@@ -73,7 +74,14 @@ export default {
       getEquip: 'getEquip',
     }),
     enumValue() {
-      const { valueType, readOnly } = this.param
+      const { caption, valueType, readOnly, defaultValue } = this.param
+      
+      console.log('---------------------------------------', )
+      console.log('$$ this.param', JSON.stringify(caption))
+      console.log('$$ valueType', JSON.stringify(valueType))
+      console.log('$$ readOnly', JSON.stringify(readOnly))
+      console.log('$$ defaultValue',  JSON.stringify(defaultValue))
+
       let result
 
       switch (valueType) {
@@ -96,15 +104,18 @@ export default {
           break
       }
 
+
       return result
     },
   },
   watch: {
-    editName(newVal) {
-      this.edit(newVal)
+    editName(value) {
+      this.edit(value)
     },
   },
-  created() {},
+  created() {
+    
+  },
   mounted() {
     this.items = this.param.paramValues
     this.values = this.param.value
