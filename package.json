@@ -1,0 +1,66 @@
+{
+  "name": "sp",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "serve": "vue-cli-service serve",
+    "build": "vue-cli-service build",
+    "lint": "vue-cli-service lint",
+    "dev": "vue-cli-service build --mode development"
+  },
+  "dependencies": {
+    "@devexpress/analytics-core": "^21.2.6",
+    "@microsoft/signalr": "^6.0.3",
+    "axios": "^0.26.0",
+    "bowser": "^2.11.0",
+    "core-js": "^3.8.3",
+    "devexpress-reporting": "^21.2.6",
+    "devextreme": "^21.2.6",
+    "leaflet": "^1.7.1",
+    "leaflet.markercluster": "^1.5.3",
+    "mitt": "^3.0.0",
+    "uuid": "^8.3.2",
+    "vue": "^3.2.13",
+    "vuex": "^4.0.2"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.12.16",
+    "@babel/eslint-parser": "^7.12.16",
+    "@types/uuid": "^8.3.4",
+    "@typescript-eslint/eslint-plugin": "^5.4.0",
+    "@typescript-eslint/parser": "^5.4.0",
+    "@vue/cli-plugin-babel": "~5.0.0",
+    "@vue/cli-plugin-eslint": "~5.0.0",
+    "@vue/cli-plugin-typescript": "^5.0.4",
+    "@vue/cli-service": "~5.0.0",
+    "@vue/eslint-config-typescript": "^9.1.0",
+    "eslint": "^8.16.0",
+    "eslint-plugin-vue": "^9.1.0",
+    "typescript": "~4.5.5",
+    "webpack": "^5.91.0"
+  },
+  "eslintConfig": {
+    "root": true,
+    "env": {
+      "node": true
+    },
+    "extends": [
+      "plugin:vue/vue3-essential",
+      "eslint:recommended",
+      "@vue/typescript"
+    ],
+    "parserOptions": {
+      "parser": "@typescript-eslint/parser"
+    },
+    "rules": {
+      "no-undef": 0,
+      "no-prototype-builtins": 0
+    }
+  },
+  "browserslist": [
+    "> 1%",
+    "last 2 versions",
+    "not dead",
+    "not ie 11"
+  ]
+}

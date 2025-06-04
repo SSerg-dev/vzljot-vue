@@ -1,0 +1,60 @@
+.tabs-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: auto;
+  width: 100%;
+}
+
+.tabs-container > .tabs {
+  display: inline-flex;
+  padding: 0 0 5px;
+  font-weight: bold;
+  background-color: white;
+}
+
+.tabs-container > .tabs > .tab {
+  display: inline-block;
+  padding: 5px 10px;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.3s ease-out;
+  user-select: none;
+}
+
+.tabs-container > .tabs > .tab:hover {
+  text-decoration: underline;
+}
+
+.tabs-container > .tabs > .tab.active {
+  cursor: default;
+  color: #48525c;
+  text-decoration: underline;
+}
+
+.tabs-container > .content {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  position: relative;
+  overflow: auto;
+}
+
+.tabs-container > .content > .tab {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: auto;
+  position: relative;
+  padding: 2px 5px;
+}
+
+/* .tab-enter-active,
+.tab-leave-active {
+  transition: all 0.5s;
+}
+
+.tab-enter-from,
+.tab-leave-to {
+  transform: translateX(100%);
+} */
